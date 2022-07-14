@@ -9,7 +9,7 @@ import itertools
 import sequence_alignments as sa
 
 # Update this to look at the known gene sequences, then take the front length & back length and compare.
-length = 9
+length = 10
 genome = 'hg19'
 output_on = True
 
@@ -19,7 +19,7 @@ master_freq = ["33P", "33Ran", "55P", "55Ran"]
 start_index = 0
 end_index = 100
 
-outputpath = pathlib.Path.cwd() / "Data_Files" / "GNum" / f"Len_{length}"
+outputpath = pathlib.Path.cwd() / "Data_Files" / "GNum" / "Selected_Samples" /f"Len_{length}"
 
 try:
     outputpath.mkdir(parents=True, exist_ok=False)
@@ -29,7 +29,6 @@ else:
     print(f"Path {outputpath} was created")
 
 ut_file_name = "UTData_cds.csv"
-starting_index = {f"{ut_file_name}": 0} 
 
 
 def frequency_results(input_dataframe: pandas.DataFrame, name: str):
@@ -125,6 +124,8 @@ with open(pathlib.Path.cwd() / "Data_Files" / "Sequence_Files" / f"{genome.upper
 
 
 utdata = utdata.drop_duplicates(subset=['Hgene', 'Tgene'])
+utdata = utdata[utdata["SeqLen"] > 1000]
+utdata = utdata.sample(n=10)
 
 # fg_rows -> the rows of the fusion genes
 fg_rows, _ = utdata.shape
@@ -186,6 +187,8 @@ for fgrow in range(fg_rows):
     tail_subframe = exon_refseq[(exon_refseq['name2'] == tail_gene) & (exon_refseq['chrom'] == tail_chr) & (exon_refseq['strand'] == tail_strand)]
     tail_subrows, _ = tail_subframe.shape
 
+    head_names, tail_names = list(head_subframe['name']), list(tail_subframe['name'])
+
     # Creating a Unique Identifier for the Excel Sheets to be output later
     # Possibly not going to be used: this is an Ensemble Name, which is not in the HG19 data I have
     unique_identifier = f"{head_gene}_{tail_gene}"
@@ -213,7 +216,7 @@ for fgrow in range(fg_rows):
             hexon_count = head_subframe.iloc[how, :]['exonCount']
             
 #             # Generate a name list from this row
-            head_gene_names = [f'{head_gene}_IF{how}_exon{e}' for e in range(1, hexon_count + 1)]
+            head_gene_names = [f'{head_gene}_{head_names[how]}_exon{e}' for e in range(1, hexon_count + 1)]
 #             # print(f"\t{len(head_gene_names)}")
 
             # This seems backwards but draw it out: the 5' is the last few nucelotides of the sequence, while the 3' is the first few.
@@ -236,7 +239,7 @@ for fgrow in range(fg_rows):
                 texon_count = tail_subframe.iloc[tow, :]['exonCount']
                 
                 # Generate a name list
-                tail_gene_names = [f'{tail_gene}_IF{tow}_exon{e}' for e in range(1, texon_count + 1)]
+                tail_gene_names = [f'{tail_gene}_{tail_names[tow]}_exon{e}' for e in range(1, texon_count + 1)]
                 # old_tail_gene_names = tail_gene_names
                 # print(f"\t\t{len(tail_gene_names)}")
 
@@ -325,8 +328,8 @@ for fgrow in range(fg_rows):
         FFP_frame = FFP_frame.T
         FFR_rando = FFR_rando.T
 
-        # FFP_xlsx[unique_identifier] = FFP_frame
-        # TTP_xlsx[unique_identifier] = TTP_frame
+        FFP_xlsx[unique_identifier] = FFP_frame
+        TTP_xlsx[unique_identifier] = TTP_frame
         # FFR_xlsx[f"{unique_identifier}_Random"] = FFR_rando
         # TTR_xlsx[f"{unique_identifier}_Random"] = TTR_rando
 
@@ -388,24 +391,29 @@ if output_on:
         # Can give a FileNotFoundError if parents don't exist: maybe add try except to create the path?
         # Can also give FileExistsError if the directory already is there, but I think this should be fine
 
-    with pandas.ExcelWriter(outputpath / f"FFP_Matrix_Length-{length}.xlsx") as FFP_writer, \
-        pandas.ExcelWriter(outputpath / f"TTP_Matrix_Length-{length}.xlsx") as TTP_writer, \
-        pandas.ExcelWriter(outputpath / f"FFR_Matrix_Length-{length}.xlsx") as FFR_writer, \
-        pandas.ExcelWriter(outputpath / f"TTR_Matrix_Length-{length}.xlsx") as TTR_writer, \
-        pandas.ExcelWriter(outputpath / f"Similarity_Frequency_Length-{length}.xlsx") as Fre_writer, \
-        pandas.ExcelWriter(outputpath / f"Statistics_Length-{length}.xlsx") as Sta_writer:
+    utdata.to_csv(outputpath / "UT_Data_Used.csv", index = False)
 
-        Frequency.to_excel(Fre_writer, "Totals")
+    try:
+        with pandas.ExcelWriter(outputpath / f"FFP_Matrix_Length-{length}.xlsx") as FFP_writer, \
+            pandas.ExcelWriter(outputpath / f"TTP_Matrix_Length-{length}.xlsx") as TTP_writer, \
+            pandas.ExcelWriter(outputpath / f"Similarity_Frequency_Length-{length}.xlsx") as Fre_writer, \
+            pandas.ExcelWriter(outputpath / f"Statistics_Length-{length}.xlsx") as Sta_writer:
+            # pandas.ExcelWriter(outputpath / f"UT_Data_Used") as Sub_data:
 
-        # for sheetname, sheet in FFP_xlsx.items():
-        #     FFP_xlsx[sheetname].to_excel(FFP_writer, sheetname)
-        #     TTP_xlsx[sheetname].to_excel(TTP_writer, sheetname)
-        #     FFR_xlsx[f"{sheetname}_Random"].to_excel(FFR_writer, f"{sheetname}_Random")
-        #     TTR_xlsx[f"{sheetname}_Random"].to_excel(TTR_writer, f"{sheetname}_Random")
-        #     Fre_xlsx[sheetname].to_excel(Fre_writer, sheetname)
-        
-        for sheetname, sheet in Stat_xlsx.items():
-            Stat_xlsx[sheetname].to_excel(Sta_writer, sheetname)
+            Frequency.to_excel(Fre_writer, "Totals")
+
+            for sheetname, sheet in FFP_xlsx.items():
+                FFP_xlsx[sheetname].to_excel(FFP_writer, sheetname)
+                TTP_xlsx[sheetname].to_excel(TTP_writer, sheetname)
+                # FFR_xlsx[f"{sheetname}_Random"].to_excel(FFR_writer, f"{sheetname}_Random")
+                # TTR_xlsx[f"{sheetname}_Random"].to_excel(TTR_writer, f"{sheetname}_Random")
+                Fre_xlsx[sheetname].to_excel(Fre_writer, sheetname)
+            
+            for sheetname, sheet in Stat_xlsx.items():
+                Stat_xlsx[sheetname].to_excel(Sta_writer, sheetname)
+
+    except Exception as e:
+        print(type(e))
 
 
 # Get the mean, median, mode, range, SD, and variance of all frames.
