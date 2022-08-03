@@ -124,8 +124,9 @@ with open(pathlib.Path.cwd() / "Data_Files" / "Sequence_Files" / f"{genome.upper
 
 
 utdata = utdata.drop_duplicates(subset=['Hgene', 'Tgene'])
-utdata = utdata[utdata["SeqLen"] > 1000]
-utdata = utdata.sample(n=10)
+utdata = utdata[utdata["SeqLen"] >= 1000]
+# utdata = utdata.sample(n=10)
+utdata = utdata.head(n = 10)
 
 # fg_rows -> the rows of the fusion genes
 fg_rows, _ = utdata.shape
@@ -323,10 +324,11 @@ for fgrow in range(fg_rows):
                 TTP_frame = pandas.concat([TTP_frame.stack(), TTP_subframe.stack()], axis = 0).unstack()
                 FFR_rando = pandas.concat([FFR_rando.stack(), FFR_subrando.stack()], axis = 0).unstack()
                 TTR_rando = pandas.concat([TTR_rando.stack(), TTR_subrando.stack()], axis = 0).unstack()
-        
-        # Taking the transpose of the FFP porition, because the Tail is the second gene and I want that one as the row labels
-        FFP_frame = FFP_frame.T
-        FFR_rando = FFR_rando.T
+
+        # # No longer taking the transpose: I think it's going to be easier for me to look at the FF and TT frames with Head = Row, Tail = Column        
+        # # Taking the transpose of the FFP porition, because the Tail is the second gene and I want that one as the row labels
+        # FFP_frame = FFP_frame.T
+        # FFR_rando = FFR_rando.T
 
         FFP_xlsx[unique_identifier] = FFP_frame
         TTP_xlsx[unique_identifier] = TTP_frame
