@@ -1,4 +1,19 @@
 import requests
+import logging
+import traceback
+from inspect import currentframe, getframeinfo
+
+# Establish logging: because it's better then print
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(name)s:%(message)s')
+
+file_handler = logging.FileHandler(f'RQuery.log')
+file_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler)
+
 
 
 def query(url: str) -> requests.models.Response:
@@ -8,12 +23,25 @@ def query(url: str) -> requests.models.Response:
     try:
         query: requests.models.Response = requests.get(url)
     except Exception as e:
-        print("####\nException found")
-        print(e)
-        print(type(e))
         query = None
+        logger_output(message_title="New Exception", data=f"Line 24\nError: {e}\n\tType: {type(e)}\n\nTraceback:\n{traceback.format_exc()}")
 
     return query
+
+
+
+def logger_output(message_title=None, data=None):
+    '''
+    For outputing log messages
+    '''
+    if (message_title is None) & (data is not None):
+        logger.info(f'\n{data}')
+    elif (message_title is not None) & (data is None):
+        logger.info(f'\n{message_title}')
+    elif (message_title is not None) & (data is not None):
+        logger.info(f'\n{message_title}\n{data}')
+    else:
+        logger.info(f'Something happened that was log worthy, but no message')
 
 
 if __name__ in '__main__':

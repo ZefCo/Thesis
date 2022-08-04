@@ -5,6 +5,21 @@ import requests
 import json
 import re
 import RQuery
+import logging
+import traceback
+from inspect import currentframe, getframeinfo
+
+# Establish logging: because it's better then print
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(name)s:%(message)s')
+
+file_handler = logging.FileHandler(f'BlatAPI.log')
+file_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler)
+
 
 
 
@@ -118,25 +133,25 @@ def blat_query(qseq = None, qurl = None, qdb = 'hg19', qtype = 'DNA') -> pandas.
     try:
         query = RQuery.query(query_url)
     except UnboundLocalError as e:
-        print("$$$$ There is no sequence or url input $$$$")
-        print("$$$$ Blat Frame == None $$$$")
+        print("$$$$ Unbound Local Error $$$$")
+        logger_output(message_title="Unbound Local Error when trying to query UCSC Database", data=f"Query URL:\n{query_url}\nQuery: {query}")
+
         query = None
 
-        # exit()
     except Exception as e:
-        print("$$$$ Placeholder for eventual log output $$$$")
-        print(e)
-        print(type(e))
+        print("$$$$ New Error $$$$")
+        logger_output(message_title="New Error when trying to query UCSC Database", data=f"Error: {e}\n\tType: {type(e)}\nQuery URL:\n{query_url}\n: {query}")
 
-        # exit()
+        query = None
+
 
     if isinstance(query, requests.models.Response):
-        blat_frame = convert2frame(query)
+        return_data = convert2frame(query)
 
     else:
-        blat_frame = None
+        return_data = None
 
-    return blat_frame
+    return return_data
 
 
 def convert2list(sequence: str, ) -> tuple:
@@ -231,6 +246,21 @@ def gen_url(qseq, qdb = 'hg19', qtype = 'DNA') -> str:
     query_url = f"{main_url}{qseq}&{qtype}&{qdb}&{qoutput}"
 
     return query_url
+
+
+def logger_output(message_title=None, data=None):
+    '''
+    For outputing log messages
+    '''
+    if (message_title is None) & (data is not None):
+        logger.info(f'\n{data}')
+    elif (message_title is not None) & (data is None):
+        logger.info(f'\n{message_title}')
+    elif (message_title is not None) & (data is not None):
+        logger.info(f'\n{message_title}\n{data}')
+    else:
+        logger.info(f'Something happened that was log worthy, but no message')
+
 
         
 
