@@ -52,19 +52,22 @@ def blating():
     look at the head version then the tail version.
 
     '''
-    start_index = 5552
+    # Where to start in the UT Database, so I can stop the code and start it right where I left off
+    # start_index = 5552
+    start_index = 0
+    # Min length for the sequences of interest
     min_length = 1000
-    output_headers = []
+    # Collection of headers for output files
     utheaders = ["Hgene", "Henst", "Hchr", "Hstrand", "Tgene", "Tenst", "Tchr", "Tstrand", "Seq"]
-    utheadurl = utheaders + ["URL"]
-    utheaderrors = utheadurl + ["Erro", ["Type"]]
-    # utheaderr = utheaders + ["Error", "Type"]
-    # zeroheader = utheaders + ["URL"]
+    head_tail_headers = ["HblockCount", "HblockSizes", "HtStarts", "TblockCount", "TblockSizes", "TtStarts"]
+    utheadurl = utheaders + ["BURL"]
+    utheaderrors = utheadurl + ["Error", "Type"]
 
-    out_zlat = pregen(filename = "ZeroBlat_2.csv", headers = utheadurl)
-    out_error = pregen(filename = "UT_Errors_2.csv", headers = utheaderrors)
-    out_blat = pregen(filename = f"UT_Blat_{min_length}_2.csv", headers = utheadurl)
-    out_three = pregen(filename = "ThreePlusBlat_2.csv", headers = utheadurl)
+    # Generate output files. Append to these later. It's easier to append if something goes wrong, that way data lost isn't lost forever
+    out_zlat = pregen(filename = "NoBlat.csv", headers = utheadurl)
+    out_error = pregen(filename = "UTErrors.csv", headers = utheaderrors)
+    out_blat = pregen(filename = f"UTBlat_{min_length}.csv", headers = utheadurl + head_tail_headers)
+    out_three = pregen(filename = "ThreePlusBlat.csv", headers = utheadurl)
     
     with open(pathlib.Path.cwd().parent / "Data_Files" / "UTData_cds.csv") as csvfile:
         utdata = pandas.read_csv(csvfile, header = 0)
@@ -86,25 +89,18 @@ def blating():
 
         print(f"\n####\n{hgene}_{tgene}\n{henst}_{tenst}\n####")
 
+        # this block attempts to blat the sequence. If for some reason it doesn't blat it sends the url to an error file
         for attempt in range(error_attempts):
             try:
                 blat: pandas.DataFrame = ba.blat_query(qurl = qurl)
                 if attempt > 0:
-                    logger_output(message_title = "Errors at blat", data = f"{attempt} number of attempts to blat the following url:\n{qurl}")
+                    logger_output(message_title = "Errors at blat", data = f"{attempt} number of attempts to blat the following CmRNA:\n{hgene}_{tgene}\n{henst}_{tenst}")
                 break
 
             except json.decoder.JSONDecodeError as e:
                 print("$$$$ JSON Decoder Error $$$$")
                 print("          retrying          ")
                 last_error_message = e
-                # logger_output(message_title="JSON Decoder Error at creating BLAT", data=f"Check other logs for additional details?")
-
-                # row_of_interest["Error"] = e
-                # row_of_interest["Type"] = type(e)
-
-                # row_of_interest.to_frame().T.to_csv(out_error, header = None, index = None, mode = 'a')
-                
-                # continue
 
             except Exception as e:
                 print("$$$$      New Error     $$$$")
@@ -119,7 +115,7 @@ def blating():
         
         else:
             print("$$$ Failed to blat, sending to log $$$")
-            logger_output(message_title=f"Failed to Blat of the following URL after {attempt + 1} number of attempts", data=f"Fusion: {hgene}_{tgene}\t{henst}_{tenst}\nError: {last_error_message}\n\tType: {type(last_error_message)}")
+            logger_output(message_title=f"Failed to Blat of the following CmRNA after {attempt + 1} number of attempts", data=f"Fusion: {hgene}_{tgene}\t{henst}_{tenst}\nError: {last_error_message}\n\tType: {type(last_error_message)}")
 
             row_of_interest["Error"] = last_error_message
             row_of_interest["Type"] = type(last_error_message)
@@ -129,6 +125,9 @@ def blating():
             continue
 
 
+        # This part of the code is only reaches if there were no blat errors
+
+        # Find the blat we actually want: because blat doesn't include any Gene names or ENST we need to isolate this to only some genes
         blat = blat[((blat["strand"] == hstrand) & (blat["tName"] == hchr)) | ((blat["strand"] == tstrand) & (blat["tName"] == tchr))]
 
         if blat.shape[0] == 2:
@@ -165,7 +164,6 @@ def ensting():
         blatURL = row_of_interest["URL"]
         print(f"\n####\n{hgene}_{tgene}\n{henst}_{tenst}\n####")
 
-
         for attempt in range(error_attempts):
             try:
                 blat: pandas.DataFrame = ba.blat_query(qurl = blatURL)
@@ -193,16 +191,52 @@ def ensting():
         blat = blat[((blat["strand"] == hstrand) & (blat["tName"] == hchr)) | ((blat["strand"] == tstrand) & (blat["tName"] == tchr))]
 
         if blat.shape[0] == 2:
+
             # print("~~~ Clean Blat ~~~")
             print(blat.T)
+            enst_index = []
+            comparison_start, comparison_end = [], []
             bows, _ = blat.shape
             for bow in range(bows):
                 bow_of_interest: pandas.Series = blat.iloc[bow, :].squeeze()
                 # print(type(bow_of_interest["blockSizes"]))
                 enstURL = api.ens_tracks(chrom=bow_of_interest["tName"], start=bow_of_interest["tStart"], end=bow_of_interest["tStart"] + bow_of_interest["blockSizes"][0])
 
-                # get ENST URL, filter to only the enst being used for the fusion row.
                 print(enstURL)
+
+                enst_frame: pandas.DataFrame = api.convert2frame(RQuery.query(enstURL))
+
+                # print(enst_frame)
+                enst_set: set = set(enst_frame["name"])
+
+                enst_intersection = enst_set.intersection([henst, tenst])
+
+                # print(len(enst_intersection))
+                if len(enst_intersection) == 1:
+                    if henst in enst_intersection:
+                        enst_index.append(henst)
+                        # grab the "last" and the next start/end things
+                        
+                    elif tenst in enst_intersection:
+                        enst_index.append(tenst)
+                        # grab the first and the second start/end things
+
+                    else:
+                        enst_index = None
+                        print("Need to add to logs or something: coulnd't find either ENST")
+                        break
+            
+            if isinstance(enst_index, list):
+                blat["HTEnst"] = enst_index
+                blat = blat.set_index("HTEnst")
+
+                # grab the head 3' and tail 5' start and block size
+            else:
+                break
+
+                # print(blat)
+
+                
 
 
 
@@ -243,8 +277,8 @@ def logger_output(message_title=None, data=None):
 def main():
     '''
     '''
-    # blating()
-    ensting()
+    blating()
+    # ensting()
 
 
 
