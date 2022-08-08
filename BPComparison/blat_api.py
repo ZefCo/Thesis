@@ -154,24 +154,24 @@ def blat_query(qseq = None, qurl = None, qdb = 'hg19', qtype = 'DNA') -> pandas.
     return return_data
 
 
-def convert2list(sequence: str, ) -> tuple:
-    '''
-    Because on some of these responses come back as lists, but their not type(list), their type(str). This converts
-    them to a list. But it converts EVERYTHING in that column to a list for simplicity, so an entry of 1 is not in a
-    list of 1. Trust me, in the long run this works out for the best.
+# def convert2list(sequence: str, ) -> tuple:
+#     '''
+#     Because on some of these responses come back as lists, but their not type(list), their type(str). This converts
+#     them to a list. But it converts EVERYTHING in that column to a list for simplicity, so an entry of 1 is not in a
+#     list of 1. Trust me, in the long run this works out for the best.
 
-    OK technically this is a tuple, but list, tuple, set, tomato potatoe
+#     OK technically this is a tuple, but list, tuple, set, tomato potatoe
     
-    Yes I know what the actually phrase is!
-    '''
+#     Yes I know what the actually phrase is!
+#     '''
 
-    seqlist = re.split(',', sequence)
-    seqlist = [int(strint) for strint in seqlist]
-    # print(seqlist)
-    seqlist = tuple(seqlist)
-    # print(seqlist)
+#     seqlist = re.split(',', sequence)
+#     seqlist = [int(strint) for strint in seqlist]
+#     # print(seqlist)
+#     seqlist = tuple(seqlist)
+#     # print(seqlist)
 
-    return seqlist
+#     return seqlist
 
 
 def convert2frame(query: requests.Response) -> pandas.DataFrame:
@@ -214,8 +214,9 @@ def convert2frame(query: requests.Response) -> pandas.DataFrame:
     att_people = {}
     for i, b in enumerate(britta):
         gdb = dict(zip(blat['fields'], b))
-        gdb["blockSizes"] = convert2list(gdb["blockSizes"])
-        gdb["tStarts"] = convert2list(gdb["tStarts"])
+        gdb["blockSizes"] = RQuery.convert2list(gdb["blockSizes"])
+        gdb["tStarts"] = RQuery.convert2list(gdb["tStarts"])
+        gdb["qStarts"] = RQuery.convert2list(gdb["qStarts"])
 
         att_people[f"{i}"] = gdb
 

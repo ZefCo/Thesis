@@ -67,6 +67,7 @@ def convert2frame(query: requests.Response) -> json:
 
     track = track[tuple(track.keys())[-2]]
 
+
     if isinstance(track, list):
         # Because the UCSC people thought it would be HILarious if they made this a list...
         track = dict(zip(range(len(track)), track))

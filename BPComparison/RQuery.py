@@ -1,7 +1,9 @@
+from cmath import exp
 import requests
 import logging
 import traceback
 from inspect import currentframe, getframeinfo
+import re
 
 # Establish logging: because it's better then print
 logger = logging.getLogger(__name__)
@@ -27,6 +29,42 @@ def query(url: str) -> requests.models.Response:
         logger_output(message_title="New Exception", data=f"Line 24\nError: {e}\n\tType: {type(e)}\n\nTraceback:\n{traceback.format_exc()}")
 
     return query
+
+
+def convert2list(sequence: str, ) -> tuple:
+    '''
+    Because on some of these responses come back as lists, but their not type(list), their type(str). This converts
+    them to a list. But it converts EVERYTHING in that column to a list for simplicity, so an entry of 1 is not in a
+    list of 1. Trust me, in the long run this works out for the best.
+
+    This was originally in the Blat API, but honestly I need to use it in several places so I moved it here. Easier access
+    for everyone.
+
+    OK technically this is a tuple, but list, tuple, set, tomato, potatoe
+    
+    Yes I know what the actually phrase is!
+    '''
+
+    sequence = re.split(',', sequence)
+
+    seqlist = []
+    for strint in sequence:
+        
+        try:
+            strint = int(strint)
+
+        except ValueError as e:
+            strint = None
+
+        except Exception as e:
+            # print(f"Error: {e}\tType: {type(e)}")
+            strint = None
+
+        seqlist.append(strint)
+
+    seqlist = tuple(seqlist)
+
+    return seqlist
 
 
 
