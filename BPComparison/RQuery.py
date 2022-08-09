@@ -1,9 +1,11 @@
 from cmath import exp
+from textwrap import wrap
 import requests
 import logging
 import traceback
 from inspect import currentframe, getframeinfo
 import re
+import time
 
 # Establish logging: because it's better then print
 logger = logging.getLogger(__name__)
@@ -22,13 +24,36 @@ def query(url: str) -> requests.models.Response:
     '''
     A try/except to handle the querying of UCSC
     '''
+
+    url_query: requests.models.Response = query_response(url)
+
+    if url_query.status_code == 429:
+        # Apparently UCSC thought it would be hilarious to report their wait time as a string...
+        wait_time = int(url_query.headers["Retry-After"])
+
+        print(f"Too many requests - request made to wait {wait_time} seconds - waiting {wait_time * 2} seconds")
+
+        time.sleep(wait_time * 2)
+
+        print(f"Trying once again - if this fails then look into fixing")
+
+        url_query: requests.models.Response = query_response(url)
+
+    return url_query
+
+
+def query_response(url: str):
+    '''
+    '''
     try:
         query: requests.models.Response = requests.get(url)
     except Exception as e:
         query = None
-        logger_output(message_title="New Exception", data=f"Line 24\nError: {e}\n\tType: {type(e)}\n\nTraceback:\n{traceback.format_exc()}")
+        logger_output(message_title="New Exception", data=f"Line {getframeinfo(currentframe()).lineno -3}\nError: {e}\n\tType: {type(e)}\n\nTraceback:\n{traceback.format_exc()}")
 
     return query
+
+
 
 
 def convert2list(sequence: str, ) -> tuple:

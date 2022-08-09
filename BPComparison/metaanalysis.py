@@ -82,12 +82,20 @@ def main():
 
     if show:
         strand_heatmap.show()
+        strand_heatmap.write_html(pathlib.Path.cwd() / "AllStrandFrequency.html")
 
         chrm_logmap.show()
         chrm_logmap_nosame.show()
 
+        chrm_logmap.write_html(pathlib.Path.cwd() / "FFxChrom_LogTransform.html")
+        chrm_logmap_nosame.write_html(pathlib.Path.cwd() / "FFxChrom_LogTransform_noSame.html")
+
         chrm_heatmap.show()
         chrm_heatmap_nosame.show()
+
+        chrm_heatmap.write_html(pathlib.Path.cwd() / "FFxChrom_Raw.html")
+        chrm_heatmap_nosame.write_html(pathlib.Path.cwd() / "FFxChrom_Raw_noSame.html")
+
         strand_by_chrm(ut_data)
 
 
@@ -230,6 +238,8 @@ def strand_by_chrm(dataframe: pandas.DataFrame):
     hfig.show()
     tfig.show()
 
+    hfig.write_html(pathlib.Path.cwd() / "SFxHChrom.html")
+    hfig.write_html(pathlib.Path.cwd() / "SFxTChrom.html")
 
 
 

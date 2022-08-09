@@ -59,18 +59,19 @@ def blating():
     '''
     # Where to start in the UT Database, so I can stop the code and start it right where I left off
     # start_index = 5552
-    start_index = 0
+    start_index = 3530
     # Min length for the sequences of interest
     min_length = 1000
     # Collection of headers for output files
     utheaders = ["Hgene", "Henst", "Hchr", "Hstrand", "Tgene", "Tenst", "Tchr", "Tstrand", "Seq"]
-    ht_blat_headers = ["HtStart", "HblockCount", "HblockSizes", "HtStarts", "TtStart", "TblockCount", "TblockSizes", "TtStarts"]
-    ht_enst_headers = ["HenstURL", 'HexonCount', 'HexonStarts', 'HexonEnds', 'HexonFrames', "TenstURL", 'TexonCount', 'TexonStarts', 'TexonEnds', 'TexonFrames']
 
     blat_of_interest = ["qStart", "qEnd", "tSize", "tStart", "tEnd", "blockCount", "blockSizes", "qStarts", "tStarts"]
+    ht_blat_headers = [f"H{bOi}" for bOi in blat_of_interest] + [f"T{bOi}" for bOi in blat_of_interest]
+    enst_of_interest = ["enstURL", "txStart", "txEnd", "cdsStart", "cdsEnd", "exonCount", "exonStarts", "exonEnds", "exonFrames", "cdsStartStat", "cdsEndStat", "name2"]
+    ht_enst_headers = [f"H{eOi}" for eOi in enst_of_interest] + [f"T{eOi}" for eOi in enst_of_interest]
 
-    utheadurl = utheaders + ["BlatURL"]
-    utheaderrors = utheaders + ["LastURL", "Error", "Type"]
+    utheadurl = utheaders + ["BlatURL", "HenstURL", "TenstURL", ]
+    utheaderrors = utheaders + ["Error", "Type"]
 
     # Generate output files. Append to these later. It's easier to append if something goes wrong, that way data lost isn't lost forever
     out_zlat = pregen(filename = "NoBlat.csv", headers = utheadurl)
@@ -123,42 +124,65 @@ def blating():
         elif blat.shape[0] == 2:
             print("~~~ Clean Blat ~~~")
 
-            enst_frame: pandas.DataFrame = ensting(blat, henst, tenst)
-            blat = blat[blat_of_interest]
-            blat.index = list(enst_frame.index)
-            # print(enst_frame.T)
-            # print(blat.T)
-            # print(enst_frame.T)
-            # print(row_of_interest)
-            dump_frame = pandas.concat([blat, enst_frame], axis = 1)
-            print(dump_frame)
-            # Take the dump frame and make it a series, then add this to the row of interest
-            # Write the row of interest to the out file. How to handle the headers? If it's the first one, add the headers, else don't
-            exit()
-            # # enst_index = tuple(enst_series.index)
-            # # print(f"Blat:\n{blat.T}")
-            # # print(f"Enst:\n{enst_series.T}")
+            enst_return = ensting(blat, henst, tenst)
 
-            # if isinstance(enst_series, pandas.Series):
-            #     print("~~~ Clean ENST ~~~")
+            enst: pandas.DataFrame = enst_return[0]
 
-            #     row_of_interest: pandas.Series = pandas.concat([row_of_interest, enst_series], axis = 0)
-            #     row_of_interest = row_of_interest[utheadurl + ht_blat_headers + ht_enst_headers]
-            #     # print(row_of_interest.T)
-            #     # print(list(row_of_interest.index))
-            #     # exit()
-            #     # print(list(row_of_interest.index))
-            #     # print(enst_series)
+            if isinstance(enst, pandas.DataFrame):
+                if enst.shape[0] < 2:
+                    print("$$$ Not enough enst $$$")
+                    for i, url in enumerate(enst_return[1]):
+                        row_of_interest[f"URL_{i}"] = url
 
-            #     row_of_interest.to_frame().T.to_csv(out_blat, header = None, index = None, mode = 'a')
-            #     # exit()
+                    # OK so ZLAT, which stands for Zero BLAT, might not be the best location for this, but IDC.
+                    row_of_interest.to_frame().T.to_csv(out_zlat, header = None, index = None, mode = 'a')
 
-            # elif isinstance(enst_series, tuple):
+                elif enst.shape[0] > 2:
+                    print("$$$ To much enst $$$")
+                    for i, url in enumerate(enst_return[1]):
+                        row_of_interest[f"URL_{i}"] = url
 
-            #     row_of_interest["LastURL"], row_of_interest["Error"], row_of_interest["Type"] = enst_series[0], enst_series[1], enst_series[2]
+                    # Again maybe not the best place for this but why not?
+                    row_of_interest.to_frame().T.to_csv(out_three, header = None, index = None, mode = 'a')
 
-            #     row_of_interest.to_frame().T.to_csv(out_error, header = None, index = None, mode = 'a')
 
+                elif enst.shape[0] == 2:
+                    print("~~~ Clean ENST ~~~")
+                    blat = blat[blat_of_interest]
+                    blat.index = list(enst.index)
+
+                    dump_frame = pandas.concat([blat, enst], axis = 1)
+                    # print(enst)
+
+                    # Take the dump frame and make it a series, then add this to the row of interest
+                    # Write the row of interest to the out file. How to handle the headers? If it's the first one, add the headers, else don't
+
+                    dows, _ = dump_frame.shape
+                    for dow in range(dows):
+                        dow_of_interest: pandas.Series = dump_frame.iloc[dow, :].squeeze()
+                        hORt = dow_of_interest.name
+                        new_index = {old_index:f"{hORt}{old_index}" for old_index in dow_of_interest.index}
+                        dow_of_interest = dow_of_interest.rename(index = new_index)
+
+                        row_of_interest = pandas.concat([row_of_interest, dow_of_interest])
+
+                    # print(row_of_interest.index)
+                    # print(row_of_interest.T)
+                    row_of_interest = row_of_interest[utheadurl + ht_blat_headers + ht_enst_headers]
+                    # print(row_of_interest)
+                    row_of_interest.to_frame().T.to_csv(out_blat, header = None, index = None, mode = 'a')
+            
+            else:
+                # this should dump the error
+                print("$$$ Printing Error to Error files $$$")
+                row_of_interest["Error"] = enst
+                row_of_interest["Type"] = type(enst)
+                for i, url in enumerate(enst_return[1]):
+                    row_of_interest[f"URL_{i}"] = url
+
+                row_of_interest.to_frame().T.to_csv(out_error, header = None, index = None, mode = 'a')
+
+                
 
         print(f"Finished UT Database row {row}")
 
@@ -196,23 +220,7 @@ def blat_attempt(qurl: str, hgene: str = None, henst: str = None, tgene: str = N
 
 
 
-def enst_attempt(chrom: str, start: int, end: int, error_attempts: int = 5):
-    '''
-    '''
-    try:
-        enstURL = api.ens_tracks(chrom=chrom, start=start, end=end)
-    
-    except Exception as e:
-        print("$$$$      New Error     $$$$")
-        logger_output(message_title="New Error at ENST", data=f"URL:\nChr: {chrom}\tStart: {start}\tEnd: {end}\nError: {e}\n\tType: {type(e)}\n\nTraceback: {traceback.format_exc()}")
-
-        enstURL = None
-    
-    return enstURL
-
-
-
-def enst_convert_attemp(enstURL, error_attempts: int = 5):
+def enst_attemp(enstURL, error_attempts: int = 5):
     '''
     '''
 
@@ -224,11 +232,9 @@ def enst_convert_attemp(enstURL, error_attempts: int = 5):
 
         except AttributeError as e:
             print("$$$$ Attribute Error $$$$")
-            # print("trying again")
-            # enst_frame = e
-            print(traceback.format_exc())
-            print(enstURL)
-            exit()
+            print("Possibly wrong blat information")
+            enst_frame = e
+            break
         
         except Exception as e:
             print("$$$$   New ENST Error   $$$$")
@@ -237,10 +243,6 @@ def enst_convert_attemp(enstURL, error_attempts: int = 5):
 
             print(traceback.format_exc())
 
-            # logger_output(message_title=f"Error at trying to convert ENST Response to Dataframe", data=f"Fusion: {henst}_{tenst}\nError: {e}\n\tType: {type(e)}\nURL: {enstURL}\n")
-            # return_series: tuple = (enstURL, e, type(e))
-            # dump_frame = None
-            # enst_frame = None
             exit()
 
     else:
@@ -282,108 +284,65 @@ def ensting(blat_input: pandas.DataFrame, henst: str, tenst: str) -> pandas.Seri
 
     # order_index = head_names + tail_names
 
-    dump_frame = pandas.DataFrame(dtype='str')
-    return_series = pandas.Series(dtype='str')
+    # dump_frame = pandas.DataFrame(dtype='str')
+    # return_series = pandas.Series(dtype='str')
     enst_index, url_index = [], []
 
     enst_frame = pandas.DataFrame()
+    continuing = True
+
+
     for row in range(rows):
         row_of_interest: pandas.Series = blat.iloc[row, :].squeeze()
 
         enstURL = api.ens_tracks(chrom=row_of_interest["tName"], start=row_of_interest["tStart"], end=row_of_interest["tStart"] + row_of_interest["blockSizes"][0])
+        url_index.append(enstURL)
 
-        local_enst_frame = enst_convert_attemp(enstURL)
-        local_enst_frame["enstURL"] = enstURL
-        enst_frame = pandas.concat([enst_frame, local_enst_frame])
+        local_enst_frame: pandas.DataFrame = enst_attemp(enstURL)
 
-    enst_frame = enst_frame[(enst_frame["name"] == henst) | (enst_frame["name"] == tenst)]
+        if isinstance(local_enst_frame, pandas.DataFrame):
+            local_enst_frame["enstURL"] = enstURL
+            enst_frame = pandas.concat([enst_frame, local_enst_frame])
+        else:
+            # Doing it like this because I want both URLs
+            continuing = False
 
-    enst_index = enst_frame.index
+    if continuing:
 
-    enst_frame = enst_frame.rename(index = {old_index: ("H" if enst_frame.loc[old_index, "name"] in henst else "T" if enst_frame.loc[old_index, "name"] in tenst else f"IDK{old_index}") for old_index in enst_index})
+        # print("!!! Continuing the ENSTing !!!!")
 
-    for index in list(enst_frame.index):
-        for sets in enst_of_sets:
-            # print(enst_frame.loc[index, sets])
-            enst_frame.loc[index, sets] = RQuery.convert2list(enst_frame.loc[index, sets])
+        enst_frame = enst_frame[(enst_frame["name"] == henst) | (enst_frame["name"] == tenst)]
+        # Updates index: it's very common to have the head and tail have the same index
+        enst_frame.reset_index(drop = True, inplace = True)
 
-    # enst_frame.rename(index={old_index: new_index}, inplace=True)
-    enst_frame = enst_frame[enst_of_interest]
-    # print(enst_frame.T)
-    # print(blat.T)
-    # exit()
+        enst_index = enst_frame.index
 
-    return enst_frame
+        # changing index to head and tail. Because we're preserving their positions, we can later pull this index and apply it to the blat to identify which is the head
+        # and which is the tail
+        new_index = {old_index: ("H" if enst_frame.loc[old_index, "name"] in henst else "T" if enst_frame.loc[old_index, "name"] in tenst else f"IDK{old_index}") for old_index in enst_index}
 
-        # enst_frame = enst_frame[(enst_frame['name'] == henst) | (enst_frame['name'] == tenst)]
+        enst_frame = enst_frame.rename(index = new_index)
+
+        # print(enst_frame)
+        # exit()
+
+        for index in list(enst_frame.index):
+            for sets in enst_of_sets:
+                # print(enst_frame.loc[index, sets])
+                enst_frame.loc[index, sets] = RQuery.convert2list(enst_frame.loc[index, sets])
+
+        # enst_frame.rename(index={old_index: new_index}, inplace=True)
+        enst_frame = enst_frame[enst_of_interest]
         # print(enst_frame.T)
-    #     else:
-    #         break
-        
-        # enst_set: set = set(enst_frame["name"])
+        # print(blat.T)
+        # exit()
+    
+    else:
+        # This should now have an error in it
+        enst_frame = local_enst_frame
 
-        # enst_intersection = enst_set.intersection([henst, tenst])
+    return enst_frame, url_index
 
-        # if len(enst_intersection) == 1:
-        #     if henst in enst_intersection:
-        #         enst_index.append(henst), url_index.append(enstURL)
-        #         ienst = henst
-                
-        #     elif tenst in enst_intersection:
-        #         enst_index.append(tenst), url_index.append(enstURL)
-        #         ienst = tenst
-
-        #     enst_frame = enst_frame[enst_frame["name"] == ienst]
-
-        #     for index in enst_of_sets:
-        #         enst_frame.loc[enst_frame.index[0], index] = string2tuple(enst_frame.loc[enst_frame.index[0], index])
-            
-        #     dump_frame = pandas.concat([dump_frame, enst_frame[enst_frame["name"] == ienst]])
-
-        # else:
-        #     print(f"$$$$ ENST Issue $$$$\nlength = {len(enst_intersection)}\nPrinting to Log")
-        #     logger_output(message_title=f"No length to intersection at the following URL", data=f"Fusion: {henst}_{tenst}\nURL:\n{enstURL}")
-
-        #     dump_frame = None
-        #     enst_frame = None
-
-        #     break
-
-    # if isinstance(dump_frame, pandas.DataFrame): # and isinstance(enst_frame, list):
-
-    #     # for dow in range(dump_frame.shape[0]):
-    #     #     for index in enst_of_sets:
-    #     #         print(dump_frame.loc[dow, index])
-    #     #         dump_frame.loc[dow, index] = string2tuple(dump_frame.loc[dow, index])
-
-    #     blat = blat[blat_of_interest]
-    #     blat["Ident"] = enst_index
-    #     blat = blat.set_index(blat["Ident"])
-    #     del blat["Ident"]
-
-    #     dump_frame["enstURL"] = url_index
-    #     dump_frame = dump_frame[enst_of_interest]
-    #     dump_frame["Ident"] = enst_index
-    #     dump_frame = dump_frame.set_index(dump_frame["Ident"])
-    #     del dump_frame["Ident"]
-
-    #     dump_frame = pandas.concat([blat, dump_frame], axis = 1)
-
-    #     rows, _ = dump_frame.shape
-    #     for row in range(rows):
-    #         future_series: pandas.Series = dump_frame.iloc[row, :].squeeze()
-    #         new_index = head_names if future_series.name in henst else tail_names
-
-    #         future_series.index = new_index
-
-    #         return_series = pandas.concat([return_series, future_series], axis = 0)
-
-    #     return_series = return_series[order_index]
-
-    # else:
-    #     return_series = None
-
-    # return return_series
         
 
 def logger_output(message_title=None, data=None):
