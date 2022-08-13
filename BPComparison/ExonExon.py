@@ -8,6 +8,7 @@ import pandas
 import RQuery
 import json
 import re
+import CommonMethods as CM
 
 import logging
 import traceback
@@ -227,7 +228,7 @@ def enst_attemp(enstURL, error_attempts: int = 5):
     for attempt in range(error_attempts):
 
         try:
-            enst_frame: pandas.DataFrame = api.convert2frame(RQuery.query(enstURL))
+            enst_frame: pandas.DataFrame = api.convertRequest(RQuery.query(enstURL))
             break
 
         except AttributeError as e:
@@ -329,7 +330,7 @@ def ensting(blat_input: pandas.DataFrame, henst: str, tenst: str) -> pandas.Seri
         for index in list(enst_frame.index):
             for sets in enst_of_sets:
                 # print(enst_frame.loc[index, sets])
-                enst_frame.loc[index, sets] = RQuery.convert2list(enst_frame.loc[index, sets])
+                enst_frame.loc[index, sets] = CM.convert2list(enst_frame.loc[index, sets])
 
         # enst_frame.rename(index={old_index: new_index}, inplace=True)
         enst_frame = enst_frame[enst_of_interest]

@@ -60,17 +60,12 @@ def sequence(genome: str = "hg19", chrom: str = None, start: int = None, end: in
     return seq_url
 
 
-def convert2frame(query: requests.Response) -> json:
+def convert2frame(track: list) -> pandas.DataFrame:
     '''
     '''
-    track: dict = json.loads(query.text)
-
-    track = track[tuple(track.keys())[-2]]
-
-
     if isinstance(track, list):
         # Because the UCSC people thought it would be HILarious if they made this a list...
-        track = dict(zip(range(len(track)), track))
+        track: dict = dict(zip(range(len(track)), track))
 
     track_frame = pandas.DataFrame()
     for key, t in track.items():
@@ -84,52 +79,34 @@ def convert2frame(query: requests.Response) -> json:
     return track_frame
 
 
-class UCSCURLGenerator:
-    def __init__(self, genome = "hg19") -> None:
-        self.base_url = f'https://api.genome.ucsc.edu/'
+def convertRequest(query: requests.Response) -> pandas.DataFrame or str:
+    '''
+    '''
+    track: dict = json.loads(query.text)
 
-        self.list_tracks = f"/list/tracks"
-        self.get_track = f"getData/track"
-        self.get_sequence = f"getData/sequence"
-        self.genomes = f"genome={genome}"
+    try:
+        # Litterally don't care how many items are returned, we'll grab that later. Only need to know what index to grab
+        # the data from
+        _ = track["itemsReturned"]
+        index_key = -2
+    except KeyError as e:
+        index_key = -1
+    except Exception as e:
+        index_key = -1
+        print(f"Exception Raised: {e}\tType: {type(e)}\nSetting index key to -1 and trying")
 
-    def ens_tracks(self, chrom: str = None, start: int = None, end: int = None, genome: str = None) -> str:
-        '''
-        '''
-        ens_track = f"track=ensGene"
+    track = track[tuple(track.keys())[index_key]]
 
-        if genome is None:
-            genome = self.genomes
-        else:
-            genome = f"genome={genome}"
+    if isinstance(track, list):
+        # If it's a list: we need to convert it to something more usable
+        track: pandas.DataFrame = convert2frame(track)
+    elif isinstance(track, str):
+        # If it's a string, it probably already is usable
+        track: str = track
 
-        if (chrom is not None) and (start is not None) and (end is not None):
-            chrom = f"chrom={chrom}"
-            start = f"start={start}"
-            end = f"end={end}"
-
-            ens_url = f"{self.base_url}{self.get_track}?{ens_track};{genome};{chrom};{start};{end}"
-
-            # try:
-            #     ens_url = f"{self.base_url}{self.get_track}?{ens_track};{genome};{chrom};{start};{end}"
-            # except Exception as e:
-            #     print(f"####\nError in trying to get ENS\nError: {e}\nType: {type(e)}\nURL: {ens_url}")
-
-        
-        else:
-            ens_url = f"{self.base_url}{self.get_track}?{ens_track};{self.genomes}"
-
-        return ens_url
-
-        # genomes = f"genome=hg19"
+    return track
 
 
-        # list_all_tracks = f"{self.base_url}{list_tracks}?{genomes}"
-
-        # # print(list_all_tracks)
-
-        # test_est = f"{self.base_url}{get_track}?{genomes};{ens_track};chrom=chr15;start={65849223};end={65849223+18}"
-        # print(test_est)
 
 
 if __name__ in '__main__':
