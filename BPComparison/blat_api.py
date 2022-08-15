@@ -9,6 +9,7 @@ import logging
 import traceback
 import CommonMethods as CM
 from inspect import currentframe, getframeinfo
+from datetime import datetime
 
 # Establish logging: because it's better then print
 logger = logging.getLogger(__name__)
@@ -16,7 +17,15 @@ logger.setLevel(logging.INFO)
 
 formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(name)s:%(message)s')
 
-file_handler = logging.FileHandler(f'BlatAPI.log')
+start_time = datetime.now()
+start_time = f"{start_time.strftime(f'%H%M%S')}_{start_time.strftime(f'%d%m%Y')}"
+log_folder = pathlib.Path.cwd() / "LogFiles"
+
+if not log_folder.is_dir():
+    log_folder.mkdir(parents=True, exist_ok=True)
+
+
+file_handler = logging.FileHandler(log_folder /f'BlatAPI_{start_time}.log')
 file_handler.setFormatter(formatter)
 
 logger.addHandler(file_handler)
@@ -118,29 +127,29 @@ def blat_queries(dataframe: pandas.DataFrame, qtype = "DNA", qdb = "hg19") -> pa
 
 
 
-def blat_query(qseq = None, qurl = None, qdb = 'hg19', qtype = 'DNA') -> pandas.DataFrame:
+def blat_query(qseq: str = None, qurl: str = None, qdb = 'hg19', qtype = 'DNA') -> pandas.DataFrame:
     '''
     If this receives a sequence, then it generates a URL
     Else (if the sequence is none and) IF this receives a url, then it will use the url
     So if a sequence is sent in this will generate a new URL EVEN IF one is already provided
     '''
 
-    if qseq is not None:
+    if isinstance(qseq, str):
         query_url = gen_url(qseq, qdb=qdb, qtype=qtype)
     
-    elif qurl is not None:
+    elif isinstance(qurl, str):
         query_url = qurl        
 
     try:
         query = RQuery.query(query_url)
     except UnboundLocalError as e:
-        print("$$$$ Unbound Local Error $$$$")
+        print("!!!!\tUnbound Local Error\t!!!!")
         logger_output(message_title="Unbound Local Error when trying to query UCSC Database", data=f"Query URL:\n{query_url}\nQuery: {query}")
 
         query = None
 
     except Exception as e:
-        print("$$$$ New Error $$$$")
+        print("!!!!\tNew Error in Blat API\t!!!!")
         logger_output(message_title="New Error when trying to query UCSC Database", data=f"Error: {e}\n\tType: {type(e)}\nQuery URL:\n{query_url}\n: {query}")
 
         query = None
