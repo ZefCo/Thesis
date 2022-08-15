@@ -1,6 +1,5 @@
 from datetime import datetime
-from doctest import master
-from threading import local
+from wsgiref import headers
 from requests import Response
 import blat_api as ba
 import ucsc_restapi as api
@@ -57,7 +56,9 @@ class CmRNA():
 
         self.enst_of_sets = ['exonStarts', 'exonEnds', 'exonFrames']
         self.enst_of_interest = ["enstURL", "txStart", "txEnd", "cdsStart", "cdsEnd", "exonCount"] + self.enst_of_sets + ["name2", "cdsStartStat", "cdsEndStat"]
+        self.hnst_headers, self.tnst_headers = [f"H{eOi}" for eOi in self.enst_of_interest], [f"T{eOi}" for eOi in self.enst_of_interest]
 
+        self.row_ordered_headers = self.master_headers + ["BlatURL"] + self.hlat_headers + self.tlat_headers + self.hnst_headers + self.tnst_headers
 
         self.data = self.import_data(file_path)
         # self.data: robjects.DataFrame = self.rFun.importData(str(file_path))
@@ -65,10 +66,12 @@ class CmRNA():
 
 
 
-    def blat(self, fusionData: pandas.DataFrame, min_length = 20, start_row: int = ..., end_row: int = ...):
+    def blat(self, fusionData: pandas.DataFrame, output_file: str or pathlib.Path = ..., min_length = 20, start_row: int = ..., end_row: int = ...):
         '''
         
         '''
+        if output_file is not ...:
+            output_file = self.check_file(output_file, self.row_ordered_headers)
 
         if isinstance(start_row, int):
             start_row = start_row
@@ -93,22 +96,21 @@ class CmRNA():
 
         for row in range(start_row, end_row):
             row_of_interest: pandas.Series = fusionData.iloc[row, :].copy().squeeze()
+            # And yes, this only really looks at the ENST, but to get to a clean ENST it has to have a clean BLAT
+            clean_everything = True
+
+            enst_genes = [row_of_interest["Henst"], row_of_interest["Tenst"]]
             local_blat: pandas.DataFrame = self.blat_data(data_to_blat=row_of_interest)
 
-            if local_blat.shape[0] == 2:
-                print("~~~~\tClean BLAT\t~~~~")
 
-                row_of_interest["BlatURL"] = local_blat.loc[0, "BlatURL"]
-
-                local_enst: pandas.DataFrame = self.enst_indentification(local_blat)
-
-            elif local_blat.shape[0] > 2:
+            if local_blat.shape[0] > 2:
                 print("~~~~\tToo much BLAT\t~~~~")
                 
                 row_of_interest["BlatURL"] = local_blat.loc[0, "BlatURL"]
                 self.error_outputs(row_of_interest, error_file="TooMuchBlat.csv")
 
                 continue
+
 
             elif local_blat.shape[0] < 2:
                 print("~~~~\tToo little BLAT\t~~~~")
@@ -119,23 +121,79 @@ class CmRNA():
                 continue
 
 
-            if isinstance(local_enst, tuple):
-                print("!!!!\tError during ENST Identification\t!!!!")
-                print("    \tSending to logs")
-                self.error_outputs(row_of_interest, error_file="ENST_Error.csv", return_error=local_enst)
+            elif local_blat.shape[0] == 2:
+                print("~~~~\tClean BLAT\t~~~~")
 
-            elif isinstance(local_enst, pandas.DataFrame):
+                row_of_interest["BlatURL"] = local_blat.loc[0, "BlatURL"]
+                # henst, tenst = row_of_interest["Henst"], row_of_interest["Tenst"]
+                # hgene, tgene = row_of_interest["Hgene"], row_of_interest["Tgene"]
 
-                local_enst = local_enst[(local_enst["name"] == row_of_interest["Henst"]) | (local_enst["name"] == row_of_interest["Tenst"])]
+                local_enst: pandas.DataFrame = pandas.DataFrame()
+                local_blat["name"] = None
+                # this is just range(2)... don't know why I wrote it like this...
+                for bow in range(local_blat.shape[0]):
+                    blat_of_interest = local_blat.iloc[bow, :]
 
-                print(f"~~~~\tRow of Interest\t~~~~\n{row_of_interest}")
-                print(f"~~~~\tLocal BLAT\t~~~~\n{local_blat.T}")
-                print(f"~~~~\tLocal Enst\t~~~~\n{local_enst.T}")
+                    l_enst: pandas.DataFrame = self.identifyBlatEnst(blat_of_interest)
+
+                    if not isinstance(l_enst, pandas.DataFrame):
+                        print(f"!!!! Error in ENST Identification !!!!")
+                        self.error_outputs(data = row_of_interest, error_file = "ENST_Error.csv", return_error = l_enst)
+
+                        continue
+
+                    l_enst = l_enst[(l_enst["name"] == row_of_interest["Henst"]) | (l_enst["name"] == row_of_interest["Tenst"])].copy()
+
+                    if l_enst.shape[0] < 1:
+                        print("~~~~\tToo little ENST\t~~~~")
+                        self.error_outputs(row_of_interest, error_file="ZeroENST.csv")
+                        clean_everything = False
+                    
+                    elif l_enst.shape[0] > 1:
+                        print("~~~~\tToo much ENST\t~~~~")
+                        self.error_outputs(row_of_interest, error_file="TooMuchENST.csv")
+                        clean_everything = False
+
+                    elif l_enst.shape[0] == 1:
+                        print(f"~~~~\tClean ENST {bow + 1}\t~~~~")
+                        # So this might have index other then 0, hence the weird way of pulling out the specific index
+                        for eOs in self.enst_of_sets:
+                            l_enst.loc[l_enst.index[0], eOs] = CM.convert2list(l_enst.loc[l_enst.index[0], eOs])
+
+                        local_blat.loc[bow, "name"] = l_enst.loc[l_enst.index[0], "name"]
+
+                        local_enst = pandas.concat([local_enst, l_enst])
+                        local_enst.reset_index(drop = True, inplace = True)
 
 
-                
+            if clean_everything:
+
+                for position, enst_gene in enumerate(enst_genes):
+                    target_enst: pandas.Series = local_enst[local_enst["name"] == enst_gene].squeeze()
+                    target_blat: pandas.Series = local_blat[local_blat["name"] == enst_gene].squeeze()
+
+                    new_beaders = dict(zip(self.blat_of_interest, self.hlat_headers)) if position == 0 else dict(zip(self.blat_of_interest, self.tlat_headers))
+                    new_eeaders = dict(zip(self.enst_of_interest, self.hnst_headers)) if position == 0 else dict(zip(self.enst_of_interest, self.tnst_headers))
+
+                    target_enst = target_enst.rename(new_eeaders)
+                    target_blat = target_blat.rename(new_beaders)
+
+                    row_of_interest = pandas.concat([row_of_interest, target_blat, target_enst])
+
+                row_of_interest = row_of_interest[self.row_ordered_headers]
+
+                if output_file is not ...:
+                    row_of_interest.to_frame().T.to_csv(output_file, index = None, header = None, mode = 'a')
+
+                # print(f"~~~~\tRow of Interest\t~~~~\n{row_of_interest}")
+                # print(f"~~~~\tLocal BLAT\t~~~~\n{local_blat.T}")
+                # print(f"~~~~\tLocal Enst\t~~~~\n{local_enst.T}")
 
             print(f"Finished row {row} of {end_row}")
+
+            # exit()
+
+
 
 
 
@@ -211,76 +269,82 @@ class CmRNA():
 
 
 
-    def enst_indentification(self, fusionData: pandas.DataFrame, start_row: int = ..., end_row: int = ..., min_length: int = 20) -> pandas.DataFrame or list:
+    def identifyBlatEnst(self, fusionData: pandas.Series) -> pandas.DataFrame or list:
         '''
         Need to re-write this. The BLAT doesn't tell me what gene I am looking at, only the corrdinates. I need to convert those corredinates to a ENST.
 
         '''
 
         # print(fusionData)
+        # print(type(fusionData))
+        # print(fusionData.T.shape)
 
         # fusionData["enstURL"] = None
-        enst_data: pandas.DataFrame = pandas.DataFrame()
-        enst_urls: list = list()
-        enst_errors: list = list()
 
-        if isinstance(start_row, int):
-            start_row = start_row
-        else:
-            start_row = 0
+        chr, start, end = fusionData["tName"], fusionData["tStart"], fusionData["tStart"] + fusionData["blockSizes"][0]
+
+        enstURL = api.ens_tracks(chrom=chr, start=start, end=end)
+
+        local_enst: pandas.DataFrame = self.enst_attempt(enstURL)
+
+        if not isinstance(local_enst, pandas.DataFrame):
+            local_enst = (enstURL, local_enst)
+
+        elif isinstance(local_enst, pandas.DataFrame):
+            local_enst["enstURL"] = enstURL
+
+
+
+        # if isinstance(start_row, int):
+        #     start_row = start_row
+        # else:
+        #     start_row = 0
 
         # fusionData = fusionData[fusionData["SeqLen"] >= min_length]
 
-        rows, _ = fusionData.shape
-        if (isinstance(end_row, int)) and end_row > start_row:
-            end_row = end_row
-        else:
-            end_row = rows
+        # rows, _ = fusionData.shape
+        # if (isinstance(end_row, int)) and end_row > start_row:
+        #     end_row = end_row
+        # else:
+        #     end_row = rows
 
-        for row in range(start_row, end_row):
-            row_of_interest = fusionData.iloc[row, :].copy().squeeze()
+        # for row in range(start_row, end_row):
+        #     row_of_interest = fusionData.iloc[row, :].copy().squeeze()
 
-            chr, start, end = row_of_interest["tName"], row_of_interest["tStart"], row_of_interest["tStart"] + row_of_interest["blockSizes"][0]
+        #     chr, start, end = row_of_interest["tName"], row_of_interest["tStart"], row_of_interest["tStart"] + row_of_interest["blockSizes"][0]
 
-            enstURL = api.ens_tracks(chrom=chr, start=start, end=end)
-            enst_urls.append(enstURL)
+            # enstURL = api.ens_tracks(chrom=chr, start=start, end=end)
+            # enst_urls.append(enstURL)
 
-            local_enst: pandas.DataFrame = self.enst_attempt(enstURL)
+            # local_enst: pandas.DataFrame = self.enst_attempt(enstURL)
 
-            if isinstance(local_enst, pandas.DataFrame) and isinstance(enst_data, pandas.DataFrame):
-                # everything is fine: append the data and go on
-                local_enst["enstURL"] = enstURL
-                enst_data = pandas.concat([enst_data, local_enst])
-                enst_data.reset_index(drop = True, inplace = True)
+        #     if isinstance(local_enst, pandas.DataFrame) and isinstance(enst_data, pandas.DataFrame):
+        #         # everything is fine: append the data and go on
+        #         local_enst["enstURL"] = enstURL
+        #         enst_data = pandas.concat([enst_data, local_enst])
+        #         enst_data.reset_index(drop = True, inplace = True)
 
-            elif (not isinstance(local_enst, pandas.DataFrame)) and (isinstance(enst_data, pandas.DataFrame)):
-                # everything is NOT fine: error found, turns into an error report
-                enst_errors.append(local_enst)
+        #     elif (not isinstance(local_enst, pandas.DataFrame)) and (isinstance(enst_data, pandas.DataFrame)):
+        #         # everything is NOT fine: error found, turns into an error report
+        #         enst_errors.append(local_enst)
 
-                enst_data = None
+        #         enst_data = None
 
-            elif (not isinstance(local_enst, pandas.DataFrame)) and (not isinstance(enst_data, pandas.DataFrame)):
-                # already have an error report, adding more to it
-                enst_errors.append(local_enst)
+        #     elif (not isinstance(local_enst, pandas.DataFrame)) and (not isinstance(enst_data, pandas.DataFrame)):
+        #         # already have an error report, adding more to it
+        #         enst_errors.append(local_enst)
 
-            elif isinstance(local_enst, pandas.DataFrame) and (not isinstance(enst_data, pandas.DataFrame)):
-                # already have an error report, but nothing to add to
-                pass
+        #     elif isinstance(local_enst, pandas.DataFrame) and (not isinstance(enst_data, pandas.DataFrame)):
+        #         # already have an error report, but nothing to add to
+        #         pass
 
-        if not isinstance(enst_data, pandas.DataFrame):
-            enst_data = (enst_urls, enst_errors)
-
-
-        return enst_data
+        # if not isinstance(enst_data, pandas.DataFrame):
+        #     enst_data = (enst_urls, enst_errors)
 
 
-        # print(enst_data.T)
-        # exit()
+        return local_enst
 
 
-            # fusionData.loc[row, "enstURL"] = enstURL
-
-        # print(fusionData.T)
 
 
     def enst_attempt(self, enstURL):
@@ -383,7 +447,7 @@ def main():
     '''
     cmrna = CmRNA(pathlib.Path.cwd().parent / "Data_Files" / "UTData_cds.csv")
     # print(type(cmrna.data))
-    cmrna.data = cmrna.blat(cmrna.data, min_length=1000, end_row=10)
+    cmrna.data = cmrna.blat(cmrna.data, min_length=1000, end_row=100)
 
 
 if __name__ in '__main__':
