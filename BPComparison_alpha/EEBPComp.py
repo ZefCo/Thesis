@@ -1,4 +1,6 @@
 from datetime import datetime
+from distutils.command import clean
+from threading import local
 from wsgiref import headers
 from requests import Response
 import blat_api as ba
@@ -102,68 +104,78 @@ class CmRNA():
             enst_genes = [row_of_interest["Henst"], row_of_interest["Tenst"]]
             local_blat: pandas.DataFrame = self.blat_data(data_to_blat=row_of_interest)
 
-
-            if local_blat.shape[0] > 2:
-                print("~~~~\tToo much BLAT\t~~~~")
-                
-                row_of_interest["BlatURL"] = local_blat.loc[0, "BlatURL"]
-                self.error_outputs(row_of_interest, error_file="TooMuchBlat.csv")
-
-                continue
-
-
-            elif local_blat.shape[0] < 2:
-                print("~~~~\tToo little BLAT\t~~~~")
-
-                row_of_interest["BlatURL"] = local_blat.loc[0, "BlatURL"]
-                self.error_outputs(row_of_interest, error_file="ZeroBlat.csv")
-
-                continue
-
-
-            elif local_blat.shape[0] == 2:
-                print("~~~~\tClean BLAT\t~~~~")
-
-                row_of_interest["BlatURL"] = local_blat.loc[0, "BlatURL"]
-                # henst, tenst = row_of_interest["Henst"], row_of_interest["Tenst"]
-                # hgene, tgene = row_of_interest["Hgene"], row_of_interest["Tgene"]
-
-                local_enst: pandas.DataFrame = pandas.DataFrame()
-                local_blat["name"] = None
-                # this is just range(2)... don't know why I wrote it like this...
-                for bow in range(local_blat.shape[0]):
-                    blat_of_interest = local_blat.iloc[bow, :]
-
-                    l_enst: pandas.DataFrame = self.identifyBlatEnst(blat_of_interest)
-
-                    if not isinstance(l_enst, pandas.DataFrame):
-                        print(f"!!!! Error in ENST Identification !!!!")
-                        self.error_outputs(data = row_of_interest, error_file = "ENST_Error.csv", return_error = l_enst)
-
-                        continue
-
-                    l_enst = l_enst[(l_enst["name"] == row_of_interest["Henst"]) | (l_enst["name"] == row_of_interest["Tenst"])].copy()
-
-                    if l_enst.shape[0] < 1:
-                        print("~~~~\tToo little ENST\t~~~~")
-                        self.error_outputs(row_of_interest, error_file="ZeroENST.csv")
-                        clean_everything = False
+            if isinstance(local_blat, pandas.DataFrame):
+                if local_blat.shape[0] > 2:
+                    print("~~~~\tToo much BLAT\t~~~~")
                     
-                    elif l_enst.shape[0] > 1:
-                        print("~~~~\tToo much ENST\t~~~~")
-                        self.error_outputs(row_of_interest, error_file="TooMuchENST.csv")
-                        clean_everything = False
+                    row_of_interest["BlatURL"] = local_blat.loc[0, "BlatURL"]
+                    self.error_outputs(data = row_of_interest, error_file = "TooMuchBlat.csv")
 
-                    elif l_enst.shape[0] == 1:
-                        print(f"~~~~\tClean ENST {bow + 1}\t~~~~")
-                        # So this might have index other then 0, hence the weird way of pulling out the specific index
-                        for eOs in self.enst_of_sets:
-                            l_enst.loc[l_enst.index[0], eOs] = CM.convert2list(l_enst.loc[l_enst.index[0], eOs])
+                    print(f"Finished row {row} of {end_row}")
 
-                        local_blat.loc[bow, "name"] = l_enst.loc[l_enst.index[0], "name"]
+                    continue
 
-                        local_enst = pandas.concat([local_enst, l_enst])
-                        local_enst.reset_index(drop = True, inplace = True)
+
+                elif local_blat.shape[0] < 2:
+                    print("~~~~\tToo little BLAT\t~~~~")
+
+                    row_of_interest["BlatURL"] = local_blat.loc[0, "BlatURL"]
+                    self.error_outputs(data = row_of_interest, error_file = "ZeroBlat.csv")
+
+                    print(f"Finished row {row} of {end_row}")
+
+                    continue
+
+
+                elif local_blat.shape[0] == 2:
+                    print("~~~~\tClean BLAT\t~~~~")
+                    # print(local_blat)
+                    # exit()
+
+                    # henst, tenst = row_of_interest["Henst"], row_of_interest["Tenst"]
+                    # hgene, tgene = row_of_interest["Hgene"], row_of_interest["Tgene"]
+
+                    local_enst: pandas.DataFrame = pandas.DataFrame()
+                    local_blat["name"] = None
+                    # this is just range(2)... don't know why I wrote it like this...
+                    for bow in range(local_blat.shape[0]):
+                        blat_of_interest = local_blat.iloc[bow, :]
+
+                        l_enst: pandas.DataFrame = self.identifyBlatEnst(blat_of_interest)
+
+                        if not isinstance(l_enst, pandas.DataFrame):
+                            print(f"!!!! Error in ENST Identification !!!!")
+                            self.error_outputs(data = row_of_interest, error_file = "ENST_Error.csv", return_error = l_enst)
+
+                            continue
+
+                        l_enst = l_enst[(l_enst["name"] == row_of_interest["Henst"]) | (l_enst["name"] == row_of_interest["Tenst"])].copy()
+
+                        if l_enst.shape[0] < 1:
+                            print("~~~~\tToo little ENST\t~~~~")
+                            self.error_outputs(data = row_of_interest, error_file = "ZeroENST.csv")
+                            clean_everything = False
+                        
+                        elif l_enst.shape[0] > 1:
+                            print("~~~~\tToo much ENST\t~~~~")
+                            self.error_outputs(data = row_of_interest, error_file = "TooMuchENST.csv")
+                            clean_everything = False
+
+                        elif l_enst.shape[0] == 1:
+                            print(f"~~~~\tClean ENST {bow + 1}\t~~~~")
+                            print(l_enst)
+                            # So this might have index other then 0, hence the weird way of pulling out the specific index
+                            for eOs in self.enst_of_sets:
+                                l_enst.loc[l_enst.index[0], eOs] = CM.convert2list(l_enst.loc[l_enst.index[0], eOs])
+
+                            local_blat.loc[bow, "name"] = l_enst.loc[l_enst.index[0], "name"]
+
+                            local_enst = pandas.concat([local_enst, l_enst])
+                            local_enst.reset_index(drop = True, inplace = True)
+
+            else:
+                clean_everything = False
+                print(f"Finished row {row} of {end_row}")
 
 
             if clean_everything:
@@ -178,12 +190,21 @@ class CmRNA():
                     target_enst = target_enst.rename(new_eeaders)
                     target_blat = target_blat.rename(new_beaders)
 
+                    # print(target_enst.index)
+                    # print(target_blat.index)
+
+                    # exit()
+
                     row_of_interest = pandas.concat([row_of_interest, target_blat, target_enst])
+                    # print("-----")
+                    # print(row_of_interest)
+                    # print("-----")
 
                 row_of_interest = row_of_interest[self.row_ordered_headers]
+                print(row_of_interest.index)
 
-                if output_file is not ...:
-                    row_of_interest.to_frame().T.to_csv(output_file, index = None, header = None, mode = 'a')
+                # if output_file is not ...:
+                #     row_of_interest.to_frame().T.to_csv(output_file, index = None, header = None, mode = 'a')
 
                 # print(f"~~~~\tRow of Interest\t~~~~\n{row_of_interest}")
                 # print(f"~~~~\tLocal BLAT\t~~~~\n{local_blat.T}")
@@ -191,11 +212,7 @@ class CmRNA():
 
             print(f"Finished row {row} of {end_row}")
 
-            # exit()
-
-
-
-
+            exit()
 
 
     def blat_attempt(self, blat_target: str, hgene: str = None, henst: str = None, tgene: str = None, tenst: str = None) -> pandas.DataFrame or None:
@@ -249,7 +266,7 @@ class CmRNA():
             blat["BlatURL"] = burl
         
         else:
-            self.error_outputs(data_to_blat, error_file_path = "BlatError.csv", return_error= blat)
+            self.error_outputs(data_to_blat, error_file = "BlatError.csv", return_error = blat)
 
         return blat
 
@@ -395,18 +412,18 @@ class CmRNA():
 
 
 
-    def error_outputs(self, data: pandas.Series = ..., error_file: str = ..., return_error: Exception or list or tuple = ..., *args, **kwargs):
+    def error_outputs(self, data: pandas.Series = ..., error_file: str = ..., return_error: Exception or list or tuple = None, *args, **kwargs):
         '''
         For outputing to the error csv. By error I mean and any unexpected result
         '''
 
-        if return_error is not ...:
+        if return_error is not None:
 
             if isinstance(return_error, list):
                 return_error = tuple(return_error)
                 return_type = tuple([type(rerror) for rerror in return_error])
             else:
-                return_type = type(return_type)
+                return_type = type(return_error)
 
             data["Error"] = return_error
             data["Error Type"] = return_type
@@ -447,7 +464,7 @@ def main():
     '''
     cmrna = CmRNA(pathlib.Path.cwd().parent / "Data_Files" / "UTData_cds.csv")
     # print(type(cmrna.data))
-    cmrna.data = cmrna.blat(cmrna.data, min_length=1000, end_row=100)
+    cmrna.data = cmrna.blat(cmrna.data, min_length=1000, output_file="UT_BE_min1000.csv", start_row=5)
 
 
 if __name__ in '__main__':

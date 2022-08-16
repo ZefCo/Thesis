@@ -66,36 +66,102 @@ def main():
 
 
 
-def blat_query(qseq: str, qdb = 'hg19', qtype = 'DNA') -> pandas.DataFrame:
+
+def blat_queries(dataframe: pandas.DataFrame, qtype = "DNA", qdb = "hg19") -> pandas.DataFrame:
     '''
-    Takes in a sequence and generates a URL from that sequence. This URL is then used to get a Query,
-    which is convereted to a pandas Dataframe
+    For sending in a ton of different sequences via a dataframe
+
+        hg19 comes back with:
+    track -> blat
+    genome -> set by user
+    fields: list
+    blat: list of list
+        matches
+        misMatches
+        repMatches
+        nCount
+        qNumInsert
+        qBaseInsert
+        tNumInsert
+        tBaseInsert
+        -> strand <-        which strand of DNA it's on, will be used for reference
+        qName
+        qSize
+        qStart
+        qEnd
+        -> tName <-         which chrm it is on, will be used for reference
+        tSize
+        tStart
+        tEnd
+        -> blockCount <-    how many blocks it aligns to, mostly exons, useful for finding the cds
+        -> blockSizes <-    how big each block is, useful for finding end. By default this is a string, should be a list/set/tuple
+        qStarts
+        -> tStarts <-       where each block starts, useful for finding the sequence. By default this is a string, should be a list/set/tuple
+
+        note these are ALL read left to right, but the - strand is actually RIGHT to LEFT, so the 
+        chrm region is REVERSED
+
+        They seem to be off by 1 nucleotide
+
+        it's all -1 in the start position: does the web api index start at 0?
+        Programically it appears to start at 0.
+
+        Yes, it most certinaly appears to start index at 0, and it reports the correct sequence when this is put
+        into the getData/sequence url. Now to find a way to grab the correct ENST
+
     '''
 
-    query_url = gen_url(qseq, qdb=qdb, qtype=qtype)
+    rows, _ = dataframe.shape
+
+    for row in range(rows):
+        row_of_interest = dataframe.iloc[row, :]
+
+        qseq = row_of_interest["Seq"]
+
+        query_frame = blat_query(qseq)
+        
+        print(type(query_frame))
+        print(query_frame)
+        if row == 0:
+            break
+
+
+
+def blat_query(qseq: str = None, qurl: str = None, qdb = 'hg19', qtype = 'DNA') -> pandas.DataFrame:
+    '''
+    If this receives a sequence, then it generates a URL
+    Else (if the sequence is none and) IF this receives a url, then it will use the url
+    So if a sequence is sent in this will generate a new URL EVEN IF one is already provided
+    '''
+
+    if isinstance(qseq, str):
+        query_url = gen_url(qseq, qdb=qdb, qtype=qtype)
     
+    elif isinstance(qurl, str):
+        query_url = qurl        
+
     try:
         query = RQuery.query(query_url)
     except UnboundLocalError as e:
         print("!!!!\tUnbound Local Error\t!!!!")
         logger_output(message_title="Unbound Local Error when trying to query UCSC Database", data=f"Query URL:\n{query_url}")
 
-        query = e
+        query = None
 
     except Exception as e:
         print("!!!!\tNew Error in Blat API\t!!!!")
         logger_output(message_title="New Error when trying to query UCSC Database", data=f"Error: {e}\n\tType: {type(e)}\nQuery URL:\n{query_url}")
 
-        query = e
+        query = None
 
 
     if isinstance(query, requests.models.Response):
         return_data = convert2frame(query)
 
     else:
-        return_data = query
+        return_data = None
 
-    return return_data, query_url
+    return return_data
 
 
 def convert2frame(query: requests.Response) -> pandas.DataFrame:

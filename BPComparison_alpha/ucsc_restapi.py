@@ -1,7 +1,6 @@
 import json
 import requests
 import pandas
-import RQuery
 
 
 def base_urls():
@@ -39,31 +38,7 @@ def ens_tracks(genome: str = "hg19", chrom: str = None, start: int = None, end: 
     else:
         ens_url = f"{base_url}{get_track}?{ens_url};{genome}"
 
-    # return ens_url
-
-    try:
-        query = RQuery.query(ens_url)
-    except UnboundLocalError as e:
-        print("!!!!\tUnbound Local Error\t!!!!")
-        # logger_output(message_title="Unbound Local Error when trying to query UCSC Database", data=f"Query URL:\n{query_url}")
-
-        query = e
-
-    except Exception as e:
-        print("!!!!\tNew Error in Blat API\t!!!!")
-        # logger_output(message_title="New Error when trying to query UCSC Database", data=f"Error: {e}\n\tType: {type(e)}\nQuery URL:\n{query_url}")
-
-        query = e
-
-    if isinstance(query, requests.models.Response):
-        return_data = convertRequest(query)
-
-    else:
-        return_data = query
-
-    return return_data, ens_url
-
-
+    return ens_url
 
 
 def sequence(genome: str = "hg19", chrom: str = None, start: int = None, end: int = None) -> str:
