@@ -53,7 +53,7 @@ def main(infile: str or pathlib.Path, min_length: int = 1000):
 
         fusion.distance_measure()
 
-        if fusion.classification in "Unknown":
+        if (fusion.classification is None) or (fusion.classification in "Unknown"):
             unknowns = running_totals(unknowns, "Unknown")
         elif fusion.classification in "C-SAG":
             cis = running_totals(cis, "Cis-SAG")
@@ -69,7 +69,7 @@ def main(infile: str or pathlib.Path, min_length: int = 1000):
         elif not fusion.clean_blat and not fusion.clean_enst:
             outfile = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "BlatFailed.csv"
 
-        # fusion.write_to_csv(outfile = outfile)
+        fusion.write_to_csv(outfile = outfile)
 
         print(f"\n~~Finished Row {row} of {rows}~~\n####\n")
 
