@@ -79,5 +79,5 @@ def main(infile: str or pathlib.Path, min_length: int = 1000):
 
 
 if __name__ in '__main__':
-    fusion_file = pathlib.Path.cwd().parent / "Data_Files" / "UTData_cds_sample.csv"
+    fusion_file = pathlib.Path.cwd().parent / "Data_Files" / "UTData_cds.csv"
     main(fusion_file)
