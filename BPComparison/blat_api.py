@@ -82,6 +82,12 @@ def blat_query(qseq: str, qdb = 'hg19', qtype = 'DNA') -> pandas.DataFrame:
 
         query = e
 
+    except AttributeError as e:
+        print("!!!!\tAttribute Error\t!!!!")
+        logger_output(message_title="Attribute Error when trying to query UCSC Database", data=f"Query URL:\n{query_url}")
+
+        query = e
+
     except Exception as e:
         print("!!!!\tNew Error in Blat API\t!!!!")
         logger_output(message_title="New Error when trying to query UCSC Database", data=f"Error: {e}\n\tType: {type(e)}\nQuery URL:\n{query_url}")

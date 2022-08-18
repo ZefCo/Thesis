@@ -1,28 +1,37 @@
 from json import JSONDecodeError
-from sqlite3 import DatabaseError
 import blat_api as bpi
 import ucsc_restapi as upi
 # import RQuery
 # import requests
 import pandas
 from GeneClass import Gene
+from BlatClass import Blat
 from typing import Tuple
+import pathlib
+import numpy as np
 
 
 class FusionGene():
     def __init__(self, hgene: str, tgene: str, seq: str, henst: str, tenst: str, hstrand: str, tstrand: str, hchrm: str, tchrm: str, gdb: str = "hg19") -> None:
         # everything here, unless otherwise noted, is mostly likely a string
-        self.hgene, self.tgene = hgene, tgene
-        self.henst, self.tenst = henst, tenst
-        self.hchrm, self.tchrm = hchrm, tchrm
-        self.hstrand, self.tstrand = hstrand, tstrand
-        self.seq = seq
         self.gdb = gdb
 
-        self.gnames = f"{self.hgene}_{self.tgene}"
-        self.enames = f"{self.henst}_{self.tenst}"
+        self.hgene, self.henst, self.hchrm, self.hstrand = hgene, henst, hchrm, hstrand
+        self.tgene, self.tenst, self.tchrm, self.tstrand = tgene, tenst, tchrm, tstrand
+        
+        self.seq = seq
 
-        self.error_attempts: int = 5
+        self.clean_blat: bool = False
+        self.clean_enst: bool = False
+
+        self.classification: str = None
+        self.distance: int = None
+
+        self.head_gene: Gene = None
+        self.tail_gene: Gene = None
+
+        self.head_blat: Blat = None
+        self.tail_gene: Blat = None
 
 
     def blat(self):
@@ -31,37 +40,66 @@ class FusionGene():
 
         This will then trigger the ENST Identification. Why? Because BLAT only tells the genomic location, not what you're looking at.
         '''
-        filter_blat = lambda blat_frame, strand, chrom: blat_frame[(blat_frame["strand"] == strand) & (blat_frame["tName"] == chrom)]
+        filter_blat = lambda blat_frame, strand, chrom: blat_frame[(blat_frame["strand"] == strand) & (blat_frame["tName"] == chrom)].copy()
 
         # blat_response = bpi.blat_query(self.seq)
         blat_response, blat_url = self.query_attempt(bpi.blat_query, self.seq)
         self.blat_url: str = blat_url
         # print(blat_response)
         if isinstance(blat_response, pandas.DataFrame):
+            blat_response["name"] = "Unknown"
             head_response: pandas.DataFrame = filter_blat(blat_response, self.hstrand, self.hchrm)
+            head_response.reset_index(drop = True, inplace = True)
             tail_response: pandas.DataFrame = filter_blat(blat_response, self.tstrand, self.tchrm)
+            tail_response.reset_index(drop = True, inplace = True)
         
         else:
             print("!!!!\tBlat Failed\t!!!!")
-            print("Printing to logs?")
+            self.clean_blat = False
+
+
             # This might not be the best way, but if it can't BLAT then I just want to escape out of this. It's not going to do anything
             # So yes, this is a bare return
             return
 
         if (head_response.shape[0] > 0) and (tail_response.shape[0] > 0):
             print(f"~~~~\tClean Blat\t~~~~")
+            self.clean_blat = True
 
             # print(f"Blat => Head: {head_response.shape[0]} - Tail: {tail_response.shape[0]}")
 
-            head_enst, head_enst_url = self.enst_identify(enst = self.henst, blat_data = head_response)
-            tail_enst, tail_enst_url = self.enst_identify(enst = self.tenst, blat_data = tail_response)
+            head_enst, henstURL = self.enst_identify(enst = self.henst, blat_data = head_response)
+            tail_enst, tenstURL = self.enst_identify(enst = self.tenst, blat_data = tail_response)
 
-            self.head_enst_url, self.tail_enst_url = head_enst_url, tail_enst_url
+            self.henstURL, self.tenstURL = henstURL, tenstURL
 
-            if (isinstance(head_enst, pandas.DataFrame) and (head_enst.shape[0] > 0)) and (isinstance(tail_enst, pandas.DataFrame) and (tail_enst.shape[0] > 0)):
+            # if (isinstance(head_enst, pandas.Series) and (head_enst.shape[0] > 0)) and (isinstance(tail_enst, pandas.Series) and (tail_enst.shape[0] > 0)):
+            if (isinstance(head_enst, pandas.Series)) and (isinstance(tail_enst, pandas.Series)):
+
                 print(f"~~~~\tClean ENST\t~~~~")
+                self.clean_enst = True
 
-                self.head_gene = Gene(self.hgene, chrm = self.hchrm, strand = self.hstrand, ename=self.henst,
+                head_response, tail_response = head_response[head_response["name"] == head_enst["name"]].squeeze(), tail_response[tail_response["name"] == tail_enst["name"]].squeeze()
+
+                # Dumps all the blat data into the Blat class. Why am I doing that here? Because I didn't identify them until now. Now that they are fully identified it is worth it to 
+                # put them into the Blat class
+                self.head_blat = Blat(qName = self.hgene,
+                                      tStart = head_response["tStart"],
+                                      tEnd = head_response["tEnd"],
+                                      blockCount = head_response["blockCount"],
+                                      blockSizes = head_response["blockSizes"],
+                                      tStarts = head_response["tStarts"])
+
+                self.tail_blat = Blat(qName = self.tgene,
+                                      tStart = tail_response["tStart"],
+                                      tEnd = tail_response["tEnd"],
+                                      blockCount = tail_response["blockCount"],
+                                      blockSizes = tail_response["blockSizes"],
+                                      tStarts = tail_response["tStarts"])
+
+                # dumps all the ENST data needed into another class, the Gene class. The Gene class holds all the information about the gene. This way I can also contact UCSC in the gene class to get
+                # additional data if need be.
+                self.head_gene = Gene(self.hgene, # chrm = self.hchrm, strand = self.hstrand, ename=self.henst,
                                     gname = head_enst["name2"],
                                     txStart = head_enst["txStart"],
                                     txEnd = head_enst["txEnd"],
@@ -72,7 +110,7 @@ class FusionGene():
                                     exonEnds = head_enst["exonEnds"],
                                     exonFrames = head_enst["exonFrames"])
 
-                self.tail_gene = Gene(self.tgene, chrm = self.tchrm, strand = self.tstrand, ename=self.tenst,
+                self.tail_gene = Gene(self.tgene, # chrm = self.tchrm, strand = self.tstrand, ename=self.tenst,
                                     gname = tail_enst["name2"],
                                     txStart = tail_enst["txStart"],
                                     txEnd = tail_enst["txEnd"],
@@ -83,10 +121,15 @@ class FusionGene():
                                     exonEnds = tail_enst["exonEnds"],
                                     exonFrames = tail_enst["exonFrames"])
 
+
+
             else:
                 head_rows = head_enst.shape[0] if isinstance(head_enst, pandas.DataFrame) else 0
                 tail_rows = tail_enst.shape[0] if isinstance(tail_enst, pandas.DataFrame) else 0
+                print("!!!!\tFailed to ENST\t!!!!")
                 print(f"One did not ENST Identify Correctly\nHead Rows: {head_rows}\tTail Rows: {tail_rows}")
+                self.clean_enst = False
+         
 
         # else:
         #     print(f"One does not identify correctly\nHead Rows: {head_response.shape[0]}\tTail Rows: {tail_response.shape[0]}")
@@ -97,10 +140,88 @@ class FusionGene():
 
 
 
-    def classify(self):
+    def classify(self, adjacent_def: int = 50_000, unknown: str = "Unknown", cis: str = "C-SAG", inter: str = "T-E", intra: str = "T-A", tag_def: int = 100_000):
         '''
-        Classify if it's Trans Inter/Intra Genic, Cis SAG
+        Classify if it's Trans Inter/Intra Genic, Cis SAG. 
+
+        Classify the type of splice as:
+        C-SAG ~ Cis-SAG ~ same chr, same dir, adjecent genes -> last exon/UTR is < 50 kb to start of exon/UTR of next gene
+        T-A ~ Trans-IntrAgenic ~ same chr, same/diff dir, non-adjecent genes
+        T-E ~ trans-IntErgenic ~ diff chr
+        
+        Also look for TAD? The problem with TAD is it is defined in bases and therefore only really able to be found if it's TA. If it's TE, I don't
+        spacially know where the chromosomes are.
+
+        The last few clauses are redundant, since at initialization the classification is set to unknown, but I wanted to, for completion, include them.
         '''
+
+        if self.clean_blat and self.clean_enst:
+
+            if self.hchrm not in self.tchrm:
+                self.classification = inter
+
+            elif self.hchrm in self.tchrm:
+
+                if self.hstrand not in self.tstrand:
+                    self.classification = intra
+                
+                elif self.hstrand in self.tstrand:
+                    if self.hstrand in '-':
+                        hposition = self.head_blat.tStarts[0]
+                    elif self.hstrand in '+':
+                        hposition = self.head_blat.tStarts[self.head_blat.blockCount - 1] + self.head_blat.blockSizes[self.head_blat.blockCount - 1]
+
+                    if self.tstrand in '-':
+                        tposition = self.tail_blat.tStarts[self.tail_blat.blockCount - 1] + self.tail_blat.blockSizes[self.tail_blat.blockCount - 1]
+                    elif self.tstrand in '+':
+                        tposition = self.tail_blat.tStarts[0]
+
+                    if abs(hposition - tposition) <= adjacent_def:
+                        self.classification = cis
+
+                    elif abs(hposition - tposition) > adjacent_def:
+                        self.classification = intra
+
+                    else:
+                        self.classification = unknown
+                
+                else:
+                    self.classification = unknown
+            
+            else:
+                self.classification = unknown
+
+        else:
+            print("Cannot classify")
+            self.classification = None
+
+
+        
+
+    def distance_measure(self):
+        '''
+        '''
+        distances, aistances = np.zeros((4, 1)), np.zeros((4, 1))
+
+        if (self.clean_blat and self.clean_enst) and (self.hchrm in self.tchrm):
+            head_positions: tuple = (self.head_blat.tStarts[0], self.head_blat.tStarts[-1] + self.head_blat.blockSizes[-1])
+            tail_positions: tuple = (self.tail_blat.tStarts[0], self.tail_blat.tStarts[-1] + self.head_blat.blockSizes[-1])
+
+            i = 0
+            for hosition in head_positions:
+                for tosition in tail_positions:
+                    d = hosition - tosition
+                    distances[i], aistances[i] = d, abs(d)
+                    i += 1
+            
+            min_position = np.argmin(aistances)
+
+            self.distance = int(distances[min_position])
+            print(f"Distance is {self.distance}")
+
+        else:
+            print("Cannot find distnaces")
+            self.distance = None
 
 
 
@@ -128,8 +249,10 @@ class FusionGene():
                     enst_response = enst_response[enst_response["name"] == enst]
 
                     if enst_response.shape[0] == 1:
-                        enst_response.squeeze()
+                        enst_response = enst_response.squeeze()
+                        blat_data.loc[row, "name"] = enst_response["name"]
                         break
+
                     elif enst_response.shape[0] > 1:
                         print(f"!!!!\t{enst} isn non unique\t!!!!")
                         break
@@ -143,11 +266,8 @@ class FusionGene():
         return enst_response, enst_url
 
 
-            # exit()
 
-
-
-    def query_attempt(self, func, *args, **kwargs) -> Tuple[pandas.Series or pandas.DataFrame or Exception, str]:
+    def query_attempt(self, func, *args, error_attempts: int = 5, **kwargs) -> Tuple[pandas.Series or pandas.DataFrame or Exception, str]:
         '''
         Returns the usable response from the UCSC Genome browser (typically a Pandas Series or DataFrame)
         along with the url used.
@@ -156,7 +276,7 @@ class FusionGene():
         # print(*args)
         # print(kwargs)
         # exit()
-        for attempt in range(self.error_attempts):
+        for attempt in range(error_attempts):
             try:
                 ucsc_data, ucsc_url = func(*args, **kwargs)
                 if attempt > 0:
@@ -188,10 +308,57 @@ class FusionGene():
         return ucsc_data, ucsc_url
 
 
-    def write_to_csv(self, outfile: str):
+    def second_import(self, second_file: str or pathlib.Path = None, *args, **kwargs):
+        '''
+        For when things have already been identified and you just want to add details to the thing.
+        '''
+
+
+    def write_to_csv(self, outfile: str or pathlib.Path, error_output: bool = False, *args, **kwargs):
         '''
         Writes to the error or output file
+
+        Does not output None type, Bool type, or repetative names
         '''
+
+        if isinstance(outfile, str):
+            outfile: pathlib.Path = pathlib.Path(outfile)
+
+        printable_row = pandas.Series(dtype=object)
+
+        for key, value in vars(self).items():
+            if ((value is not None) and (not isinstance(value, bool))):
+
+                if isinstance(value, Gene):
+                    indicator = "h" if value.name in self.hgene else "t"
+
+                    for gey, galue in vars(value).items():
+
+                        if (galue is not None) and (not isinstance(galue, bool)) and (gey not in "name"):
+                            printable_row[f"{indicator}{gey}"] = galue
+                            # print(f"{gey}: {galue}\nType: {type(galue)}")
+
+                elif isinstance(value, Blat):
+                    indicator = "h" if value.qName in self.hgene else "t"
+
+                    for bey, balue in vars(value).items():
+
+                        if(balue is not None) and (not isinstance(balue, bool)) and (bey not in "qName"):
+                            printable_row[f"{indicator}{bey}"] = balue
+                            # print(f"{bey}: {balue}\nType: {type(balue)}")
+
+                else:
+                    printable_row[f"{key}"] = value
+                    # print(f"{key}: {value}\nType: {type(value)}")
+
+        # print(printable_row)
+        # print(printable_row.shape)
+
+        if not outfile.is_file():
+            pandas.DataFrame(columns=list(printable_row.index)).to_csv(outfile, header = True, index = False)
+
+
+        printable_row.to_frame().T.to_csv(outfile, header = False, index = False, mode = 'a')
 
 
 
