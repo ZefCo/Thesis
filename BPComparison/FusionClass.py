@@ -1,3 +1,4 @@
+from ast import Num
 from json import JSONDecodeError
 import blat_api as bpi
 import ucsc_restapi as upi
@@ -21,17 +22,18 @@ class FusionGene():
         
         self.seq = seq
 
-        self.clean_blat: bool = False
-        self.clean_enst: bool = False
+        self._clean_blat: bool = False
+        self._clean_enst: bool = False
 
         self.classification: str = None
-        self.distance: int = None
+        self.shortDistance: int = None
 
         self.head_gene: Gene = None
         self.tail_gene: Gene = None
 
         self.head_blat: Blat = None
         self.tail_gene: Blat = None
+
 
 
     def blat(self):
@@ -55,7 +57,7 @@ class FusionGene():
         
         else:
             print("!!!!\tBlat Failed\t!!!!")
-            self.clean_blat = False
+            self._clean_blat = False
 
 
             # This might not be the best way, but if it can't BLAT then I just want to escape out of this. It's not going to do anything
@@ -64,7 +66,7 @@ class FusionGene():
 
         if (head_response.shape[0] > 0) and (tail_response.shape[0] > 0):
             print(f"~~~~\tClean Blat\t~~~~")
-            self.clean_blat = True
+            self._clean_blat = True
 
             # print(f"Blat => Head: {head_response.shape[0]} - Tail: {tail_response.shape[0]}")
 
@@ -77,7 +79,7 @@ class FusionGene():
             if (isinstance(head_enst, pandas.Series)) and (isinstance(tail_enst, pandas.Series)):
 
                 print(f"~~~~\tClean ENST\t~~~~")
-                self.clean_enst = True
+                self._clean_enst = True
 
                 head_response, tail_response = head_response[head_response["name"] == head_enst["name"]].squeeze(), tail_response[tail_response["name"] == tail_enst["name"]].squeeze()
 
@@ -128,7 +130,7 @@ class FusionGene():
                 tail_rows = tail_enst.shape[0] if isinstance(tail_enst, pandas.DataFrame) else 0
                 print("!!!!\tFailed to ENST\t!!!!")
                 print(f"One did not ENST Identify Correctly\nHead Rows: {head_rows}\tTail Rows: {tail_rows}")
-                self.clean_enst = False
+                self._clean_enst = False
          
 
         # else:
@@ -155,7 +157,7 @@ class FusionGene():
         The last few clauses are redundant, since at initialization the classification is set to unknown, but I wanted to, for completion, include them.
         '''
 
-        if self.clean_blat and self.clean_enst:
+        if self._clean_blat and self._clean_enst:
 
             if self.hchrm not in self.tchrm:
                 self.classification = inter
@@ -169,18 +171,18 @@ class FusionGene():
                     if self.hstrand in '-':
                         hposition = self.head_blat.tStarts[0]
                     elif self.hstrand in '+':
-                        hposition = self.head_blat.tStarts[self.head_blat.blockCount - 1] + self.head_blat.blockSizes[self.head_blat.blockCount - 1]
+                        hposition = self.head_blat.tStarts[-1] + self.head_blat.blockSizes[-1]
 
                     if self.tstrand in '-':
-                        tposition = self.tail_blat.tStarts[self.tail_blat.blockCount - 1] + self.tail_blat.blockSizes[self.tail_blat.blockCount - 1]
+                        tposition = self.tail_blat.tStarts[-1] + self.tail_blat.blockSizes[-1]
                     elif self.tstrand in '+':
                         tposition = self.tail_blat.tStarts[0]
 
                     if abs(hposition - tposition) <= adjacent_def:
-                        self.classification = cis
+                        self.classification = f"{cis}"
 
                     elif abs(hposition - tposition) > adjacent_def:
-                        self.classification = intra
+                        self.classification = f"{intra}"
 
                     else:
                         self.classification = unknown
@@ -193,7 +195,7 @@ class FusionGene():
 
         else:
             print("Cannot classify")
-            self.classification = None
+            self.classification = unknown
 
 
         
@@ -201,9 +203,10 @@ class FusionGene():
     def distance_measure(self):
         '''
         '''
-        distances, aistances = np.zeros((4, 1)), np.zeros((4, 1))
+        # distances, aistances = np.zeros((4, 1)), np.zeros((4, 1))
+        distances, aistances = np.zeros((4)), np.zeros((4))
 
-        if (self.clean_blat and self.clean_enst) and (self.hchrm in self.tchrm):
+        if (self._clean_blat and self._clean_enst) and (self.hchrm in self.tchrm):
             head_positions: tuple = (self.head_blat.tStarts[0], self.head_blat.tStarts[-1] + self.head_blat.blockSizes[-1])
             tail_positions: tuple = (self.tail_blat.tStarts[0], self.tail_blat.tStarts[-1] + self.head_blat.blockSizes[-1])
 
@@ -216,12 +219,14 @@ class FusionGene():
             
             min_position = np.argmin(aistances)
 
-            self.distance = int(distances[min_position])
-            print(f"Distance is {self.distance}")
+            self.shortDistance = int(distances[min_position])
+            print(f"Shortest Distance is {self.shortDistance}")
 
+        elif (self._clean_blat and self._clean_enst) and (self.hchrm not in self.tchrm):
+            self.shortDistance = "T-E"
+        
         else:
-            print("Cannot find distnaces")
-            self.distance = None
+            self.shortDistance = "Unknown"
 
 
 
@@ -264,6 +269,59 @@ class FusionGene():
             #     # print(enst_response.shape[0])
 
         return enst_response, enst_url
+
+
+    def find_junction(self, length: int = 10):
+        '''
+        To anyone who comes in after me to make adjusments: draw out what you're doing. UCSC Genome reports things in the + strand, so it's a little tricky
+
+        Just need to grab the next expected exon and the slippage
+        '''
+        if self._clean_blat and self._clean_enst:
+            head5primeExIn, tail3primeExIn = self._align_blat()
+
+            if self.hstrand in "+":
+                hend: int = self.head_blat.tStarts[-1] + self.head_blat.blockSizes[-1]
+                hstart: int = hend - length
+                hitart: int = hend + 1
+                hind: int = hend + 11
+
+                head5primeExIn += 1
+
+            elif self.hstrand in "-":
+                hstart: int = self.head_blat.tStarts[0]
+                hend: int = hstart + length
+                hind: int = hstart - 1
+                hitart: int = hstart - 11
+
+                head5primeExIn -= 1
+
+            head3primeSeq, _ = upi.sequence(chrom = self.hchrm, start = hstart, end = hend, strand = self.hstrand)
+            head5primeInt, _ = upi.sequence(chrom = self.hchrm, start = hitart, end = hind, strand = self.hstrand)
+
+            print(f"H3' Fus Seq = {head3primeSeq}\tH5' Int Seq = {head5primeInt}")
+
+            if self.tstrand in "+":
+                tstart: int = self.tail_blat.tStarts[0]
+                tend: int = tstart + length
+                tind: int = tstart - 1
+                titart: int = tstart - 11
+
+                tail3primeExIn -= 1
+            
+            elif self.tstrand in "-":
+                tend: int = self.tail_blat.tStarts[-1] + self.tail_blat.blockSizes[-1]
+                tstart: int = tend - length
+                tind: int = tend + 11
+                titart: int = tend + 1
+
+                tail3primeExIn += 1
+
+            tail5primeSeq, _ = upi.sequence(chrom = self.tchrm, start = tstart, end = tend, strand = self.tstrand)
+            tail3primeInt, _ = upi.sequence(chrom = self.tchrm, start = titart, end = tind, strand = self.tstrand)
+
+            # print(f"T5' Fus Seq = {tail5primeSeq}\tT3' Int Seq = {tail3primeInt}")
+            # print(f"{urlT5}\n{urlT3}")
 
 
 
@@ -361,6 +419,44 @@ class FusionGene():
         printable_row.to_frame().T.to_csv(outfile, header = False, index = False, mode = 'a')
 
 
+    def _align_blat(self) -> Tuple[int, int]:
+        '''
+        '''
+        if self.hstrand in "+":
+            h3prime = self.head_blat.tStarts[-1] + self.head_blat.blockSizes[-1]
+            exon3primes = self.head_gene.exonEnds
+        elif self.hstrand in "-":
+            h3prime = self.head_blat.tStarts[0]
+            exon3primes = self.head_gene.exonStarts
+
+        if self.tstrand in "+":
+            t5prime = self.tail_blat.tStarts[0]
+            exon5primes = self.tail_gene.exonStarts
+        elif self.tstrand in "-":
+            t5prime = self.tail_blat.tStarts[-1] + self.tail_blat.blockSizes[-1]
+            exon5primes = self.tail_gene.exonEnds
+
+        hindex = self._local_align(h3prime, exon3primes)
+        tindex = self._local_align(t5prime, exon5primes)
+
+        # print(f"H Index: {hindex}")
+        # print(f"T Index: {tindex}")
+
+        return hindex, tindex
+
+
+    def _local_align(self, blatPosition: int, exonPositions: tuple) -> int:
+        '''
+
+        '''
+        # print(f"blatStart = {blatPosition}\nexonStarts = {exonStarts}")
+        delta_blat = np.array(exonPositions)
+
+        delta_blat = abs(delta_blat - blatPosition)
+
+        min_delta = np.argmin(delta_blat)
+
+        return min_delta
 
 
 def main():

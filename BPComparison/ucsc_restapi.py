@@ -1,7 +1,10 @@
 import json
+from re import T
+from urllib.request import Request
 import requests
 import pandas
 import RQuery
+from typing import Tuple
 
 
 def base_urls():
@@ -9,14 +12,14 @@ def base_urls():
     '''
 
     base_url = f'https://api.genome.ucsc.edu/'
-    list_tracks = "/list/tracks"
+    list_tracks = "list/tracks"
     get_track = "getData/track"
     get_sequence = "getData/sequence"
 
     return base_url, list_tracks, get_track, get_sequence
 
 
-def ens_tracks(genome: str = "hg19", chrom: str = None, start: int = None, end: int = None) -> str:
+def ens_tracks(genome: str = "hg19", chrom: str = None, start: int = None, end: int = None) -> Tuple[pandas.DataFrame, str]:
     '''
     For creating a ENS Track URL. Returns a str of the url.
 
@@ -25,21 +28,8 @@ def ens_tracks(genome: str = "hg19", chrom: str = None, start: int = None, end: 
     you this will return a url without that info (and it probably would work), but it would be a cluttered 
     mess of a response.
     '''
-    # can't really partial unpack here because of it's position
-    base_url, _, get_track, _ = base_urls()
-    ens_url = "track=ensGene"
 
-    genome = f"genome={genome}"
-
-    if (chrom is not None) and (start is not None) and (end is not None):
-        chrom, start, end = f"chrom={chrom}", f"start={start}", f"end={end}"
-         
-        ens_url = f"{base_url}{get_track}?{ens_url};{genome};{chrom};{start};{end}"
-
-    else:
-        ens_url = f"{base_url}{get_track}?{ens_url};{genome}"
-
-    # return ens_url
+    ens_url = enst_tracks_url(genome = genome, chrom = chrom, start = start, end = end)
 
     try:
         query = RQuery.query(ens_url)
@@ -56,7 +46,7 @@ def ens_tracks(genome: str = "hg19", chrom: str = None, start: int = None, end: 
         query = e
 
     if isinstance(query, requests.models.Response):
-        return_data = convertRequest(query)
+        return_data: pandas.DataFrame = convertRequest(query)
 
     else:
         return_data = query
@@ -65,8 +55,82 @@ def ens_tracks(genome: str = "hg19", chrom: str = None, start: int = None, end: 
 
 
 
+def enst_tracks_url(genome: str = "hg19", chrom: str = None, start: int = None, end: int = None) -> str:
+    '''
+    '''
+    # can't really partial unpack here because of it's position
+    base_url, _, get_track, _ = base_urls()
+    ens_url = "track=ensGene"
 
-def sequence(genome: str = "hg19", chrom: str = None, start: int = None, end: int = None) -> str:
+    genome = f"genome={genome}"
+
+    if (chrom is not None) and (start is not None) and (end is not None):
+        chrom, start, end = f"chrom={chrom}", f"start={start}", f"end={end}"
+         
+        ens_url = f"{base_url}{get_track}?{ens_url};{genome};{chrom};{start};{end}"
+
+    else:
+        ens_url = f"{base_url}{get_track}?{ens_url};{genome}"
+
+    return ens_url
+
+
+
+def geneid_track(genome: str = "hg19", chrom: str = None, start: int = None, end: int = None) -> str:
+    '''
+    '''
+
+    base_url, _, get_track, _ = base_urls()
+    geneid_url = "track=geneid"
+
+    genome = f"genome={genome}"
+
+    if (chrom is not None) and (start is not None) and (end is not None):
+        chrom, start, end = f"chrom={chrom}", f"start={start}", f"end={end}"
+         
+        geneid_url = f"{base_url}{get_track}?{geneid_url};{genome};{chrom};{start};{end}"
+
+    else:
+        geneid_url = f"{base_url}{get_track}?{geneid_url};{genome}"
+
+    return geneid_url
+
+
+
+def sequence(genome: str = "hg19", chrom: str = None, start: int = None, end: int = None, strand: str = None) -> Tuple[str, str]:
+    '''
+    '''
+
+    seqURL = sequence_url(genome = genome, chrom = chrom, start = start, end = end)
+
+    try:
+        query = RQuery.query(seqURL)
+    except UnboundLocalError as e:
+        print("!!!!\tUnbound Local Error\t!!!!")
+        # logger_output(message_title="Unbound Local Error when trying to query UCSC Database", data=f"Query URL:\n{query_url}")
+
+        query = e
+
+    except Exception as e:
+        print("!!!!\tNew Error in Blat API\t!!!!")
+        # logger_output(message_title="New Error when trying to query UCSC Database", data=f"Error: {e}\n\tType: {type(e)}\nQuery URL:\n{query_url}")
+
+        query = e
+
+    if isinstance(query, requests.models.Response):
+        query = convertRequest(query)
+
+    # This little thing is here because, in this script, EVERYTHING is going to be read LEFT to RIGHT. This will make the math eaiser, but will require
+    # a little more thought
+    if strand in "-":
+        query = query[::-1]
+
+    return query, seqURL
+
+
+
+
+def sequence_url(genome: str = "hg19", chrom: str = None, start: int = None, end: int = None) -> str:
     '''
     For getting a specific sequence.
     '''
@@ -140,6 +204,13 @@ if __name__ in '__main__':
     # ensURL = url_gen.ens_tracks(chrom="chr15", start=65849223, end = 65849223 + 18)
     # print(ensURL)
 
-    seqURL = ens_tracks(chrom = "chr1", start = 94140169, end = 94140169 + 317)
-    print(seqURL)
+    # _, seqURL = ens_tracks(chrom = "chr1", start = 94140169, end = 94140169 + 317)
+    # print(seqURL)
+
+    # baseURL, trackURL, *_ = base_urls()
+    # trackURL = f"{baseURL}{trackURL}?genome=hg19"
+    # print(trackURL)
+
+    geneid_url = geneid_track(chrom = "chr1", start = 94140169, end = 94140169 + 317)
+    # print(geneid_url)
 
