@@ -19,6 +19,24 @@ def base_urls():
     return base_url, list_tracks, get_track, get_sequence
 
 
+def compliment_strand(sequence: str) -> str:
+    '''
+    '''
+    compliment_sequence = ''
+
+    for n in sequence:
+        if n in "A":
+            compliment_sequence = f"{compliment_sequence}T"
+        if n in "C":
+            compliment_sequence = f"{compliment_sequence}G"
+        if n in "G":
+            compliment_sequence = f"{compliment_sequence}C"
+        if n in "T":
+            compliment_sequence = f"{compliment_sequence}A"
+
+    return compliment_sequence
+
+
 def ens_tracks(genome: str = "hg19", chrom: str = None, start: int = None, end: int = None) -> Tuple[pandas.DataFrame, str]:
     '''
     For creating a ENS Track URL. Returns a str of the url.
@@ -97,7 +115,7 @@ def geneid_track(genome: str = "hg19", chrom: str = None, start: int = None, end
 
 
 
-def sequence(genome: str = "hg19", chrom: str = None, start: int = None, end: int = None, strand: str = None) -> Tuple[str, str]:
+def sequence(genome: str = "hg19", chrom: str = None, start: int = None, end: int = None, strand: str = None, reverse_dir = False) -> Tuple[str, str]:
     '''
     '''
 
@@ -120,9 +138,11 @@ def sequence(genome: str = "hg19", chrom: str = None, start: int = None, end: in
     if isinstance(query, requests.models.Response):
         query = convertRequest(query)
 
-    # This little thing is here because, in this script, EVERYTHING is going to be read LEFT to RIGHT. This will make the math eaiser, but will require
-    # a little more thought
     if strand in "-":
+        query = compliment_strand(query)
+        # query = query[::-1]
+
+    if reverse_dir:
         query = query[::-1]
 
     return query, seqURL
