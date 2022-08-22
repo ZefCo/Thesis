@@ -7,6 +7,7 @@ import blat_api as bpi
 import ucsc_restapi as upi
 from FusionClass import FusionGene as Fusions
 from GeneClass import Gene
+from ScoreingClasses import DissSimilarityScore
 import pathlib
 
 
@@ -21,8 +22,9 @@ def running_totals(add_var, var_str):
 
 
 
-def main(infile: str or pathlib.Path, min_length: int = 100):
+def main(infile: str or pathlib.Path, min_length: int = 100, start_index: int = 0):
     '''
+    Row 101 of the Data hit a NoneType attribute error at scoring classes line 125.
     '''
     with open(infile) as datafile:
         fusion_data = pandas.read_csv(datafile, header=0)
@@ -36,7 +38,7 @@ def main(infile: str or pathlib.Path, min_length: int = 100):
     ta: int = 0
     te: int = 0
 
-    for row in range(0, rows):
+    for row in range(start_index, rows + 1):
         row_of_interest = fusion_data.iloc[row, :].copy()
 
         hgene, tgene = row_of_interest["Hgene"], row_of_interest["Tgene"]
@@ -51,7 +53,7 @@ def main(infile: str or pathlib.Path, min_length: int = 100):
         fusion.blat()
         fusion.classify()
         fusion.distance_measure()
-        fusion.find_junction()
+
 
         if (fusion.classification is None) or (fusion.classification in "Unknown"):
             unknowns = running_totals(unknowns, "Unknown")
@@ -62,18 +64,29 @@ def main(infile: str or pathlib.Path, min_length: int = 100):
         elif fusion.classification in "T-A":
             ta = running_totals(ta, "Trans-A")
 
-        if fusion._clean_blat and fusion._clean_enst:
-            outfile = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / f"UT_BE_min{min_length}.csv"
-        elif fusion._clean_blat and not fusion._clean_enst:
-            outfile = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / f"EnstFailed.csv"
-        elif not fusion._clean_blat and not fusion._clean_enst:
-            outfile = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "BlatFailed.csv"
 
-        fusion.write_to_database(outfile = outfile)
+        if fusion._clean_blat and fusion._clean_enst:
+            outfusion: pathlib.Path = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / f"UT_BE_min{min_length}.csv"
+            outscore: pathlib.Path = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / f"Fusion_Scores_min{min_length}.csv"
+            
+            score: DissSimilarityScore = DissSimilarityScore(fusion)
+            score.score()
+
+            score.write_score(outfile = outscore)
+        
+        elif fusion._clean_blat and not fusion._clean_enst:
+            outfusion: pathlib.Path = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / f"EnstFailed.csv"
+        
+        elif not fusion._clean_blat and not fusion._clean_enst:
+            outfusion: pathlib.Path = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "BlatFailed.csv"
+
+        fusion.write_to_database(outfile = outfusion)
+        # exit()
+
 
         print(f"\n~~Finished Row {row} of {rows}~~\n####\n")
-
         # exit()
+
         # if row == 1:
         #     exit()
 
@@ -82,4 +95,4 @@ def main(infile: str or pathlib.Path, min_length: int = 100):
 
 if __name__ in '__main__':
     fusion_file = pathlib.Path.cwd().parent / "Data_Files" / "UTData_cds.csv"
-    main(fusion_file)
+    main(fusion_file, start_index=0)

@@ -7,7 +7,7 @@ import ucsc_restapi as upi
 import pandas
 from GeneClass import Gene
 from BlatClass import Blat
-from ScoreingClasses import DissSimilarityScore
+# from ScoreingClasses import DissSimilarityScore
 from typing import Tuple
 import pathlib
 import numpy as np
@@ -294,113 +294,6 @@ class FusionGene():
             #     # print(enst_response.shape[0])
 
         return enst_response, enst_url
-
-
-    def find_junction(self, length: int = 10):
-        '''
-        To anyone who comes in after me to make adjusments: draw out what you're doing. UCSC Genome reports things in the + strand, so it's a little tricky
-
-        I probably could clean this up a bit and turn it into some extra methods, but I'm having a hard time visualizing this without dealing with the personal
-        shit going on, so I'm doing this very explicetly.
-
-        Just need to grab the next expected exon and the slippage
-
-        Looks like their is a rather major issue: some of these go right to the end of the exon, so I need to check that I can actually grab the thing I want.
-
-        Move most of this over to the scoring class
-        '''
-        if self._clean_blat and self._clean_enst:
-            head5primeExIn, tail3primeExIn = self._align_blat()
-
-            if self.hstrand in "+":
-                hEnd: int = self.head_blat.tStarts[-1] + self.head_blat.blockSizes[-1]
-                hStart: int = hEnd - length
-                h3prime_rev_dir: bool = True
-                h5int_rev_dir: bool = False
-                h5exo_rev_dir: bool = False
-                
-                hIntStart: int = hEnd
-                hIntEnd: int = hEnd + 10
-
-                head5primeExIn += 1
-
-                hExoStart: int = self.head_gene.exonStarts[head5primeExIn]
-                hExoEnd: int = hExoStart + length
-
-            elif self.hstrand in "-":
-                hStart: int = self.head_blat.tStarts[0]
-                hEnd: int = hStart + length
-                h3prime_rev_dir: bool = False
-                h5int_rev_dir: bool = True
-                h5exo_rev_dir: bool = True
-
-                hIntEnd: int = hStart
-                hIntStart: int = hStart - 10
-
-                head5primeExIn -= 1
-
-                hExoEnd: int = self.head_gene.exonEnds[head5primeExIn]
-                hExoStart: int = hExoEnd - length
-
-            if self.tstrand in "+":
-                tStart: int = self.tail_blat.tStarts[0]
-                tEnd: int = tStart + length
-                t5prime_rev_dir: bool = False
-                t3int_rev_dir: bool = True
-                t3exo_rev_dir: bool = True
-
-                tIntEnd: int = tStart
-                tIntStart: int = tStart - 10
-
-                tail3primeExIn -= 1
-
-                tExoEnd: int = self.tail_gene.exonEnds[tail3primeExIn]
-                tExoStart: int = tExoEnd - length
-            
-            elif self.tstrand in "-":
-                tEnd: int = self.tail_blat.tStarts[-1] + self.tail_blat.blockSizes[-1]
-                tStart: int = tEnd - length
-                t5prime_rev_dir: bool = True
-                t3int_rev_dir: bool = False
-                t3exo_rev_dir: bool = False
-                
-                tIntEnd: int = tEnd + 10
-                tIntStart: int = tEnd
-
-                tail3primeExIn += 1
-
-                tExoStart: int = self.tail_gene.exonStarts[tail3primeExIn]
-                # chr1:94,495,984-94,495,993
-                tExoEnd: int = tExoStart + length
-
-            head3primeSeq, _ = upi.sequence(chrom = self.hchrm, start = hStart, end = hEnd, strand = self.hstrand, reverse_dir = h3prime_rev_dir)
-            head5primeInt, _ = upi.sequence(chrom = self.hchrm, start = hIntStart, end = hIntEnd, strand = self.hstrand, reverse_dir = h5int_rev_dir)
-            head5primeExo, _ = upi.sequence(chrom = self.hchrm, start = hExoStart, end = hExoEnd, strand = self.hstrand, reverse_dir = h5exo_rev_dir)
-
-            tail5primeSeq, _ = upi.sequence(chrom = self.tchrm, start = tStart, end = tEnd, strand = self.tstrand, reverse_dir = t5prime_rev_dir)
-            tail3primeInt, _ = upi.sequence(chrom = self.tchrm, start = tIntStart, end = tIntEnd, strand = self.tstrand, reverse_dir = t3int_rev_dir )
-            tail3primeExo, _ = upi.sequence(chrom = self.tchrm, start = tExoStart, end = tExoEnd, strand = self.tstrand, reverse_dir = t3exo_rev_dir)
-
-            # print(f"H3' Seq = {head3primeSeq}\n{url1}\nH5' Int = {head5primeInt}\n{url2}\nH5' Exo = {head5primeExo}\n{url3}\nT5' Seq = {tail5primeSeq}\n{url4}\nT3' Int = {tail3primeInt}\n{url5}\nT3' Exo = {tail3primeExo}\n{url6}")
-
-            # print(f"H3' Seq = {head3primeSeq}\tT5' Seq = {tail5primeSeq}")
-            # print(f"T3' Int = {tail3primeInt}\tH5' Int = {head5primeInt}")
-            # print(f"T3' Exo = {tail3primeExo}\tH5' Exo = {head5primeExo}")
-
-            # print(f"T5' Fus Seq = {tail5primeSeq}\tT3' Int Seq = {tail3primeInt}")
-            # print(f"{urlT5}\n{urlT3}")
-
-            toscore = {"H3_on_Tint3": [head3primeSeq, tail3primeInt],
-                       "H3_on_Texo3": [head3primeSeq, tail3primeExo],
-                       "T5_on_Hint5": [tail5primeSeq, head5primeInt],
-                       "T5_on_Hexo5": [tail5primeSeq, head5primeExo]}
-            
-            self.disscores = DissSimilarityScore(print_score = True, **toscore)
-
-            # for name, score in self.disscores:
-            #     if not isinstance(score, np.ndarray):
-            #         print(f"{name} = {score}")
-
             
 
 
@@ -484,11 +377,11 @@ class FusionGene():
                             printable_row[f"{indicator}{bey}"] = balue
                             # print(f"{bey}: {balue}\nType: {type(balue)}")
 
-                elif isinstance(value, DissSimilarityScore):
-                    for dey, dalue in vars(value).items():
+                # elif isinstance(value, DissSimilarityScore):
+                #     for dey, dalue in vars(value).items():
 
-                        if not isinstance(dalue, np.ndarray):
-                            printable_row[f"{dey}"] = dalue
+                #         if not isinstance(dalue, np.ndarray):
+                #             printable_row[f"{dey}"] = dalue
 
                 else:
                     printable_row[f"{key}"] = value
