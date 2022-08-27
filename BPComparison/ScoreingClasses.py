@@ -136,6 +136,76 @@ class DissSimilarityScore():
                                 "T3_Exon": self.T3_Exo}
 
 
+
+    def slip_junction(self):
+        '''
+        Finds the slip between the head and tail
+
+        Note about the Head/Tail Rev: Now we want everything to be read Left to Right, NOT Left to Right from the FJ. As a result of this
+        we only need to reverse the negative strand, because that one is being read backwards.
+        '''
+        head3primeIndex, tail5primeIndex = self.fusion._align_blat()
+
+        if self.fusion.hstrand in "+":
+            xB: int = self.fusion.head_blat.tStarts[-1] + self.fusion.head_blat.blockSizes[-1]
+            head_rev: bool = False
+
+            xE: int = self.fusion.head_gene.exonEnds[head3primeIndex]
+
+            dx: int = xB - xE
+
+            hslipStart: int = xE
+            hslipEnd: int = xB
+            
+        elif self.fusion.hstrand in "-":
+            xB: int = self.fusion.head_blat.tStarts[0]
+            head_rev: bool = True
+
+            xE: int = self.fusion.head_gene.exonStarts[head3primeIndex]
+
+            dx: int = xE - xB
+
+            hslipStart: int = xB
+            hslipEnd: int = xE
+
+        if self.fusion.tstrand in "+":
+            yB: int = self.fusion.tail_blat.tStarts[0]
+            tail_rev: bool = False
+
+            yE: int = self.fusion.tail_gene.exonStarts[tail5primeIndex]
+
+            dy: int = yE - yB
+
+            tslipStart: int = yB
+            tslipEnd: int = yE
+        
+        elif self.fusion.tstrand in "-":
+            yB: int = self.fusion.tail_blat.tStarts[-1] + self.fusion.tail_blat.blockSizes[-1]
+            tail_rev: bool = True
+
+            yE: int = self.fusion.tail_gene.exonEnds[tail5primeIndex]
+
+            dy: int = yB - yE
+
+            tslipStart: int = yE
+            tslipEnd: int = yB
+
+        # print(f"H x Exon = {xE}\tH x Block = {xB}\tDelta x = {dx}\nT y Exon = {yE}\tT y Block = {yB}\tDelta y = {dy}")
+
+        if dx > 0:
+            # print("Finding Head slip")
+            self.Hslip, _ = upi.sequence(chrom = self.fusion.hchrm, start = hslipStart, end = hslipEnd, strand = self.fusion.hstrand, reverse_dir = head_rev)
+        else:
+            self.Hslip = ""
+
+        if dy > 0:
+            # print("Finding Tail slip")
+            self.Tslip, _ = upi.sequence(chrom = self.fusion.tchrm, start = tslipStart, end = tslipEnd, strand = self.fusion.tstrand, reverse_dir = tail_rev)
+        else:
+            self.Tslip = ""
+
+
+
     def score(self):
         '''
         '''
@@ -206,6 +276,28 @@ class DissSimilarityScore():
         printable_row.to_frame().T.to_csv(outfile, index = False, header = False, mode = 'a')
 
 
+    def write_slip(self, outfile: str or pathlib.Path):
+        '''
+        Probably could combine this and the previous one but I'm lazy
+        '''
+
+        if isinstance(outfile, str):
+            outfile: pathlib.Path = pathlib.Path(outfile)
+
+        printable_row = pandas.Series(dtype=object)
+        printable_row["Name"] = f"{self.fusion.hgene}_{self.fusion.tgene}"
+        printable_row["ENST"] = f"{self.fusion.henst}_{self.fusion.tenst}"
+        printable_row["HStrand"], printable_row["TStrand"] = self.fusion.hstrand, self.fusion.tstrand
+        printable_row["HChr"], printable_row["TChr"] = self.fusion.hchrm, self.fusion.tchrm
+
+        printable_row["Classification"], printable_row["ShortDistance"], printable_row["Head2TailDistance"] = self.fusion.classification, self.fusion.shortDistance, self.fusion.head2tailDistance
+
+        printable_row["HSlip"], printable_row["TSlip"], printable_row["CombinedSlipSeq"] = self.Hslip, self.Tslip, f"{self.Hslip}{self.Tslip}"
+
+        if not outfile.is_file():
+            pandas.DataFrame(columns=list(printable_row.index)).to_csv(outfile, header = True, index = False)
+
+        printable_row.to_frame().T.to_csv(outfile, index = False, header = False, mode = 'a')
 
 
     def _little_g(self, sequence1: str, sequence2: str):

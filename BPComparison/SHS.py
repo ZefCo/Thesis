@@ -7,6 +7,7 @@ import blat_api as bpi
 import ucsc_restapi as upi
 from FusionClass import FusionGene as Fusions
 from GeneClass import Gene
+from BlatClass import Blat
 from ScoreingClasses import DissSimilarityScore
 import pathlib
 
@@ -22,7 +23,86 @@ def running_totals(add_var, var_str):
 
 
 
-def main(infile: str or pathlib.Path, min_length: int = 100, start_index: int = 0):
+def gapSearch(infile: str or pathlib.Path):
+    '''
+    '''
+    with open(infile) as datafile:
+        fusion_data = pandas.read_csv(datafile, header=0)
+
+    rows, _ = fusion_data.shape
+
+    for row in range(rows):
+        row_of_interest = fusion_data.iloc[row, :].copy()
+
+        hgene, tgene = row_of_interest["hgene"], row_of_interest["tgene"]
+        henst, tenst = row_of_interest["henst"], row_of_interest["tenst"]
+        hchrm, tchrm = row_of_interest["hchrm"], row_of_interest["tchrm"]
+        hstrand, tstrand = row_of_interest["hstrand"], row_of_interest["tstrand"]
+        seq = row_of_interest["seq"]
+
+        classification, short_distance, head2tailDistance = row_of_interest["classification"], row_of_interest["shortDistance"], row_of_interest["head2tailDistance"]
+
+        fusion = Fusions(hgene = hgene, tgene = tgene, henst = henst, tenst = tenst, hchrm = hchrm, tchrm = tchrm, hstrand = hstrand, tstrand = tstrand, seq = seq)
+
+        # Fuck I forgot that these things go out as lists but come back in as strings
+        convert_list = ["hexonStarts", "texonStarts", "hexonEnds", "texonEnds", "hexonFrames", "texonFrames", "hblockSizes", "tblockSizes", "htStarts", "ttStarts"]
+        for strtup in convert_list:
+            row_of_interest[strtup] = CM.convert2list(row_of_interest[strtup])
+
+        head_gene = Gene(row_of_interest["hgene"],
+                        gname = row_of_interest["hgname"],
+                        txStart = row_of_interest["htxStart"],
+                        txEnd = row_of_interest["htxEnd"],
+                        cdsStart =row_of_interest["hcdsStart"],
+                        cdsEnd = row_of_interest["hcdsEnd"],
+                        exonCount = row_of_interest["hexonCount"],
+                        exonStarts = row_of_interest["hexonStarts"],
+                        exonEnds = row_of_interest["hexonEnds"],
+                        exonFrames = row_of_interest["hexonFrames"])
+
+        tail_gene = Gene(row_of_interest,
+                        gname = row_of_interest["tgname"],
+                        txStart = row_of_interest["ttxStart"],
+                        txEnd = row_of_interest["ttxEnd"],
+                        cdsStart = row_of_interest["tcdsStart"],
+                        cdsEnd = row_of_interest["tcdsEnd"],
+                        exonCount = row_of_interest["texonCount"],
+                        exonStarts = row_of_interest["texonStarts"],
+                        exonEnds = row_of_interest["texonEnds"],
+                        exonFrames = row_of_interest["texonFrames"])
+
+        head_blat = Blat(qName = row_of_interest["hgene"],
+                        tStart = row_of_interest["htStart"],
+                        tEnd = row_of_interest["htEnd"],
+                        blockCount = row_of_interest["hblockCount"],
+                        blockSizes = row_of_interest["hblockSizes"],
+                        tStarts = row_of_interest["htStarts"])
+
+        tail_blat = Blat(qName = row_of_interest["tgene"],
+                        tStart = row_of_interest["ttStart"],
+                        tEnd = row_of_interest["ttEnd"],
+                        blockCount = row_of_interest["tblockCount"],
+                        blockSizes = row_of_interest["tblockSizes"],
+                        tStarts = row_of_interest["ttStarts"])
+
+
+
+        fusion.second_import(classification, short_distance, head2tailDistance, head_gene, tail_gene, head_blat, tail_blat)
+        print(f"####\n{fusion.hgene}_{fusion.tgene}\n{fusion.henst}_{fusion.tenst}")
+
+        score: DissSimilarityScore = DissSimilarityScore(fusion)
+        score.slip_junction()
+        # print(f"{score.Hslip}{score.Tslip}")
+        # score.write_slip(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "SlipJunction.csv")
+
+        print(f"\n~~Finished Row {row} of {rows}~~\n####\n")
+
+        # if row == 10:
+        #     exit()
+
+
+
+def databaseBuild(infile: str or pathlib.Path, min_length: int = 100, start_index: int = 0):
     '''
     Row 101 of the Data hit a NoneType attribute error at scoring classes line 125.
     '''
@@ -94,5 +174,7 @@ def main(infile: str or pathlib.Path, min_length: int = 100, start_index: int = 
 
 
 if __name__ in '__main__':
-    fusion_file = pathlib.Path.cwd().parent / "Data_Files" / "UTData_cds.csv"
-    main(fusion_file, start_index=0)
+    # fusion_file = pathlib.Path.cwd().parent / "Data_Files" / "UTData_cds.csv"
+    # databaseBuild(fusion_file, start_index=0)
+    refusion_file = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "UT_BE_min100.csv"
+    gapSearch(refusion_file)

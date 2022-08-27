@@ -48,6 +48,13 @@ def convert2list(sequence: str, ) -> tuple:
 
     seqlist = tuple(seqlist)
 
+    if seqlist[-1] is None:
+        seqlist = list(seqlist)
+        seqlist = seqlist[:-1]
+        seqlist = tuple(seqlist)
+
+    # print(seqlist)
+
     return seqlist
 
 

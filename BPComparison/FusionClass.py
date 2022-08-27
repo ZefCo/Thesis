@@ -38,7 +38,7 @@ class FusionGene():
         self.tail_gene: Gene = None
 
         self.head_blat: Blat = None
-        self.tail_gene: Blat = None
+        self.tail_blat: Blat = None
 
 
 
@@ -338,10 +338,24 @@ class FusionGene():
         return ucsc_data, ucsc_url
 
 
-    def second_import(self, second_file: str or pathlib.Path = None, *args, **kwargs):
+    def second_import(self, classification, short_distance, head2tailDistance, head_gene, tail_gene, head_blat, tail_blat, *args, **kwargs):
         '''
         For when things have already been identified and you just want to add details to the thing.
         '''
+        self._clean_blat: bool = True
+        self._clean_enst: bool = True
+
+        self.classification: str = classification
+        self.shortDistance: int or complex or str = short_distance
+        self.head2tailDistance: int or complex or str = head2tailDistance
+
+        self.head_gene: Gene = head_gene
+        self.tail_gene: Gene = tail_gene
+
+        self.head_blat: Blat = head_blat
+        self.tail_blat: Blat = tail_blat
+
+
 
 
     def write_to_database(self, outfile: str or pathlib.Path, error_output: bool = False, *args, **kwargs):
@@ -402,6 +416,7 @@ class FusionGene():
         '''
         '''
         if self.hstrand in "+":
+            # print(self.head_blat.tStarts)
             h3prime = self.head_blat.tStarts[-1] + self.head_blat.blockSizes[-1]
             exon3primes = self.head_gene.exonEnds
         elif self.hstrand in "-":
@@ -428,7 +443,7 @@ class FusionGene():
         '''
 
         '''
-        # print(f"blatStart = {blatPosition}\nexonStarts = {exonStarts}")
+        # print(f"blatStart = {blatPosition}\nexonStarts = {exonPositions}")
         delta_blat = np.array(exonPositions)
 
         delta_blat = abs(delta_blat - blatPosition)

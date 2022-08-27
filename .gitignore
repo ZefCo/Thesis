@@ -2,3 +2,4 @@
 /CheapBlat
 *.log
 LogFiles/
+.Rproj.user
