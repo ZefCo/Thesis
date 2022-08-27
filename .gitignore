@@ -3,3 +3,6 @@
 *.log
 LogFiles/
 .Rproj.user
+.RData
+.Rhistory
+Thesis.Rproj
