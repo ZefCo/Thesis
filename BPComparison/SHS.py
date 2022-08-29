@@ -92,8 +92,8 @@ def gapSearch(infile: str or pathlib.Path):
 
         score: DissSimilarityScore = DissSimilarityScore(fusion)
         score.slip_junction()
-        # print(f"{score.Hslip}{score.Tslip}")
-        # score.write_slip(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "SlipJunction.csv")
+        print(f"{score.Hslip}{score.Tslip}")
+        score.write_slip(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "SlipJunctionWSeq.csv")
 
         print(f"\n~~Finished Row {row} of {rows}~~\n####\n")
 
@@ -171,10 +171,63 @@ def databaseBuild(infile: str or pathlib.Path, min_length: int = 100, start_inde
         #     exit()
 
 
+def addCancerTypes():
+    '''
+    Because now suddenly the cancer types are important!
+    '''
+
+    original_file = pathlib.Path.cwd().parent / "Data_Files" / "UTData_cds.csv"
+    slippage_file = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "SlipJunctionWSeq.xlsx"
+
+    with open(original_file) as og:
+        original_data: pandas.DataFrame = pandas.read_csv(og, header = 0)
+
+    with open(slippage_file) as ex:
+        slippage_data: pandas.DataFrame = pandas.read_excel(slippage_file, sheet_name = "SlipJunctionWSeq", header = 0)
+
+    outpath = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "SlippageGenes_2.csv"
+    # pandas.DataFrame(columns=tuple(slippage_data.columns)).to_csv(outpath, header = True, index = False)
+
+    # print(slippage_data)
+
+    original_data["CName"] = original_data["Hgene"] + "_" + original_data["Tgene"]
+    original_data["Censt"] = original_data["Henst"] + "_" + original_data["Tenst"]
+
+    # print(original_data)
+
+    rows, _ = slippage_data.shape
+
+    slippage_2oh = pandas.DataFrame()
+    for row in range(rows):
+        row_of_interest = slippage_data.iloc[row, :].copy()
+        matching_row = original_data.index[(original_data["Seq"] == row_of_interest["Seq"]) & (original_data["CName"] == row_of_interest["Name"]) & (original_data["Censt"] == row_of_interest["ENST"]) & (original_data["Hstrand"] == row_of_interest["HStrand"]) & (original_data["Tstrand"] == row_of_interest["TStrand"]) & (original_data["Hchr"] == row_of_interest["HChr"]) & (original_data["Tchr"] == row_of_interest["TChr"])].to_list()
+        # matching_row = original_data[original_data["Seq"] == row_of_interest["Seq"]]
+        # match_index = matching_row.i
+        # print(original_data.loc[matching_row, "Ctype"].iat[0])
+        # print(type(original_data.loc[matching_row, "Ctype"].iat[0]))
+
+        row_of_interest["Ctype"] = original_data.loc[matching_row, "Ctype"].iat[0]
+        row_of_interest["Source"] = original_data.loc[matching_row, "Source"].iat[0]
+        # print(matching_row)
+        # print(row_of_interest)
+
+        slippage_2oh = pandas.concat([slippage_2oh, row_of_interest.to_frame().T], axis = 0)
+
+        # if row > 5:
+        #     print(slippage_2oh)
+        #     slippage_2oh.to_csv(outpath, index = False)
+        #     exit()
+
+    slippage_2oh.to_csv(outpath, index = False)
+
+
+
+
 
 
 if __name__ in '__main__':
     # fusion_file = pathlib.Path.cwd().parent / "Data_Files" / "UTData_cds.csv"
     # databaseBuild(fusion_file, start_index=0)
-    refusion_file = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "UT_BE_min100.csv"
-    gapSearch(refusion_file)
+    # refusion_file = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "UT_BE_min100.csv"
+    # gapSearch(refusion_file)
+    addCancerTypes()

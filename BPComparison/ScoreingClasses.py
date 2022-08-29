@@ -285,6 +285,7 @@ class DissSimilarityScore():
             outfile: pathlib.Path = pathlib.Path(outfile)
 
         printable_row = pandas.Series(dtype=object)
+        printable_row["Seq"] = self.fusion.seq
         printable_row["Name"] = f"{self.fusion.hgene}_{self.fusion.tgene}"
         printable_row["ENST"] = f"{self.fusion.henst}_{self.fusion.tenst}"
         printable_row["HStrand"], printable_row["TStrand"] = self.fusion.hstrand, self.fusion.tstrand
@@ -293,6 +294,7 @@ class DissSimilarityScore():
         printable_row["Classification"], printable_row["ShortDistance"], printable_row["Head2TailDistance"] = self.fusion.classification, self.fusion.shortDistance, self.fusion.head2tailDistance
 
         printable_row["HSlip"], printable_row["TSlip"], printable_row["CombinedSlipSeq"] = self.Hslip, self.Tslip, f"{self.Hslip}{self.Tslip}"
+
 
         if not outfile.is_file():
             pandas.DataFrame(columns=list(printable_row.index)).to_csv(outfile, header = True, index = False)
