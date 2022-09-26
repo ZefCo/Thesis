@@ -1,6 +1,4 @@
 # import rpy2
-from re import sub
-from sys import path_hooks
 import pandas
 import pathlib
 # from RFunClass import RFun
@@ -25,7 +23,124 @@ import plotly.express as px
     # Do this by cancer too
 
 
-def main(file_path = pathlib.Path or str):
+def score_histogram(file_path = pathlib.Path or str):
+    '''
+    '''
+    if isinstance(file_path, str):
+        file_path = pathlib.Path(file_path)
+    
+    # import file in different ways, depending on if its csv or xlx
+    if file_path.suffix in ".csv":
+        with open(file_path) as indata:
+            data = pandas.read_csv(indata, header=0)
+    elif file_path.suffix in ".xlsx":
+        with open(file_path) as indata:
+            data = pandas.read_excel(indata, sheet_name = "idk", header = 0)
+
+    # grab only the stuff between [1, 10] length. This data is copy and pasted from the Slip Seq File (same order)
+    data = data[(data["CSlipLen"] < 11) & (data["CSlipLen"] > 0)]
+
+    # empty dataframes to hold the counts later
+    ht3Intron_freq_data = pandas.DataFrame()
+    ht3Exon_freq_data = pandas.DataFrame()
+    th5Intron_freq_data = pandas.DataFrame()
+    th5Exon_freq_data = pandas.DataFrame()
+
+    # Being a little lazy here: I'm going to create them as catagories, that way I can just easily count the number of catagories
+    data["H3_Seq_T3_Intron"], data["H3_Seq_T3_Exon"], data["H5_Intron_T5_Seq"], data["H5_Exon_T5_Seq"], data["Ctype"] = pandas.Categorical(data["H3_Seq_T3_Intron"]), pandas.Categorical(data["H3_Seq_T3_Exon"]), pandas.Categorical(data["H5_Intron_T5_Seq"]), pandas.Categorical(data["H5_Exon_T5_Seq"]), pandas.Categorical(data["Ctype"])
+
+    # grab the cancer types, include a global option so we can look at everything
+    c_types = tuple(["Global"] + list(data["Ctype"].cat.categories))
+
+    # Iterate through the types of cancer, counting the frequency of the scores
+    for c_type in c_types:
+        if c_type in "Global":
+            ht3Intron_score_freq = data["H3_Seq_T3_Intron"].value_counts()
+            ht3Intron_score_freq.name = c_type
+            ht3Intron_freq_data = pandas.concat([ht3Intron_freq_data, ht3Intron_score_freq.to_frame().T])
+
+            ht3Exon_score_freq = data["H3_Seq_T3_Exon"].value_counts()
+            ht3Exon_score_freq.name = c_type
+            ht3Exon_freq_data = pandas.concat([ht3Exon_freq_data, ht3Exon_score_freq.to_frame().T])
+
+            th5Intron_score_freq = data["H5_Intron_T5_Seq"].value_counts()
+            th5Intron_score_freq.name = c_type
+            th5Intron_freq_data = pandas.concat([th5Intron_freq_data, th5Intron_score_freq.to_frame().T])
+
+            th5Exon_score_freq = data["H5_Exon_T5_Seq"].value_counts()
+            th5Exon_score_freq.name = c_type
+            th5Exon_freq_data = pandas.concat([th5Exon_freq_data, th5Exon_score_freq.to_frame().T])
+
+        else:
+            subdata = data[data["Ctype"] == c_type]
+            
+            ht3Intron_score_freq = subdata["H3_Seq_T3_Intron"].value_counts()
+            ht3Intron_score_freq.name = c_type
+            ht3Intron_freq_data = pandas.concat([ht3Intron_freq_data, ht3Intron_score_freq.to_frame().T])
+
+            ht3Exon_score_freq = subdata["H3_Seq_T3_Exon"].value_counts()
+            ht3Exon_score_freq.name = c_type
+            ht3Exon_freq_data = pandas.concat([ht3Exon_freq_data, ht3Exon_score_freq.to_frame().T])
+
+            th5Intron_score_freq = subdata["H5_Intron_T5_Seq"].value_counts()
+            th5Intron_score_freq.name = c_type
+            th5Intron_freq_data = pandas.concat([th5Intron_freq_data, th5Intron_score_freq.to_frame().T])
+
+            th5Exon_score_freq = subdata["H5_Exon_T5_Seq"].value_counts()
+            th5Exon_score_freq.name = c_type
+            th5Exon_freq_data = pandas.concat([th5Exon_freq_data, th5Exon_score_freq.to_frame().T])
+
+
+    ht3Intron_freq_data = ht3Intron_freq_data.T
+    ht3Intron_norm_data = ht3Intron_freq_data / ht3Intron_freq_data.sum(axis = 0)
+    ht3Intron_freq_data.to_csv(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "HistogramData" / "HT3_Intron_Data.csv")
+    ht3Intron_norm_data.to_csv(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "HistogramData" / "HT3_Intron_Norm.csv")
+
+    ht3Exon_freq_data = ht3Exon_freq_data.T
+    ht3Exon_norm_data = ht3Exon_freq_data / ht3Exon_freq_data.sum(axis = 0)
+    ht3Exon_freq_data.to_csv(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "HistogramData" / "HT3_Exon_Data.csv")
+    ht3Exon_norm_data.to_csv(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "HistogramData" / "HT3_Exon_Norm.csv")
+    
+    th5Intron_freq_data = th5Intron_freq_data.T
+    th5Intron_norm_data = th5Intron_freq_data / th5Intron_freq_data.sum(axis = 0)
+    th5Intron_freq_data.to_csv(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "HistogramData" / "TH5_Intron_Data.csv")
+    th5Intron_norm_data.to_csv(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "HistogramData" / "TH5_Intron_Norm.csv")
+    
+    th5Exon_freq_data = th5Exon_freq_data.T
+    th5Exon_norm_data = th5Exon_freq_data / th5Exon_freq_data.sum(axis = 0)
+    th5Exon_freq_data.to_csv(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "HistogramData" / "TH5_Exon_Data.csv")
+    th5Exon_norm_data.to_csv(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "HistogramData" / "TH5_Exon_Norm.csv")
+
+    for c_type in c_types:
+        # subdata = pandas.DataFrame(g_freq_data[c_type])
+        subhidata, subhedata, subtidata, subtedata = ht3Intron_freq_data[c_type], ht3Exon_freq_data[c_type], th5Intron_freq_data[c_type], th5Exon_freq_data[c_type]
+        subhidano, subhedano, subtidano, subtedano = ht3Intron_norm_data[c_type], ht3Exon_norm_data[c_type], th5Intron_norm_data[c_type], th5Exon_norm_data[c_type]
+
+        # print(subdata)
+
+        hig = px.histogram(subhidata, x = tuple(subhidata.index), y = c_type, nbins = len(tuple(subhidata.index)), title = f"{c_type}: Head 3 Prime to Tail 3 Prime Intron Scores")
+        hig.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / "Scores" / f"HT3I_{c_type}.html")
+        hin = px.histogram(subhidano, x = tuple(subhidano.index), y = c_type, nbins = len(tuple(subhidata.index)), title = f"{c_type}: Normalized Head 3 Prime to Tail 3 Prime Intron Scores")
+        hin.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / "Scores" / f"HT3I_{c_type}_norm.html")
+
+        heg = px.histogram(subhedata, x = tuple(subhedata.index), y = c_type, nbins = len(tuple(subhedata.index)), title = f"{c_type}: Head 3 Prime to Tail 3 Prime Exon Scores")
+        heg.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / "Scores" / f"HT3E_{c_type}.html")
+        hen = px.histogram(subhedano, x = tuple(subhedano.index), y = c_type, nbins = len(tuple(subhedano.index)), title = f"{c_type}: Normalized Head 3 Prime to Tail 3 Prime Exon Scores")
+        hen.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / "Scores" / f"HT3E_{c_type}_norm.html")
+
+        tig = px.histogram(subtidata, x = tuple(subtidata.index), y = c_type, nbins = len(tuple(subtidata.index)), title = f"{c_type}: Tail 5 Prime to Head 5 Prime Intron Scores")
+        tig.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / "Scores" / f"TH5I_{c_type}.html")
+        tin = px.histogram(subtidano, x = tuple(subtidano.index), y = c_type, nbins = len(tuple(subtidano.index)), title = f"{c_type}: Normalized Tail 5 Prime to Head 5 Prime Intron Scores")
+        tin.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / "Scores" / f"TH5I_{c_type}_norm.html")
+
+        teg = px.histogram(subtedata, x = tuple(subtedata.index), y = c_type, nbins = len(tuple(subtedata.index)), title = f"{c_type}: Tail 5 Prime to Head 5 Prime Exon Scores")
+        teg.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / "Scores" / f"TH5E_{c_type}.html")
+        ten = px.histogram(subtedano, x = tuple(subtedano.index), y = c_type, nbins = len(tuple(subtedano.index)), title = f"{c_type}: Normalized Tail 5 Prime to Head 5 Prime Exon Scores")
+        ten.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / "Scores" / f"TH5E_{c_type}_norm.html")
+
+
+
+def seq_histogram(file_path = pathlib.Path or str):
     '''
     '''
     if isinstance(file_path, str):
@@ -38,8 +153,7 @@ def main(file_path = pathlib.Path or str):
         with open(file_path) as indata:
             data = pandas.read_excel(indata, sheet_name = "SlippageGenes_2", header = 0)
 
-    data = data[data["CSlipLen"] >= 0]
-    total_counts, _ = data.shape
+    # data = data[data["CSlipLen"] >= 0]
     # print(total_count)
     data = data[(data["CSlipLen"] < 11) & (data["CSlipLen"] > 0)]
 
@@ -115,19 +229,19 @@ def main(file_path = pathlib.Path or str):
         # print(subdata)
 
         fig = px.histogram(subgdata, x = tuple(subgdata.index), y = c_type, title = f"{c_type}: Fusion Junction Slippage")
-        fig.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / f"FusJun_{c_type}.html")
+        fig.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / "Seq" / f"FusJun_{c_type}.html")
         fin = px.histogram(subgdano, x = tuple(subgdano.index), y = c_type, title = f"{c_type}: Normalized Fusion Junction Slippage")
-        fin.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / f"FusNorm_{c_type}.html")
+        fin.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / "Seq" / f"FusNorm_{c_type}.html")
 
         hig = px.histogram(subhdata, x = tuple(subhdata.index), y = c_type, title = f"{c_type}: Head Slippage")
-        hig.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / f"HeadJun_{c_type}.html")
-        fig = px.histogram(subhdano, x = tuple(subhdano.index), y = c_type, title = f"{c_type}: Normalized Head Slippage")
-        fig.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / f"HeadNorm_{c_type}.html")
+        hig.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / "Seq" / f"HeadJun_{c_type}.html")
+        hin = px.histogram(subhdano, x = tuple(subhdano.index), y = c_type, title = f"{c_type}: Normalized Head Slippage")
+        hin.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / "Seq" / f"HeadNorm_{c_type}.html")
 
         tig = px.histogram(subtdata, x = tuple(subtdata.index), y = c_type, title = f"{c_type}: Tail Slippage")
-        tig.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / f"TailJun_{c_type}.html")
-        fig = px.histogram(subtdano, x = tuple(subtdano.index), y = c_type, title = f"{c_type}: Normalized Tail Slippage")
-        fig.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / f"TailNorm_{c_type}.html")
+        tig.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / "Seq" / f"TailJun_{c_type}.html")
+        tin = px.histogram(subtdano, x = tuple(subtdano.index), y = c_type, title = f"{c_type}: Normalized Tail Slippage")
+        tin.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / "Seq" / f"TailNorm_{c_type}.html")
 
         # fig.update_layout(title_text=c_type)
         # fig.show()
@@ -141,4 +255,5 @@ def main(file_path = pathlib.Path or str):
 
 
 if __name__ in '__main__':
-    main(file_path = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "SlippageGenes_2.csv")
+    # seq_histogram(file_path = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "SlippageGenes_2.csv")
+    score_histogram(file_path = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Scoring_min100_83022_15k.csv")

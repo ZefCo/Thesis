@@ -19,7 +19,7 @@ def main():
     '''
     '''
     show = True
-    min_length = 1000
+    min_length = 100
     with open(pathlib.Path.cwd().parent / "Data_Files" / "UTData_cds.csv") as utdatafile:
         ut_data = pandas.read_csv(utdatafile, header=0)
 
@@ -46,7 +46,7 @@ def main():
 
     chrm_heatmap_nosame = px.imshow(ut_c_heatmap_nosame, text_auto=True, labels=dict(x="Tail Chrm", y = "Head Chrm", color = f"No Normalization"))
     chrm_heatmap_nosame.update_xaxes(side = "top")
-    chrm_heatmap_nosame.update_layout(title=f"Fusion Frequency across chromosomes ~ Min Seq Len = {min_length} ~ Same Chr value = 0")
+    chrm_heatmap_nosame.update_layout(title=f"Fusion Frequency across chromosomes ~ Same Chr value = 0")
 
     ut_logmap = normalization(ut_c_heatmap, method="log")
     chrm_logmap = px.imshow(ut_logmap, text_auto=False, labels=dict(x="Tail Chrm", y = "Head Chrm", color = "Log 2"))
@@ -56,7 +56,7 @@ def main():
     ut_logmap_nosame = normalization(ut_c_heatmap_nosame, method="log")
     chrm_logmap_nosame = px.imshow(ut_logmap_nosame, text_auto=False, labels=dict(x="Tail Chrm", y = "Head Chrm", color = f"Log 2"))
     chrm_logmap_nosame.update_xaxes(side = "top")
-    chrm_logmap_nosame.update_layout(title=f"Fusion Frequency across chromosomes ~ Min Seq Len = {min_length} ~ Same Chr value = 0")
+    chrm_logmap_nosame.update_layout(title=f"Fusion Frequency across chromosomes ~ Same Chr value = 0")
 
     # ut_rangemap = normalization(ut_c_heatmap, method = "range")
     # chrm_rangemap = px.imshow(ut_rangemap, text_auto=False, labels=dict(x="Tail Chrm", y = "Head Chrm", color = "Normal to Range"))

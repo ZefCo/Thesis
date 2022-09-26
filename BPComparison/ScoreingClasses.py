@@ -257,6 +257,8 @@ class DissSimilarityScore():
             outfile: pathlib.Path = pathlib.Path(outfile)
 
         printable_row = pandas.Series(dtype=object)
+        # This may print out None if there is nothing in there, but that's OK
+        printable_row["Ctype"], printable_row["Source"] = self.fusion.ctype, self.fusion.source
         printable_row["Name"] = f"{self.fusion.hgene}_{self.fusion.tgene}"
         printable_row["ENST"] = f"{self.fusion.henst}_{self.fusion.tenst}"
         printable_row["HStrand"], printable_row["TStrand"] = self.fusion.hstrand, self.fusion.tstrand
@@ -285,6 +287,8 @@ class DissSimilarityScore():
             outfile: pathlib.Path = pathlib.Path(outfile)
 
         printable_row = pandas.Series(dtype=object)
+        # This may print out None if there is nothing in there, but that's OK
+        printable_row["Ctype"], printable_row["Source"] = self.fusion.ctype, self.fusion.source
         printable_row["Seq"] = self.fusion.seq
         printable_row["Name"] = f"{self.fusion.hgene}_{self.fusion.tgene}"
         printable_row["ENST"] = f"{self.fusion.henst}_{self.fusion.tenst}"

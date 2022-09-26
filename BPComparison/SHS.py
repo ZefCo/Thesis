@@ -38,7 +38,7 @@ def gapSearch(infile: str or pathlib.Path):
         henst, tenst = row_of_interest["henst"], row_of_interest["tenst"]
         hchrm, tchrm = row_of_interest["hchrm"], row_of_interest["tchrm"]
         hstrand, tstrand = row_of_interest["hstrand"], row_of_interest["tstrand"]
-        seq = row_of_interest["seq"]
+        seq, ctype, source = row_of_interest["seq"], row_of_interest["Ctype"], row_of_interest["Source"]
 
         classification, short_distance, head2tailDistance = row_of_interest["classification"], row_of_interest["shortDistance"], row_of_interest["head2tailDistance"]
 
@@ -171,36 +171,134 @@ def databaseBuild(infile: str or pathlib.Path, min_length: int = 100, start_inde
         #     exit()
 
 
+def scoreing(infile: str or pathlib.Path, outfile: str or pathlib.Path):
+    '''
+    '''
+
+    if not isinstance(outfile, pathlib.Path):
+        outfile: pathlib.Path = pathlib.Path(outfile)
+
+    with open(infile) as datafile:
+        fusion_data = pandas.read_csv(datafile, header=0)
+
+    rows, _ = fusion_data.shape
+
+    for row in range(rows):
+        row_of_interest = fusion_data.iloc[row, :].copy()
+
+        hgene, tgene = row_of_interest["hgene"], row_of_interest["tgene"]
+        henst, tenst = row_of_interest["henst"], row_of_interest["tenst"]
+        hchrm, tchrm = row_of_interest["hchrm"], row_of_interest["tchrm"]
+        hstrand, tstrand = row_of_interest["hstrand"], row_of_interest["tstrand"]
+        seq, ctype, source = row_of_interest["seq"], row_of_interest["Ctype"], row_of_interest["Source"]
+
+        classification, short_distance, head2tailDistance = row_of_interest["classification"], row_of_interest["shortDistance"], row_of_interest["head2tailDistance"]
+
+        fusion = Fusions(hgene = hgene, tgene = tgene, henst = henst, tenst = tenst, hchrm = hchrm, tchrm = tchrm, hstrand = hstrand, tstrand = tstrand, seq = seq, ctype = ctype, source = source)
+
+        # Fuck I forgot that these things go out as lists but come back in as strings
+        convert_list = ["hexonStarts", "texonStarts", "hexonEnds", "texonEnds", "hexonFrames", "texonFrames", "hblockSizes", "tblockSizes", "htStarts", "ttStarts"]
+        for strtup in convert_list:
+            row_of_interest[strtup] = CM.convert2list(row_of_interest[strtup])
+
+        head_gene = Gene(row_of_interest["hgene"],
+                        gname = row_of_interest["hgname"],
+                        txStart = row_of_interest["htxStart"],
+                        txEnd = row_of_interest["htxEnd"],
+                        cdsStart =row_of_interest["hcdsStart"],
+                        cdsEnd = row_of_interest["hcdsEnd"],
+                        exonCount = row_of_interest["hexonCount"],
+                        exonStarts = row_of_interest["hexonStarts"],
+                        exonEnds = row_of_interest["hexonEnds"],
+                        exonFrames = row_of_interest["hexonFrames"])
+
+        tail_gene = Gene(row_of_interest,
+                        gname = row_of_interest["tgname"],
+                        txStart = row_of_interest["ttxStart"],
+                        txEnd = row_of_interest["ttxEnd"],
+                        cdsStart = row_of_interest["tcdsStart"],
+                        cdsEnd = row_of_interest["tcdsEnd"],
+                        exonCount = row_of_interest["texonCount"],
+                        exonStarts = row_of_interest["texonStarts"],
+                        exonEnds = row_of_interest["texonEnds"],
+                        exonFrames = row_of_interest["texonFrames"])
+
+        head_blat = Blat(qName = row_of_interest["hgene"],
+                        tStart = row_of_interest["htStart"],
+                        tEnd = row_of_interest["htEnd"],
+                        blockCount = row_of_interest["hblockCount"],
+                        blockSizes = row_of_interest["hblockSizes"],
+                        tStarts = row_of_interest["htStarts"])
+
+        tail_blat = Blat(qName = row_of_interest["tgene"],
+                        tStart = row_of_interest["ttStart"],
+                        tEnd = row_of_interest["ttEnd"],
+                        blockCount = row_of_interest["tblockCount"],
+                        blockSizes = row_of_interest["tblockSizes"],
+                        tStarts = row_of_interest["ttStarts"])
+
+
+
+        fusion.second_import(classification, short_distance, head2tailDistance, head_gene, tail_gene, head_blat, tail_blat)
+        print(f"####\n{fusion.hgene}_{fusion.tgene}\n{fusion.henst}_{fusion.tenst}")
+
+        score: DissSimilarityScore = DissSimilarityScore(fusion)
+        score.score()
+        score.write_score(outfile = outfile)
+
+
+        # print(vars(fusion))
+        # print(fusion.hgene)
+
+        # if row == 0:
+        #     exit()
+
+
 def addCancerTypes():
     '''
     Because now suddenly the cancer types are important!
+
+    This is going to be ad hoc, because what I should do is add things like the cancer and seq in the future databases when I make the databases, rather then add them in at a later date.
+    So this isn't going to be a very modular code, it's going to work for what I have in front of me.
     '''
 
-    original_file = pathlib.Path.cwd().parent / "Data_Files" / "UTData_cds.csv"
-    slippage_file = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "SlipJunctionWSeq.xlsx"
+    original_file: pathlib.Path = pathlib.Path.cwd().parent / "Data_Files" / "UTData_cds.csv"
+    updated_file: pathlib.Path = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "UT_BE_min100.csv"
 
     with open(original_file) as og:
         original_data: pandas.DataFrame = pandas.read_csv(og, header = 0)
 
-    with open(slippage_file) as ex:
-        slippage_data: pandas.DataFrame = pandas.read_excel(slippage_file, sheet_name = "SlipJunctionWSeq", header = 0)
+    if updated_file.suffix in ".xlsx":
+        with open(updated_file) as ex:
+            updated_data: pandas.DataFrame = pandas.read_excel(ex, sheet_name = "SlipJunctionWSeq", header = 0)
+    elif updated_file.suffix in ".csv":
+        with open(updated_file) as ex:
+            updated_data: pandas.DataFrame = pandas.read_csv(ex, header = 0)
 
-    outpath = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "SlippageGenes_2.csv"
+    outpath = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "UT_BE_min100_Ctype.csv"
     # pandas.DataFrame(columns=tuple(slippage_data.columns)).to_csv(outpath, header = True, index = False)
 
     # print(slippage_data)
 
-    original_data["CName"] = original_data["Hgene"] + "_" + original_data["Tgene"]
-    original_data["Censt"] = original_data["Henst"] + "_" + original_data["Tenst"]
+    # original_data["CName"] = original_data["Hgene"] + "_" + original_data["Tgene"]
+    # original_data["Censt"] = original_data["Henst"] + "_" + original_data["Tenst"]
 
     # print(original_data)
 
-    rows, _ = slippage_data.shape
+    rows, _ = updated_data.shape
 
-    slippage_2oh = pandas.DataFrame()
+    score_2oh = pandas.DataFrame()
     for row in range(rows):
-        row_of_interest = slippage_data.iloc[row, :].copy()
-        matching_row = original_data.index[(original_data["Seq"] == row_of_interest["Seq"]) & (original_data["CName"] == row_of_interest["Name"]) & (original_data["Censt"] == row_of_interest["ENST"]) & (original_data["Hstrand"] == row_of_interest["HStrand"]) & (original_data["Tstrand"] == row_of_interest["TStrand"]) & (original_data["Hchr"] == row_of_interest["HChr"]) & (original_data["Tchr"] == row_of_interest["TChr"])].to_list()
+        row_of_interest = updated_data.iloc[row, :].copy()
+        matching_row = original_data.index[(original_data["Seq"] == row_of_interest["seq"]) & \
+                                            (original_data["Hgene"] == row_of_interest["hgene"]) & \
+                                            (original_data["Tgene"] == row_of_interest["tgene"]) & \
+                                            (original_data["Henst"] == row_of_interest["henst"]) & \
+                                            (original_data["Tenst"] == row_of_interest["tenst"]) & \
+                                            (original_data["Hstrand"] == row_of_interest["hstrand"]) & \
+                                            (original_data["Tstrand"] == row_of_interest["tstrand"]) & \
+                                            (original_data["Hchr"] == row_of_interest["hchrm"]) & \
+                                            (original_data["Tchr"] == row_of_interest["tchrm"])].to_list()
         # matching_row = original_data[original_data["Seq"] == row_of_interest["Seq"]]
         # match_index = matching_row.i
         # print(original_data.loc[matching_row, "Ctype"].iat[0])
@@ -211,14 +309,14 @@ def addCancerTypes():
         # print(matching_row)
         # print(row_of_interest)
 
-        slippage_2oh = pandas.concat([slippage_2oh, row_of_interest.to_frame().T], axis = 0)
+        score_2oh = pandas.concat([score_2oh, row_of_interest.to_frame().T], axis = 0)
 
         # if row > 5:
         #     print(slippage_2oh)
         #     slippage_2oh.to_csv(outpath, index = False)
         #     exit()
 
-    slippage_2oh.to_csv(outpath, index = False)
+    score_2oh.to_csv(outpath, index = False)
 
 
 
@@ -230,4 +328,5 @@ if __name__ in '__main__':
     # databaseBuild(fusion_file, start_index=0)
     # refusion_file = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "UT_BE_min100.csv"
     # gapSearch(refusion_file)
-    addCancerTypes()
+    # addCancerTypes()
+    scoreing(infile = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "UT_BE_min100_Ctype.csv", outfile = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Scoring_min100_83022_15k.csv")
