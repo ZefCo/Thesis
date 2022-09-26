@@ -223,28 +223,36 @@ def seq_histogram(file_path = pathlib.Path or str):
 
     for c_type in c_types:
         # subdata = pandas.DataFrame(g_freq_data[c_type])
+        # subgdata, subhdata, subtdata = g_freq_data[c_type].nlargest(n = 10), h_freq_data[c_type].nlargest(n = 10), t_freq_data[c_type].nlargest(n = 10)
         subgdata, subhdata, subtdata = g_freq_data[c_type], h_freq_data[c_type], t_freq_data[c_type]
-        subgdano, subhdano, subtdano = g_freq_norm[c_type], h_freq_norm[c_type], t_freq_norm[c_type]
+        subgdata, subhdata, subtdata = subgdata.loc[lambda x: x / subgdata.sum() >= 0.01], subhdata.loc[lambda x: x / subhdata.sum() >= 0.01], subtdata.loc[lambda x: x / subhdata.sum() >= 0.01]
+
+        # subgdata, subhdata, subtdata = subgdata.loc[lambda x: x >=5], subhdata.loc[lambda x: x >=5], subtdata.loc[lambda x: x >=5]
+        subgdano, subhdano, subtdano = g_freq_norm[c_type].nlargest(n = 10), h_freq_norm[c_type].nlargest(n = 10), t_freq_norm[c_type].nlargest(n = 10)
+
+        # print(type(subgdata))
 
         # print(subdata)
 
-        fig = px.histogram(subgdata, x = tuple(subgdata.index), y = c_type, title = f"{c_type}: Fusion Junction Slippage")
+        fig = px.histogram(subgdata, x = tuple(subgdata.index), y = c_type, title = f"{c_type}: Fusion Junction Slippage", color = tuple(subgdata.index))
         fig.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / "Seq" / f"FusJun_{c_type}.html")
-        fin = px.histogram(subgdano, x = tuple(subgdano.index), y = c_type, title = f"{c_type}: Normalized Fusion Junction Slippage")
+        fin = px.histogram(subgdano, x = tuple(subgdano.index), y = c_type, title = f"{c_type}: Normalized Fusion Junction Slippage", color = tuple(subgdano.index))
         fin.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / "Seq" / f"FusNorm_{c_type}.html")
 
-        hig = px.histogram(subhdata, x = tuple(subhdata.index), y = c_type, title = f"{c_type}: Head Slippage")
+        hig = px.histogram(subhdata, x = tuple(subhdata.index), y = c_type, title = f"{c_type}: Head Slippage", color = tuple(subhdata.index))
         hig.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / "Seq" / f"HeadJun_{c_type}.html")
-        hin = px.histogram(subhdano, x = tuple(subhdano.index), y = c_type, title = f"{c_type}: Normalized Head Slippage")
+        hin = px.histogram(subhdano, x = tuple(subhdano.index), y = c_type, title = f"{c_type}: Normalized Head Slippage", color = tuple(subhdano.index))
         hin.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / "Seq" / f"HeadNorm_{c_type}.html")
 
-        tig = px.histogram(subtdata, x = tuple(subtdata.index), y = c_type, title = f"{c_type}: Tail Slippage")
+        tig = px.histogram(subtdata, x = tuple(subtdata.index), y = c_type, title = f"{c_type}: Tail Slippage", color = tuple(subtdata.index))
         tig.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / "Seq" / f"TailJun_{c_type}.html")
-        tin = px.histogram(subtdano, x = tuple(subtdano.index), y = c_type, title = f"{c_type}: Normalized Tail Slippage")
+        tin = px.histogram(subtdano, x = tuple(subtdano.index), y = c_type, title = f"{c_type}: Normalized Tail Slippage", color = tuple(subtdano.index))
         tin.write_html(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Histograms" / "Seq" / f"TailNorm_{c_type}.html")
 
-        # fig.update_layout(title_text=c_type)
+        fig.update_layout(title_text=c_type)
         # fig.show()
+        # hig.show()
+        # tig.show()
 
 
 
@@ -255,5 +263,5 @@ def seq_histogram(file_path = pathlib.Path or str):
 
 
 if __name__ in '__main__':
-    # seq_histogram(file_path = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "SlippageGenes_2.csv")
-    score_histogram(file_path = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Scoring_min100_83022_15k.csv")
+    seq_histogram(file_path = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "SlippageGenes_2.csv")
+    # score_histogram(file_path = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Scoring_min100_83022_15k.csv")

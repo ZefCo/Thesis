@@ -1,11 +1,14 @@
 rm(list=ls())
 library(ggplot2)
 
-score_path <- "D:\\Coding\\Thesis\\Data_Files\\BPComp\\Fusion_Scores_min100.csv"
+score_path <- "D:\\Coding\\Thesis\\Data_Files\\BPComp\\Scoring_min100_83022_15k.csv"
 
 score_data <- read.csv(score_path, header = T)
 
 score_data$Classification <- factor(score_data$Classification)
+score_data$Ctype <- factor(score_data$Ctype)
+print(levels(score_data$Ctype))
+score_data <- score_data[score_data$Ctype == "BRCA",]
 
 global_list <- c("H3_Seq_H5_Intron", "H3_Seq_H5_Exon", "H3_Seq_T5_Seq", "H3_Seq_T3_Intron", "H3_Seq_T3_Exon", "H5_Intron_H5_Exon", "H5_Intron_T5_Seq", "H5_Intron_T3_Intron", "H5_Intron_T3_Exon", "H5_Exon_T5_Seq", "H5_Exon_T3_Intron", "H5_Exon_T3_Exon", "T5_Seq_T3_Intron", "T5_Seq_T3_Exon", "T3_Intron_T3_Exon")
 selected_list <- c("H3_Seq_T3_Intron", "H3_Seq_T3_Exon", "H5_Intron_T5_Seq", "H5_Exon_T5_Seq")
@@ -43,11 +46,15 @@ hcolors <- c("H3_Seq_T3_Intron" = "red", "H3_Seq_T3_Exon" = "green", "H5_Intron_
 
 ggglobal <- ggplot(global_scores, aes(x=location, y=scores, fill=location))  + 
   geom_boxplot() + theme_grey() + theme(axis.ticks.x = element_blank(), axis.text.x = element_blank(), axis.title.x = element_blank()) 
+print(ggglobal)
 ggselected <- ggplot(selected_scores, aes(x=location, y=scores, fill=location)) + 
   geom_boxplot() + theme_grey() + theme(axis.title.x = element_blank(), axis.ticks.x = element_blank(), axis.text.x = element_blank())
+print(ggselected)
 gghisto <- ggplot(selected_scores, aes(x = scores, fill = location)) + geom_histogram(position = "dodge", bins = 50) #+ scale_fill_manual(values = hcolors)
 #ggglobal <- ggglobal + ggplot(randomGlobal, aes(x = x, y = y))
+print(gghisto)
 
-ggglobal
-ggselected
-gghisto
+
+# ggglobal
+# ggselected
+# gghisto
