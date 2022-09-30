@@ -38,11 +38,11 @@ def gapSearch(infile: str or pathlib.Path):
         henst, tenst = row_of_interest["henst"], row_of_interest["tenst"]
         hchrm, tchrm = row_of_interest["hchrm"], row_of_interest["tchrm"]
         hstrand, tstrand = row_of_interest["hstrand"], row_of_interest["tstrand"]
-        seq = row_of_interest["seq"]
+        seq, ctype, source = row_of_interest["seq"], row_of_interest["ctype"], row_of_interest["source"]
 
         classification, short_distance, head2tailDistance = row_of_interest["classification"], row_of_interest["shortDistance"], row_of_interest["head2tailDistance"]
 
-        fusion = Fusions(hgene = hgene, tgene = tgene, henst = henst, tenst = tenst, hchrm = hchrm, tchrm = tchrm, hstrand = hstrand, tstrand = tstrand, seq = seq)
+        fusion = Fusions(hgene = hgene, tgene = tgene, henst = henst, tenst = tenst, hchrm = hchrm, tchrm = tchrm, hstrand = hstrand, tstrand = tstrand, seq = seq, ctype = ctype, source = source)
 
         # Fuck I forgot that these things go out as lists but come back in as strings
         convert_list = ["hexonStarts", "texonStarts", "hexonEnds", "texonEnds", "hexonFrames", "texonFrames", "hblockSizes", "tblockSizes", "htStarts", "ttStarts"]
@@ -93,7 +93,7 @@ def gapSearch(infile: str or pathlib.Path):
         score: DissSimilarityScore = DissSimilarityScore(fusion)
         score.slip_junction()
         print(f"{score.Hslip}{score.Tslip}")
-        score.write_slip(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "SlipJunctionWSeq.csv")
+        score.write_slip(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "SlipJunctionWSeq_fs.csv")
 
         print(f"\n~~Finished Row {row} of {rows}~~\n####\n")
 
@@ -125,9 +125,9 @@ def databaseBuild(infile: str or pathlib.Path, min_length: int = 100, start_inde
         henst, tenst = row_of_interest["Henst"], row_of_interest["Tenst"]
         hchrm, tchrm = row_of_interest["Hchr"], row_of_interest["Tchr"]
         hstrand, tstrand = row_of_interest["Hstrand"], row_of_interest["Tstrand"]
-        seq = row_of_interest["Seq"]
+        seq, ctype, source = row_of_interest["Seq"], row_of_interest["Ctype"], row_of_interest["Source"]
 
-        fusion = Fusions(hgene = hgene, tgene = tgene, henst = henst, tenst = tenst, hchrm = hchrm, tchrm = tchrm, hstrand = hstrand, tstrand = tstrand, seq = seq)
+        fusion = Fusions(hgene = hgene, tgene = tgene, henst = henst, tenst = tenst, hchrm = hchrm, tchrm = tchrm, hstrand = hstrand, tstrand = tstrand, seq = seq, ctype = ctype, source = source)
         print(f"####\n{fusion.hgene}_{fusion.tgene}\n{fusion.henst}_{fusion.tenst}")
 
         fusion.blat()
@@ -146,8 +146,8 @@ def databaseBuild(infile: str or pathlib.Path, min_length: int = 100, start_inde
 
 
         if fusion._clean_blat and fusion._clean_enst:
-            outfusion: pathlib.Path = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / f"UT_BE_min{min_length}.csv"
-            outscore: pathlib.Path = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / f"Fusion_Scores_min{min_length}.csv"
+            outfusion: pathlib.Path = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / f"UT_BE_min{min_length}_fs.csv"
+            outscore: pathlib.Path = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / f"Fusion_Scores_min{min_length}_fs.csv"
             
             score: DissSimilarityScore = DissSimilarityScore(fusion)
             score.score()
@@ -155,16 +155,19 @@ def databaseBuild(infile: str or pathlib.Path, min_length: int = 100, start_inde
             score.write_score(outfile = outscore)
         
         elif fusion._clean_blat and not fusion._clean_enst:
-            outfusion: pathlib.Path = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / f"EnstFailed.csv"
+            outfusion: pathlib.Path = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / f"EnstFailed_fs.csv"
         
         elif not fusion._clean_blat and not fusion._clean_enst:
-            outfusion: pathlib.Path = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "BlatFailed.csv"
+            outfusion: pathlib.Path = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "BlatFailed_fs.csv"
 
         fusion.write_to_database(outfile = outfusion)
         # exit()
 
 
         print(f"\n~~Finished Row {row} of {rows}~~\n####\n")
+
+        if row > 100:
+            exit()
         # exit()
 
         # if row == 1:
@@ -226,8 +229,8 @@ def addCancerTypes():
 
 
 if __name__ in '__main__':
-    # fusion_file = pathlib.Path.cwd().parent / "Data_Files" / "UTData_cds.csv"
+    # fusion_file = pathlib.Path.cwd().parent / "Data_Files" / "UTData_fs.csv"
     # databaseBuild(fusion_file, start_index=0)
-    # refusion_file = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "UT_BE_min100.csv"
-    # gapSearch(refusion_file)
-    addCancerTypes()
+    refusion_file = pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "UT_BE_min100_fs.csv"
+    gapSearch(refusion_file)
+    # addCancerTypes()
