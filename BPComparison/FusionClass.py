@@ -14,8 +14,8 @@ import numpy as np
 
 
 class FusionGene():
-    def __init__(self, hgene: str, tgene: str, seq: str, henst: str, tenst: str, hstrand: str, tstrand: str, hchrm: str, tchrm: str, ctype: str, source: str, gdb: str = "hg19") -> None:
-        # everything here, unless otherwise noted, is a string
+    def __init__(self, hgene: str, tgene: str, seq: str, henst: str, tenst: str, hstrand: str, tstrand: str, hchrm: str, tchrm: str, ctype: str = None, source: str = None, gdb: str = "hg19") -> None:
+        # everything here, unless otherwise noted, is mostly likely a string
         self.gdb = gdb
 
         self.hgene, self.henst, self.hchrm, self.hstrand = hgene, henst, hchrm, hstrand

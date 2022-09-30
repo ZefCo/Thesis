@@ -6,3 +6,6 @@ LogFiles/
 .RData
 .Rhistory
 Thesis.Rproj
+*.pdf
+*.html
+*.png
