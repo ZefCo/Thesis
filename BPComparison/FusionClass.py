@@ -441,7 +441,7 @@ class FusionGene():
 
     def _local_align(self, blatPosition: int, exonPositions: tuple) -> int:
         '''
-
+        Finds the minimum difference between the blat exon and the gene exon.
         '''
         # print(f"blatStart = {blatPosition}\nexonStarts = {exonPositions}")
         delta_blat = np.array(exonPositions)
