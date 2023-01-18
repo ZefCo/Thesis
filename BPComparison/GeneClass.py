@@ -22,7 +22,7 @@ class Gene():
         self.name = name
         self.ename, self.gname = ename, gname
         self.chrm, self.strand = chrm, strand
-        self.txStart, self.cdsStart, self.txEnd, self.cdsEnd = txStart, cdsStart, txEnd, cdsEnd
+        self.txStart, self.cdsStart, self.txEnd, self.cdsEnd = self._convert2int(txStart), self._convert2int(cdsStart), self._convert2int(txEnd), self._convert2int(cdsEnd)
         self.exonCount, self.exonStarts, self.exonEnds, self.exonFrames = self._convert2numerical(exonCount), self._convert2numerical(exonStarts), self._convert2numerical(exonEnds), self._convert2numerical(exonFrames)
 
 
@@ -72,6 +72,16 @@ class Gene():
             seqlist = sequence
 
         return seqlist
+
+
+    def _convert2int(self, att: str) -> int:
+        '''
+        For when the thing is just a number.
+        '''
+
+        att = int(att)
+
+        return att
 
 
 

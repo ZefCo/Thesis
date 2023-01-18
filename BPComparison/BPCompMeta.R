@@ -1,7 +1,7 @@
 rm(list=ls())
 library(ggplot2)
 
-score_path <- "D:\\Coding\\Thesis\\Data_Files\\BPComp\\Exon2ExonJunctionScores_v2.csv"
+score_path <- "D:\\Coding\\Thesis\\Data_Files\\BPComp\\Exon2ExonJunctionScores_v3.csv"
 
 score_data <- read.csv(score_path, header = T)
 
