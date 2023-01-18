@@ -16,7 +16,7 @@ import pathlib
 
 
 length = 10
-random_sample = 100
+# random_sample = 100
 
 with open(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "UT_BE_min100_Ctype.csv") as csvfile:
     collected_data = pandas.read_csv(csvfile, header = 0)
@@ -24,11 +24,13 @@ with open(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "UT_BE_min100_Ct
 unique_data = collected_data.groupby(["tgene", "hgene"]).first()
 # print(unique_data["hgene"])
 unique_data = unique_data.reset_index()
-rample_data = unique_data.sample(n = random_sample)
-rows, cols = rample_data.shape
+# rample_data = unique_data.sample(n = random_sample)
+# rows, cols = rample_data.shape
+rows, cols = unique_data.shape
+
 
 for row in range(rows):
-    row_of_interest = rample_data.iloc[row, :].copy()
+    row_of_interest = unique_data.iloc[row, :].copy()
     fusion = Fusions(row_of_interest["hgene"], row_of_interest["tgene"], row_of_interest["seq"], row_of_interest["henst"], row_of_interest["tenst"], row_of_interest["hstrand"], row_of_interest["tstrand"], row_of_interest["hchrm"], row_of_interest["tchrm"], row_of_interest["ctype"], row_of_interest["source"])
 
     classification, short_distance, head2tailDistance = row_of_interest["classification"], row_of_interest["shortDistance"], row_of_interest["head2tailDistance"]
@@ -205,7 +207,7 @@ for row in range(rows):
                     "T3_Exon": T3_Exo}
 
     score.score()
-    score.write_score(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Exon2ExonJunctionScores_v2.csv")
+    score.write_score(pathlib.Path.cwd().parent / "Data_Files" / "BPComp" / "Exon2ExonJunctionScores_v3.csv")
 
     print(f"\n~~Finished Row {row} of {rows}~~\n####\n")
 

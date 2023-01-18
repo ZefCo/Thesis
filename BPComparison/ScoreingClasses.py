@@ -272,6 +272,8 @@ class DissSimilarityScore():
 
         printable_row["Classification"], printable_row["ShortDistance"], printable_row["Head2TailDistance"] = self.fusion.classification, self.fusion.shortDistance, self.fusion.head2tailDistance
 
+        printable_row["seq"] = self.fusion.seq
+
         if not outfile.is_file():
             pandas.DataFrame(columns=list(printable_row.index)).to_csv(outfile, header = True, index = False)
 
@@ -319,7 +321,7 @@ class DissSimilarityScore():
             for _ in range(abs(delta_len)):
                 sequence1 = f"{sequence1}x"
 
-        g_vec = np.array([0 if seq1 in sequence2[i] else 1 for i, seq1 in enumerate(sequence1)])
+        g_vec = np.array([0 if ((seq1 in sequence2[i]) and (seq1 not in "X") and (sequence2[i] not in "X")) else 1 for i, seq1 in enumerate(sequence1)])
 
         return g_vec
 
