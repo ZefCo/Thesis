@@ -1,6 +1,7 @@
 rm(list=ls())
 library(ggplot2)
 
+
 score_path <- "D:\\Coding\\Thesis\\Data_Files\\BPComp\\Exon2ExonJunctionScores_v3.csv"
 
 score_data <- read.csv(score_path, header = T)
@@ -45,10 +46,10 @@ randomSelected <- data.frame(x = selected_list, y = rep(0.75, length(selected_li
 hcolors <- c("H3_Seq_T3_Intron" = "red", "H3_Seq_T3_Exon" = "green", "H5_Intron_T5_Seq" = "blue", "H5_Exon_T5_Seq" = "purple")
 
 ggglobal <- ggplot(global_scores, aes(x=location, y=scores, fill=location))  + 
-  geom_boxplot() + theme_grey() + theme(axis.ticks.x = element_blank(), axis.text.x = element_blank(), axis.title.x = element_blank()) + labs(title = "Random Sample of 100 from database")
+  geom_boxplot() + theme_grey() + theme(axis.ticks.x = element_blank(), axis.text.x = element_blank(), axis.title.x = element_blank()) + labs(title = "All Comparisons")
 print(ggglobal)
 ggselected <- ggplot(selected_scores, aes(x=location, y=scores, fill=location)) + 
-  geom_boxplot() + theme_grey() + theme(axis.title.x = element_blank(), axis.ticks.x = element_blank(), axis.text.x = element_blank()) + labs(title = "Random Sample of 100 from database")
+  geom_boxplot() + theme_grey() + theme(axis.title.x = element_blank(), axis.ticks.x = element_blank(), axis.text.x = element_blank()) + labs(title = "Selected Comparisons")
 print(ggselected)
 gghisto <- ggplot(selected_scores, aes(x = scores, fill = location)) + geom_histogram(position = "dodge", bins = 50) #+ scale_fill_manual(values = hcolors)
 #ggglobal <- ggglobal + ggplot(randomGlobal, aes(x = x, y = y))
