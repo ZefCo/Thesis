@@ -30,6 +30,7 @@ class Gene():
         self.exonCount, self.exonStarts, self.exonEnds, self.exonFrames = self._convert2numerical(exonCount), self._convert2numerical(exonStarts), self._convert2numerical(exonEnds), self._convert2numerical(exonFrames)
         self.utr5_cords, self.cds_cords, self.utr3_cords, self.intron_cords = None, None, None, None
         self.utr5_seq, self.cds_seq, self.utr3_seq, self.intron_seq = None, None, None, None
+        self.full_seq = None
 
 
 
@@ -76,12 +77,16 @@ class Gene():
                 self.intron_seq.append(seq)
                 # print(url)
 
+        self.full_seq = upi.sequence(chrom = self.chrm, start = self.txStart, end = self.txEnd, strand = self.strand)
+
 
 
 
     def write_sequences(self, outfolder: str or pathlib.Path):
         '''
         Writes the UTR, CDS, and Intron sequences into 4 differenct files
+
+        Not really useful as the Introns are too long to be saved into a CSV file.
         '''
 
         print(f"Writing {self.name} Sequences")
@@ -97,6 +102,7 @@ class Gene():
         printable_row["Name"] = self.name
         printable_row["ename"], printable_row["gname"], printable_row["ncibname"] = self.ename, self.gname, self.ncibname
         printable_row["Chr"], printable_row["Strand"] = self.chrm, self.strand
+        printable_row["Sequence"] = self.full_seq
 
         utr5_headers, cds_headers, utr3_headers, intron_headers = ["Name", "ename", "gname", "ncibname", "Chr", "Strand"], ["Name", "ename", "gname", "ncibname", "Chr", "Strand"], ["Name", "ename", "gname", "ncibname", "Chr", "Strand"], ["Name", "ename", "gname", "ncibname", "Chr", "Strand"]
 
@@ -162,13 +168,70 @@ class Gene():
                 printable_row[header_seq] = seq
 
             intron_frame = printable_row[intron_headers]
-            intron_file = outfolder / "Intron.csv"
+            intron_file = outfolder / "Intron_seq.csv"
             # print(intron_frame)
 
             if not intron_file.is_file():
                 pandas.DataFrame(columns=list(printable_row.index)).to_csv(intron_file, header = False, index = False)
 
             intron_frame.to_frame().T.to_csv(intron_file, index = False, header = False, mode = 'a')
+
+
+    def new_row(self) -> pandas.Series:
+        '''
+        Returns a pandas series.
+
+        Will assemble the attributes of the gene into a series for output.
+        '''
+
+        print(f"Adding {self.name} Sequences To Pickle Frame")
+        # if isinstance(outfolder, str):
+        #     outfolder: pathlib.Path = pathlib.Path(outfolder)
+
+        # if not outfolder.is_dir():
+        #     outfolder.mkdir()
+
+        printable_row = pandas.Series(dtype=object)
+        # name	chrom	strand	txStart	txEnd	cdsStart	cdsEnd	exonCount	exonStarts	exonEnds	score	name2	cdsStartStat	cdsEndStat	exonFrames
+        # This may print out None if there is nothing in there, but that's OK
+        printable_row["Name"] = self.name
+        printable_row["ename"], printable_row["gname"], printable_row["ncibname"] = self.ename, self.gname, self.ncibname
+        printable_row["Chr"], printable_row["Strand"] = self.chrm, self.strand
+
+        if isinstance(self.utr5_seq, list):
+            for j, seq in enumerate(self.utr5_seq):
+                header_seq, header_cor = f"UTR5Seq{j}", f"UTR5Cord{j}"
+                # utr5_headers.append(header_seq), utr5_headers.append(header_cor)
+
+                printable_row[header_cor] = self.utr5_cords[j]
+                printable_row[header_seq] = seq
+            
+        if isinstance(self.cds_seq, list):
+            for j, seq in enumerate(self.cds_seq):
+                header_seq, header_cor = f"CDSSeq{j}", f"CDSCord{j}"
+                # cds_headers.append(header_seq), cds_headers.append(header_cor)
+
+                printable_row[header_cor] = self.cds_cords[j]
+                printable_row[header_seq] = seq
+
+        if isinstance(self.utr3_seq, list):
+            for j, seq in enumerate(self.utr3_seq):
+                header_seq, header_cor = f"UTR3Seq{j}", f"UTR3Cord{j}"
+                # utr3_headers.append(header_seq), utr3_headers.append(header_cor)
+
+                printable_row[header_cor] = self.utr3_cords[j]
+                printable_row[header_seq] = seq
+
+        if isinstance(self.intron_seq, list):
+            for j, seq in enumerate(self.intron_seq):
+                header_seq, header_cor = f"IntronSeq{j}", f"IntronCord{j}"
+                # intron_headers.append(header_seq), intron_headers.append(header_cor)
+
+                printable_row[header_cor] = self.intron_cords[j]
+                printable_row[header_seq] = seq
+
+        return pandas.Series(printable_row)
+
 
 
     def _sequence_coords(self):
@@ -243,6 +306,7 @@ class Gene():
 
         for i in range(len(self.exonEnds) - 1):
             self.intron_cords.append((self.exonEnds[i], self.exonStarts[i + 1])) 
+            # print(len(self.intron_cords))
 
 
 
