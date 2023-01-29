@@ -11,7 +11,7 @@ def main():
     '''
     cwd = pathlib.Path.cwd()
     root = cwd.parent
-    nuc_perm = perm.nucleotide_permutations()
+    # nuc_perm = perm.nucleotide_permutations()
     # print(nuc_perm)
     with open(root / "Data_Files" / "Sequence_Files" / "HG19" / "Known_Genes_hg19_noSeq.csv") as known_file:
     # with open(root / "Data_Files" / "Sequence_Files" / "HG19" / "hg_test.csv") as known_file:
@@ -31,6 +31,9 @@ def main():
 
     rows, cols = training_genes.shape
 
+    pickle_frame = pandas.DataFrame()
+    # gene_rows = list()
+
     for row in range(rows):
         row_of_interest = training_genes.iloc[row, :]
 
@@ -49,12 +52,27 @@ def main():
 
 
         gene_of_interest.sequence_breakdown()
-        gene_of_interest.write_sequences(root / "Data_Files" / "NucComp")
+        # gene_of_interest.write_sequences(root / "Data_Files" / "NucComp")
 
-        # print(row_of_interest)
+        gene_row: pandas.Series = gene_of_interest.new_row()
+        # print(type(gene_row))
 
-        # if row > 1:
+        pickle_frame = pandas.concat([pickle_frame, gene_row.to_frame().T])
+        # gene_rows.append(gene_row)
+
+        # if row == 3:
         #     break
+
+        # pickle_frame = pickle_frame.reset_index()
+        print(pickle_frame.shape)
+        # pickle_set = set(pickle_frame.columns)
+        pickle_frame.to_pickle("TrainingGeneData_v2.pkl")  # Updating Pickle file every iteration.
+
+    # test_frame: pandas.DataFrame = pandas.read_pickle(cwd / "FUH.pkl")
+    # print(test_frame.shape)
+    # test_set = set(test_frame.columns)
+
+    # print(test_set - pickle_set)
 
 
 

@@ -2,9 +2,6 @@ import pandas
 import pathlib
 import re
 
-# Split the sequence
-# Classify the splits
-
 def main():
     '''
     '''
@@ -19,11 +16,9 @@ def main():
     utr3_list, cds_list, intron_list, utr5_list = list(), list(), list(), list()
 
     for col in train_data_cols:
-        # if re.search("Cord", col):
-        if re.search("Seq", col):
+        if re.search("Cord", col):
             train_data.pop(col)
-        # elif re.search("Seq", col):
-        elif re.search("Cord", col):
+        elif re.search("Seq", col):
             if re.search("CDS", col):
                 cds_list.append(col)
             elif re.search("Intron", col):
@@ -38,6 +33,7 @@ def main():
     utr5_list.sort(key = len)
     utr3_list.sort(key = len)
 
+    full_seq = f""
 
     
 
