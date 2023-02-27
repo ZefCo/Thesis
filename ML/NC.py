@@ -25,7 +25,7 @@ def main():
     training_genes = pandas.DataFrame()
     for c in known_genes["chrom"].cat.categories:
         subframe = known_genes[known_genes["chrom"] == c]
-        subframe = subframe.sample(n = 200)
+        subframe = subframe.sample(n = 50)
 
         training_genes = pandas.concat([training_genes, subframe])
 
@@ -35,10 +35,13 @@ def main():
     # print(pandas.Categorical(training_genes["chrom"]).unique())
     # exit()
 
-    pickle_frame = pandas.DataFrame()
+    pickle_frame = pandas.DataFrame(columns=["Seq", "Type"])
     # gene_rows = list()
+    type_sample = 7
+    running_index = 0
 
     for row in range(rows):
+        print(f"Working on row {row}")
         row_of_interest = training_genes.iloc[row, :]
 
         gene_of_interest: Gene = Gene.Gene(row_of_interest["name2"],
@@ -59,18 +62,54 @@ def main():
         # gene_of_interest.write_sequences(root / "Data_Files" / "NucComp")
 
         gene_row: pandas.Series = gene_of_interest.new_row()
+
+        row_index = gene_row.index
+
+        for index in row_index:
+            # print(thing)
+            if re.search("Seq", index):
+                pass
+            else:
+                gene_row = gene_row.drop(index)
+        
+
         # print(gene_row)
+        # print(gene_row.shape)
+        selected_samples = gene_row.shape[0]
+        if selected_samples > type_sample:
+            selected_samples = type_sample
+
+        gene_row = gene_row.sample(n = selected_samples)
+        # print(gene_row)
+
+        row_index = gene_row.index
+        for index in row_index:
+            if re.search(r"Seq\d+", index):
+                seq_type = re.sub(r"Seq\d+", "", index)
+
+            # pickle_frame = pickle_frame.append({})
+            pickle_frame.loc[running_index] = [gene_row[index], seq_type]
+            running_index += 1
+
+            # pickle_frame.append() = gene_row[index]
+            # pickle_frame[running_index, "Type"] = seq_type
+
+        # print(gene_row)
+        # print(pickle_frame)
+
+            
+
         # exit()
         # print(type(gene_row))
 
-        pickle_frame = pandas.concat([pickle_frame, gene_row.to_frame().T])
+        # pickle_frame = pandas.concat([pickle_frame, gene_row.to_frame().T])
         # gene_rows.append(gene_row)
 
         # if row == 3:
         #     break
 
         # pickle_frame = pickle_frame.reset_index()
-        print(pickle_frame.shape)
+        # print(pickle_frame.shape)
         # pickle_set = set(pickle_frame.columns)
     pickle_frame.to_pickle("TrainingGeneData_v3.pkl")  # Updating Pickle file every iteration.
 
