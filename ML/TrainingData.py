@@ -42,9 +42,9 @@ def main():
 
     # ran_sample = utr5_data.sample(n = 1000)
 
-    testing_data = pandas.DataFrame()
+    # testing_data = pandas.DataFrame()
 
-    rows, cols = utr5_data.shape
+    rows, _ = utr5_data.shape
 
     for row in range(rows):
         utr5_sample = utr5_data.iloc[row, :]
@@ -120,6 +120,11 @@ def main():
         #     break
 
     # testing_data.to_csv(str(train_files / "Training_Data.csv"), index = False, header = True)
+
+
+def sanity():
+     '''
+     '''
 
 
 
