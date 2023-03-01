@@ -9,6 +9,9 @@ import GeneClass as Gene
 def main():
     '''
     '''
+    random_samples = 150
+
+
     cwd = pathlib.Path.cwd()
     root = cwd.parent
     # nuc_perm = perm.nucleotide_permutations()
@@ -25,7 +28,7 @@ def main():
     training_genes = pandas.DataFrame()
     for c in known_genes["chrom"].cat.categories:
         subframe = known_genes[known_genes["chrom"] == c]
-        subframe = subframe.sample(n = 50)
+        subframe = subframe.sample(n = random_samples)
 
         training_genes = pandas.concat([training_genes, subframe])
 
@@ -111,6 +114,7 @@ def main():
         # pickle_frame = pickle_frame.reset_index()
         # print(pickle_frame.shape)
         # pickle_set = set(pickle_frame.columns)
+    pickle_frame = pickle_frame.astype('int32')
     pickle_frame.to_pickle("TrainingGeneData_v3.pkl")  # Updating Pickle file every iteration.
 
     # test_frame: pandas.DataFrame = pandas.read_pickle(cwd / "FUH.pkl")
