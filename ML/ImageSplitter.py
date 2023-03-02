@@ -43,8 +43,8 @@ length = 100_000
 
 # print(data_set_1)
 
-data = np.ndarray(shape = (rows, length, 4))
-labels = np.ndarray(shape = (rows, 1))
+data = np.ndarray(shape = (rows, length, 4), dtype = 'int32')
+labels = np.ndarray(shape = (rows, 1), dtype = "int32")
 
 
 for row in range(rows):
