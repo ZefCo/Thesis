@@ -43,8 +43,8 @@ length = 100_000
 
 # print(data_set_1)
 
-data = np.ndarray(shape = (rows, length, 4), dtype = 'int32')
-labels = np.ndarray(shape = (rows, 1), dtype = "int32")
+data = np.ndarray(shape = (rows, length, 4), dtype = 'uint8')
+labels = np.ndarray(shape = (rows, 1), dtype = "uint8")
 
 
 for row in range(rows):
@@ -107,6 +107,7 @@ for row in range(rows):
         # data = np.concatenate([data, image_seq])
 
 # print(labels[0])
+print(np.unique(labels))
 
 np.save(cwd / "Data", data)
 np.save(cwd / "Labels", labels)
