@@ -86,6 +86,8 @@ def set_num_lab(in_type: str) -> np.int32:
 def set_one_hot(in_type) -> np.int32:
     '''
     Trying to get one hot encoding working
+
+    still...
     '''
 
     label = np.array([1, 0, 0, 0], dtype='int32') if in_type in "CDS" else np.array([0, 1, 0, 0], dtype='int32') if in_type in "Intron" else np.array([0, 0, 1, 0], dtype='int32') if in_type in "UTR5" else np.array([0, 0, 0, 1], dtype='int32')
