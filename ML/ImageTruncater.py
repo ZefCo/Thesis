@@ -106,8 +106,8 @@ def digitize_sequences(input_path, out_labels, out_data, length = 100_000):
     input_data: pandas.DataFrame = pandas.read_pickle(str(input_path))
 
     out_data = f"{out_data}_L{length}"
-    out_labels = f"{out_labels}_L{length}"
     out_hots = f"{out_labels}_OneHots_L{length}"
+    out_labels = f"{out_labels}_L{length}"
 
     print(input_data)
 
@@ -179,19 +179,16 @@ def digitize_sequences(input_path, out_labels, out_data, length = 100_000):
         
         else:
             labels[row] = -1
-            data[row] = -1
-            one_hots[row] = -1
             
-
-    # print(f"\n\n")
-    # for row in range(rows):
-    #     if labels[row] == 0:
-    #         print(f"Row = {row}")
     
     print(np.unique(labels))
     print(np.unique(data))
     print(np.unique(one_hots))
     print(total_seq_error, total_lab_error)
+
+    print(np.where(labels < 0)[0].shape)
+    print(np.where(data < 0)[0].shape)
+    print(np.where(one_hots < 0)[0].shape)
 
     # print(labels)
     # print(one_hots)
