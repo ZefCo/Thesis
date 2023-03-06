@@ -64,8 +64,11 @@ def count_occurences(n_data, permutations: list):
     return occurences
 
 
-nuc_perm = nucleotide_permutations()
+# nuc_perm = nucleotide_permutations()
+nuc_perm = []
+nuc_perm.append("A"), nuc_perm.append("C"), nuc_perm.append("G"), nuc_perm.append("T")
 master_occurences = {perm:0 for perm in nuc_perm}
+# master_occurences["A"], master_occurences["C"], master_occurences["G"], master_occurences["T"] = 0, 0, 0, 0
 exon_occurences = copy.deepcopy(master_occurences)
 intron_occurences = copy.deepcopy(master_occurences)
 utr5_occurences = copy.deepcopy(master_occurences)
@@ -140,4 +143,5 @@ hist.add_trace(go.Bar(x = list(utr3_occurences.keys()), y = list(utr3_occurences
 # hist.update_traces(opacity = 0.5)
 hist.update_layout(title = "All occurances")
 
-hist.show()
+# hist.show()
+hist.write_html(str(cwd / "GeneSurvey_1Mere.html"))
