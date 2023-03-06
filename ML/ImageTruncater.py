@@ -203,4 +203,5 @@ if __name__ in "__main__":
     # length = 100_000
     TraningData = cwd.parent / "Data_Files" / "TrainingData"
 
-    digitize_sequences(str(TraningData / "TrainingGeneData_v3.pkl"), str("Labels"), str("Data"), length=1000)
+    digitize_sequences(str(TraningData / "TrainingGeneData_v4.pkl"), str("Labels"), str("Data"), length=500)
+    # print(pandas.read_pickle(str(TraningData / "TrainingGeneData_v3.pkl")))
