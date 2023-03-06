@@ -32,7 +32,7 @@ def main():
 
         training_genes = pandas.concat([training_genes, subframe])
 
-    rows, cols = training_genes.shape
+    rows, _ = training_genes.shape
 
     print(training_genes.shape)
     # print(pandas.Categorical(training_genes["chrom"]).unique())
@@ -40,7 +40,7 @@ def main():
 
     pickle_frame = pandas.DataFrame(columns=["Seq", "Type"])
     # gene_rows = list()
-    type_sample = 7
+    type_sample = 20
     running_index = 0
 
     for row in range(rows):
@@ -114,8 +114,7 @@ def main():
         # pickle_frame = pickle_frame.reset_index()
         # print(pickle_frame.shape)
         # pickle_set = set(pickle_frame.columns)
-    pickle_frame = pickle_frame.astype('int32')
-    pickle_frame.to_pickle("TrainingGeneData_v3.pkl")  # Updating Pickle file every iteration.
+    pickle_frame.to_pickle("TrainingGeneData_v4.pkl")  # Updating Pickle file every iteration.
 
     # test_frame: pandas.DataFrame = pandas.read_pickle(cwd / "FUH.pkl")
     # print(test_frame.shape)
