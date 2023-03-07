@@ -12,3 +12,5 @@ Thesis.Rproj
 *.pkl
 *.npy
 *.xlsx
+*.err
+*.out
