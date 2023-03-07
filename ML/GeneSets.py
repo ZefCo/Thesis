@@ -92,6 +92,7 @@ def main(seq_path: str, window_size: int = 10):
     # print(cds_data)
 
     rows, _ = cds_data.shape
+    master_intersection = set()
 
     for i in range(rows):
         i_set: set = cds_data.loc[i, "Sets"]
@@ -104,7 +105,10 @@ def main(seq_path: str, window_size: int = 10):
 
                 intersection = i_set.intersection(j_set)
 
-                i_intersection = i_intersection | intersection
+                i_intersection = i_intersection & intersection
+
+                if len(i_intersection) > 0:
+                    print(i_intersection)
 
         cds_data.at[i, "Intersections"] = i_intersection
 
