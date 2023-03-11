@@ -14,3 +14,7 @@ Thesis.Rproj
 *.xlsx
 *.err
 *.out
+/ML/Model_History/
+/ML/Model_Loss_Plots/
+/ML/Model_Accuracy_Plots/
+/ML/Model_Summeries/
