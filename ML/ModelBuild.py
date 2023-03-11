@@ -6,16 +6,27 @@ import re
 # from sklearn.model_selection import train_test_split
 # from sklearn.metrics import accuracy_score
 import tensorflow as tf
+# print(tf.__version__)
+# exit()
 import random
 import numpy as np
 import pandas as pd
-import plotly.graph_objects as go
+# import plotly.graph_objects as go
 import datetime
-# from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt
+from contextlib import redirect_stdout
 # import keras
 # https://stackoverflow.com/questions/53066762/understanding-1d-convolution-of-dna-sequences-encoded-as-a-one-hot-vector
 # https://stackoverflow.com/questions/53514495/what-does-batch-repeat-and-shuffle-do-with-tensorflow-dataset
 # https://stackoverflow.com/questions/53066762/understanding-1d-convolution-of-dna-sequences-encoded-as-a-one-hot-vector
+
+
+
+def model_summery(summery, now):
+    '''
+    '''
+    with open(f"Model_Loss_{now.year}-{now.month}-{now.day}_{now.hour}-{now.minute}-{now.second}.txt", "a") as f:
+        print(summery, file = f)
 
 
 
@@ -97,7 +108,7 @@ def main(data_filepath, label_filepath, onehot_filepath,
     train_ds, train_lb, train_on = import_data(data_filepath, label_filepath, onehot_filepath)
     train_ds, train_lb, train_on, test_ds, test_lb, test_on, valid_ds, vlaid_lb, valid_on = data_groups(train_ds, train_lb, train_on)
 
-    shape_first = train_ds.shape[1]
+    nuc_length = train_ds.shape[1]
 
 
     data_size = train_ds.shape[0]
@@ -119,35 +130,36 @@ def main(data_filepath, label_filepath, onehot_filepath,
     validset = validset.batch(batch_size)
     # validset = validset.repeat()
 
-    input_layer = tf.keras.Input(shape = (shape_first, 4))
-    x = tf.keras.layers.Conv1D(1000, 4)(input_layer)
+    input_layer = tf.keras.Input(shape = (nuc_length, 4))
+    x = tf.keras.layers.Conv1D(filters = 500, kernel_size = 4)(input_layer)
+    # x = tf.keras.layers.Dropout(.25)(x)
+    x = tf.keras.layers.Conv1D(filters = 200, kernel_size = 4)(x)
+    # x = tf.keras.layers.Dropout(.25)(x)
+    x = tf.keras.layers.Conv1D(filters = 50, kernel_size = 1)(x)
+    # x = tf.keras.layers.Dropout(.25)(x)
+    x = tf.keras.layers.Conv1D(filters = 20, kernel_size = 1)(x)
     # x = tf.keras.layers.Dropout(.4)(x)
-    x = tf.keras.layers.Conv1D(1000, 4)(x)
-    # # x = tf.keras.layers.Dropout(.4)(x)
-    # x = tf.keras.layers.Conv1D(64, 1)(x)
-    # # x = tf.keras.layers.Dropout(.5)(x)
-    # x = tf.keras.layers.Conv1D(64, 1)(x)
-    # # x = tf.keras.layers.Dropout(.5)(x)
-    # x = tf.keras.layers.Conv1D(64, 1)(x)
-    # # x = tf.keras.layers.Dropout(.4)(x)
-    # x = tf.keras.layers.Conv1D(64, 1)(x)
-    # # x = tf.keras.layers.Dropout(.4)(x)
-    # x = tf.keras.layers.Conv1D(64, 1)(x)
-    # # x = tf.keras.layers.Dropout(.4)(x)
-    # x = tf.keras.layers.Conv1D(64, 1)(x)
-    # # x = tf.keras.layers.Dropout(.4)(x)
-    # x = tf.keras.layers.Conv1D(64, 1)(x)
-    # # x = tf.keras.layers.Dropout(.4)(x)
-    # x = tf.keras.layers.Conv1D(64, 1)(x)
-    # x = tf.keras.layers.Conv1D(64, 1)(x)
-    # x = tf.keras.layers.Conv1D(64, 1)(x)
-    # x = tf.keras.layers.Conv1D(64, 1)(x)
-    # x = tf.keras.layers.Conv1D(64, 1)(x)
-    # x = tf.keras.layers.Conv1D(64, 1)(x)
-    # x = tf.keras.layers.Conv1D(64, 1)(x)
-    # # x = tf.keras.layers.Conv1D(4, 1)(x)
-    # # x = tf.keras.layers.Conv1D(4, 1)(x)
-    # # x = tf.keras.layers.Conv1D(4, 1)(x)
+    x = tf.keras.layers.Conv1D(filters = 3, kernel_size = 1)(x)
+    # x = tf.keras.layers.Dropout(.4)(x)
+    # x = tf.keras.layers.Conv1D(filters = 20, kernel_size = 1)(x)
+    # x = tf.keras.layers.Dropout(.4)(x)
+    # x = tf.keras.layers.Conv1D(filters = 20, kernel_size = 1)(x)
+    # x = tf.keras.layers.Dropout(.4)(x)
+    # x = tf.keras.layers.Conv1D(filters = 20, kernel_size = 1)(x)
+    # x = tf.keras.layers.Dropout(.4)(x)
+    # x = tf.keras.layers.Conv1D(filters = 20, kernel_size = 1)(x)
+    # x = tf.keras.layers.Dropout(.4)(x)
+    # x = tf.keras.layers.Conv1D(filters = 20, kernel_size = 1)(x)
+    # x = tf.keras.layers.Dropout(.4)(x)
+
+    # x = tf.keras.layers.Conv1D(filters = 20, kernel_size = 1)(x)
+
+    # x = tf.keras.layers.Conv1D(1000, 4)(x)
+    # x = tf.keras.layers.Dropout(.4)(x)
+    # x = tf.keras.layers.Conv1D(1000, 4)(x)
+    # x = tf.keras.layers.Dropout(.4)(x)
+    # x = tf.keras.layers.Conv1D(1000, 4)(x)
+    # x = tf.keras.layers.Dropout(.4)(x)
     x = tf.keras.layers.Flatten()(x)
     output_layer = tf.keras.layers.Dense(4, activation = "softmax")(x)
     # output_layer = tf.keras.layers.Dense(3, activation = "softmax")(x)
@@ -163,6 +175,7 @@ def main(data_filepath, label_filepath, onehot_filepath,
     # output_layer = tf.keras.layers.Dense(4, activation = "softmax")(x)
     # # output_layer = tf.keras.layers.Dense(3, activation = "softmax")(x)
 
+    now = datetime.datetime.now()
 
     model = tf.keras.Model(inputs = input_layer, outputs = output_layer)
 
@@ -170,12 +183,15 @@ def main(data_filepath, label_filepath, onehot_filepath,
                 loss = 'categorical_crossentropy',
                 #   metrics = ['accuracy'])
                 metrics = [tf.keras.metrics.CategoricalAccuracy()])
-    model.summary()
+
+    with open(str(cwd / "Model_Summeries" / f"Model_Summary_{now.year}-{now.month}-{now.day}_{now.hour}-{now.minute}-{now.second}.txt"), "w") as f:
+        with redirect_stdout(f):
+            model.summary()
 
     # model.fit(train_ds, train_lb, batch_size=50, epochs=3, steps_per_epoch=10, validation_split=.2)
     history = model.fit(dataset, 
-                        batch_size=batch_size, 
-                        epochs=epochs, 
+                        batch_size = batch_size, 
+                        epochs = epochs, 
                         steps_per_epoch = steps_per_epoch,
                         validation_data = validset)
 
@@ -194,35 +210,33 @@ def main(data_filepath, label_filepath, onehot_filepath,
     # print(history)
     history_data = history.history
 
-    print(history_data.keys())
+    pandas.DataFrame(history_data).to_csv(str(cwd / "Model_History" / f"Model_History_{now.year}-{now.month}-{now.day}_{now.hour}-{now.minute}-{now.second}.csv"))
 
-    now = datetime.datetime.now()
+    # print(history_data.keys())
 
-    model_fitting = go.Figure()
-    model_fitting.add_trace(go.Scatter(y = history_data["loss"], name = "Loss"))
-    model_fitting.add_trace(go.Scatter(y = history_data["categorical_accuracy"], name = "Accuracy"))
-    model_fitting.add_trace(go.Scatter(y = history_data["val_loss"], name = "Valididation Loss"))
-    model_fitting.add_trace(go.Scatter(y = history_data["val_categorical_accuracy"], name = "Validation Accuracy"))
-    model_fitting.update_layout(title = "Model Preformance", xaxis_title = "Epochs")
-    # model_fitting.show()
-    model_fitting.write_html(cwd / f"Model_Preformance_{now.year}-{now.month}-{now.day}_{now.hour}-{now.minute}-{now.second}.html")
-    # model_fitting.show()
-    # plt.plot(history_data["loss"])
-    # plt.plot(history_data["categorical_accuracy"])
-    # plt.plot(history_data["val_loss"])
-    # plt.plot(history_data["val_categorical_accuracy"])
-    # plt.xlabel("Epochs")
-    # plt.legend(["Loss", "Accuracy", "Valid Loss", "Valid Accuracy"])
-    # plt.savefig()
+    plt.plot(history_data["loss"])
+    plt.plot(history_data["val_loss"])
+    plt.xlabel("Epochs")
+    plt.legend(["Loss", "Valid Loss"])
+    plt.savefig(str(cwd / "Model_Loss_Plots" / f"Model_Loss_{now.year}-{now.month}-{now.day}_{now.hour}-{now.minute}-{now.second}.png"))
+    plt.close()
+
+    plt.plot(history_data["categorical_accuracy"])
+    plt.plot(history_data["val_categorical_accuracy"])
+    plt.xlabel("Epochs")
+    plt.legend(["Accuracy", "Valid Accuracy"])
+    plt.savefig(str(cwd / "Model_Accuracy_Plots" / f"Model_Accuracy_{now.year}-{now.month}-{now.day}_{now.hour}-{now.minute}-{now.second}.png"))
+    plt.close()
 
 
 if __name__ in "__main__":
     cwd = pathlib.Path.cwd()
     # print(datetime.datetime.now().year)
-    now = datetime.datetime.now()
+    # now = datetime.datetime.now()
     # print(f"Model_Preformance_{now.year}-{now.month}-{now.day}_{now.hour}-{now.minute}-{now.second}.html")
     # print(now.hour)
     # print(now.minute)
     # print(now.day)
 
-    main(str(cwd / "Data_L1000.npy"), str(cwd / "Labels_L1000.npy"), str(cwd / "Labels_OneHots_L1000.npy"))
+    main(str(cwd / "Data_L1000.npy"), str(cwd / "Labels_L1000.npy"), str(cwd / "Labels_OneHots_L1000.npy"),
+        epochs = 100)
