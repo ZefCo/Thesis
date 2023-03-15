@@ -21,6 +21,17 @@ from contextlib import redirect_stdout
 # https://stackoverflow.com/questions/53066762/understanding-1d-convolution-of-dna-sequences-encoded-as-a-one-hot-vector
 
 
+def make_dir(dir_path: pathlib.Path):
+    '''
+    '''
+    if not dir_path.is_dir():
+        dir_path.mkdir()
+
+    return dir_path
+
+
+
+
 
 def model_summery(summery, now):
     '''
@@ -105,6 +116,11 @@ def main(data_filepath, label_filepath, onehot_filepath,
     '''
     '''
 
+    model_summery_dir: pathlib.Path = make_dir(cwd / "Model_Summeries")
+    model_history_dir: pathlib.Path = make_dir(cwd / "Model_History")
+    model_lp_dir: pathlib.Path = make_dir(cwd / "Model_Loss_Plots")
+    model_ap_dir: pathlib.Path = make_dir(cwd / "Model_Accuracy_Plots")
+
     train_ds, train_lb, train_on = import_data(data_filepath, label_filepath, onehot_filepath)
     train_ds, train_lb, train_on, test_ds, test_lb, test_on, valid_ds, vlaid_lb, valid_on = data_groups(train_ds, train_lb, train_on)
 
@@ -131,20 +147,18 @@ def main(data_filepath, label_filepath, onehot_filepath,
     # validset = validset.repeat()
 
     input_layer = tf.keras.Input(shape = (nuc_length, 4))
-    x = tf.keras.layers.Conv1D(filters = 3, kernel_size = 1)(input_layer)
-    x = tf.keras.layers.Dropout(.5)(x)
+    x = tf.keras.layers.Conv1D(filters = 3, kernel_size = 3)(input_layer)
+    # x = tf.keras.layers.Dropout(.25)(x)
     # x = tf.keras.layers.Conv1D(filters = 2, kernel_size = 1, activation="tanh")(x)
     # x = tf.keras.layers.Dropout(.25)(x)
     # x = tf.keras.layers.Conv1D(filters = 3, kernel_size = 1, activation="tanh")(x)
     # x = tf.keras.layers.Dropout(.25)(x)
-    # x = tf.keras.layers.Conv1D(filters = 6, kernel_size = 1, activation="relu", kernel_regularizer=tf.keras.regularizers.l2(l=0.02))(x)
-    # x = tf.keras.layers.Dropout(.25)(x)
-    x = tf.keras.layers.Conv1D(filters = 9, kernel_size = 1, activation="relu", kernel_regularizer=tf.keras.regularizers.l2(l=0.01))(x)
-    x = tf.keras.layers.Dropout(.5)(x)
-    x = tf.keras.layers.Conv1D(filters = 50, kernel_size = 1, activation="relu", kernel_regularizer=tf.keras.regularizers.l2(l=0.01))(x)
-    x = tf.keras.layers.Dropout(.5)(x)
-    x = tf.keras.layers.Conv1D(filters = 100, kernel_size = 3, activation="relu", kernel_regularizer=tf.keras.regularizers.l2(l=0.01))(x)
-    x = tf.keras.layers.Dropout(.5)(x)
+    x = tf.keras.layers.Conv1D(filters = 20, kernel_size = 3, activation="relu")(x)
+    # x = tf.keras.layers.Dropout(.4)(x)
+    x = tf.keras.layers.Conv1D(filters = 50, kernel_size = 3, activation="relu")(x)
+    # x = tf.keras.layers.Dropout(.4)(x)
+    x = tf.keras.layers.Conv1D(filters = 200, kernel_size = 3, activation="relu")(x)
+    x = tf.keras.layers.Conv1D(filters = 500, kernel_size = 3, activation="relu")(x)
     x = tf.keras.layers.Flatten()(x)
     x = tf.keras.layers.Dense(1000, activation = "relu", kernel_regularizer=tf.keras.regularizers.l2(l=0.01))(x)
     x = tf.keras.layers.Dropout(.5)(x)
@@ -171,7 +185,8 @@ def main(data_filepath, label_filepath, onehot_filepath,
                 #   metrics = ['accuracy'])
                 metrics = [tf.keras.metrics.CategoricalAccuracy()])
 
-    with open(str(cwd / "Model_Summeries" / f"Model_Summary_{now.year}-{now.month}-{now.day}_{now.hour}-{now.minute}-{now.second}.txt"), "w") as f:
+    
+    with open(str(model_summery_dir / f"Model_Summary_{now.year}-{now.month}-{now.day}_{now.hour}-{now.minute}-{now.second}.txt"), "w") as f:
         with redirect_stdout(f):
             model.summary()
 
@@ -197,7 +212,7 @@ def main(data_filepath, label_filepath, onehot_filepath,
     # print(history)
     history_data = history.history
 
-    pandas.DataFrame(history_data).to_csv(str(cwd / "Model_History" / f"Model_History_{now.year}-{now.month}-{now.day}_{now.hour}-{now.minute}-{now.second}.csv"))
+    pandas.DataFrame(history_data).to_csv(str(model_history_dir / f"Model_History_{now.year}-{now.month}-{now.day}_{now.hour}-{now.minute}-{now.second}.csv"))
 
     # print(history_data.keys())
 
@@ -205,14 +220,14 @@ def main(data_filepath, label_filepath, onehot_filepath,
     plt.plot(history_data["val_loss"])
     plt.xlabel("Epochs")
     plt.legend(["Loss", "Valid Loss"])
-    plt.savefig(str(cwd / "Model_Loss_Plots" / f"Model_Loss_{now.year}-{now.month}-{now.day}_{now.hour}-{now.minute}-{now.second}.png"))
+    plt.savefig(str(model_lp_dir / f"Model_Loss_{now.year}-{now.month}-{now.day}_{now.hour}-{now.minute}-{now.second}.png"))
     plt.close()
 
     plt.plot(history_data["categorical_accuracy"])
     plt.plot(history_data["val_categorical_accuracy"])
     plt.xlabel("Epochs")
     plt.legend(["Accuracy", "Valid Accuracy"])
-    plt.savefig(str(cwd / "Model_Accuracy_Plots" / f"Model_Accuracy_{now.year}-{now.month}-{now.day}_{now.hour}-{now.minute}-{now.second}.png"))
+    plt.savefig(str(model_ap_dir / f"Model_Accuracy_{now.year}-{now.month}-{now.day}_{now.hour}-{now.minute}-{now.second}.png"))
     plt.close()
 
 
