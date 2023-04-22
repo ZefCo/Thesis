@@ -131,6 +131,7 @@ def main(data_filepath, label_filepath, onehot_filepath,
     # validset = validset.repeat()
 
     input_layer = tf.keras.Input(shape = (nuc_length, 4))
+
     x = tf.keras.layers.Conv1D(filters = 3, kernel_size = 1, activation="tanh")(input_layer)
     # x = tf.keras.layers.Dropout(.25)(x)
     # x = tf.keras.layers.Conv1D(filters = 2, kernel_size = 1, activation="tanh")(x)
