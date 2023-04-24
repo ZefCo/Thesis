@@ -1,0 +1,25 @@
+Model Summery - > version 1 Exon vs Intron
+
+This was the frist real attempt at a model with fractal genes, so there is some missing information.
+
+This model used two layers, one with a keranl of 1x1 and one with a 2x2. These output to 64 layers each. Consider modifying the number of output layers.
+
+
+Tensorflow layers:
+
+input_layer = tf.keras.Input(shape = (64, 64, 4))
+x = tf.keras.layers.Conv2D(64, (1, 1), activation = "relu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.01))(input_layer)
+x = tf.keras.layers.Dropout(.25)(x)
+x = tf.keras.layers.Conv2D(64, (2, 2), activation = "relu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.01))(x)
+x = tf.keras.layers.Dropout(.25)(x)
+x = tf.keras.layers.Flatten()(x)
+output_layer = tf.keras.layers.Dense(2, activation = "softmax")(x)
+
+model = tf.keras.Model(inputs = input_layer, outputs = output_layer)
+
+model.compile(optimizer = 'adam',
+              loss = 'categorical_crossentropy',
+              #   metrics = ['accuracy'])
+              metrics = [tf.keras.metrics.CategoricalAccuracy()])
+
+In this directory is a picture of the model from the terminal.
