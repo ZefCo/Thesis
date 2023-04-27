@@ -1,6 +1,9 @@
 # https://towardsdatascience.com/convolutional-neural-networks-understanding-and-organizing-your-data-set-ba3e8b4086cb
 # https://datagy.io/python-decorators/
 
+# https://gitpython.readthedocs.io/en/stable/intro.html
+
+import git
 import pandas
 import pathlib
 import re
@@ -26,10 +29,13 @@ from contextlib import redirect_stdout
 
 cwd = pathlib.Path.cwd()
 
+report = git.Repo(search_parent_directories=True)
+branch = report.active_branch
+
 image_dir = cwd / "FractalImageEvI"
 model_dir = cwd / "FractalModels" / "IvE"
 version_num = len(next(os.walk(model_dir))[1]) + 1
-version_dir = model_dir / f"version_{version_num}"
+version_dir = model_dir / f"version_{branch}_{version_num}"
 version_dir.mkdir(parents = True, exist_ok = True)
 output_classes = 2
 
@@ -58,12 +64,12 @@ steps_per_epoch = int(pngs / batch_size) + 1
 
 
 input_layer = tf.keras.Input(shape = (64, 64, 4))
-x = tf.keras.layers.Conv2D(64, (1, 1), activation = "relu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.01))(input_layer)
+x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.01))(input_layer)
 x = tf.keras.layers.Dropout(.25)(x)
-x = tf.keras.layers.Conv2D(64, (3, 3), activation = "relu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.01))(x)
+x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.01))(x)
 x = tf.keras.layers.Dropout(.25)(x)
-x = tf.keras.layers.Conv2D(64, (9, 9), activation = "relu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.01))(x)
-x = tf.keras.layers.Dropout(.25)(x)
+# x = tf.keras.layers.Conv2D(64, (9, 9), activation = "relu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.01))(x)
+# x = tf.keras.layers.Dropout(.25)(x)
 x = tf.keras.layers.Flatten()(x)
 output_layer = tf.keras.layers.Dense(output_classes, activation = "softmax")(x)
 
