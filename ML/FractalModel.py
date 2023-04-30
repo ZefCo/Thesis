@@ -45,6 +45,8 @@ output_classes = 2
 # version_dir = model_dir / f"version_{version_num}"
 # output_classes = 4
 
+seed = random.randint(1000000, 9000000)
+
 
 batch_size = 200
 epochs = 100
@@ -56,19 +58,19 @@ for folder in os.listdir(image_dir):
             pngs += 1
 
 
-train_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (64, 64), seed = 20170520, subset = "training", validation_split=0.2, batch_size = batch_size, label_mode = "categorical", color_mode="rgba")
-valid_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (64, 64), seed = 20170520, subset = "validation", validation_split=0.2, batch_size = batch_size, label_mode = "categorical", color_mode="rgba")
+train_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (64, 64), seed = seed, subset = "training", validation_split=0.2, batch_size = batch_size, label_mode = "categorical", color_mode="rgba")
+valid_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (64, 64), seed = seed, subset = "validation", validation_split=0.2, batch_size = batch_size, label_mode = "categorical", color_mode="rgba")
 
 steps_per_epoch = int(pngs / batch_size) + 1
 # print(steps_per_epoch)
 
 
 input_layer = tf.keras.Input(shape = (64, 64, 4))
-x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.01))(input_layer)
+x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(input_layer)
 x = tf.keras.layers.Dropout(.25)(x)
-x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.01))(x)
+x = tf.keras.layers.Conv2D(64, (3, 3), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(x)
 x = tf.keras.layers.Dropout(.25)(x)
-# x = tf.keras.layers.Conv2D(64, (9, 9), activation = "relu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.01))(x)
+# x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.01))(x)
 # x = tf.keras.layers.Dropout(.25)(x)
 x = tf.keras.layers.Flatten()(x)
 output_layer = tf.keras.layers.Dense(output_classes, activation = "softmax")(x)
@@ -82,6 +84,7 @@ model.compile(optimizer = 'adam',
 
 
 with open(str(version_dir / "Summery.txt"), "w") as f:
+    f.write(f"Seed: {seed}\n\n")
     with redirect_stdout(f):
         model.summary()
 
