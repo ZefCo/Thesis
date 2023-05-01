@@ -2,7 +2,6 @@
 # https://datagy.io/python-decorators/
 # https://gitpython.readthedocs.io/en/stable/intro.html
 
-import git
 # https://stackoverflow.com/questions/26134026/how-to-get-the-current-checked-out-git-branch-name-through-pygit2
 
 # https://gitpython.readthedocs.io/en/stable/intro.html
@@ -51,7 +50,7 @@ output_classes = 2
 
 
 batch_size = 200
-epochs = 200
+epochs = 250
 
 pngs = 0
 for folder in os.listdir(image_dir):
@@ -68,16 +67,12 @@ steps_per_epoch = int(pngs / batch_size) + 1
 
 
 input_layer = tf.keras.Input(shape = (64, 64, 4))
-x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.01))(input_layer)
-x = tf.keras.layers.Conv2D(64, (1, 1), activation = "relu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.02))(input_layer)
+x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(input_layer)
 x = tf.keras.layers.Dropout(.25)(x)
-x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.01))(x)
-x = tf.keras.layers.Conv2D(64, (1, 1), activation = "relu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.01))(x)
+x = tf.keras.layers.Conv2D(64, (3, 3), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(x)
 x = tf.keras.layers.Dropout(.25)(x)
-# x = tf.keras.layers.Conv2D(64, (9, 9), activation = "relu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.01))(x)
+# x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.01))(x)
 # x = tf.keras.layers.Dropout(.25)(x)
-x = tf.keras.layers.Conv2D(64, (1, 1), activation = "relu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.01))(x)
-x = tf.keras.layers.Dropout(.3)(x)
 x = tf.keras.layers.Flatten()(x)
 output_layer = tf.keras.layers.Dense(output_classes, activation = "softmax")(x)
 
