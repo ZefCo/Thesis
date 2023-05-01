@@ -48,6 +48,8 @@ output_classes = 2
 # version_dir = model_dir / f"version_{version_num}"
 # output_classes = 4
 
+seed = random.randint(1000000, 9000000)
+
 
 batch_size = 200
 epochs = 250
@@ -59,8 +61,8 @@ for folder in os.listdir(image_dir):
             pngs += 1
 
 
-train_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (64, 64), seed = 20170520, subset = "training", validation_split=0.2, batch_size = batch_size, label_mode = "categorical", color_mode="rgba")
-valid_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (64, 64), seed = 20170520, subset = "validation", validation_split=0.2, batch_size = batch_size, label_mode = "categorical", color_mode="rgba")
+train_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (64, 64), seed = seed, subset = "training", validation_split=0.2, batch_size = batch_size, label_mode = "categorical", color_mode="rgba")
+valid_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (64, 64), seed = seed, subset = "validation", validation_split=0.2, batch_size = batch_size, label_mode = "categorical", color_mode="rgba")
 
 steps_per_epoch = int(pngs / batch_size) + 1
 # print(steps_per_epoch)
@@ -85,6 +87,7 @@ model.compile(optimizer = 'adam',
 
 
 with open(str(version_dir / "Summery.txt"), "w") as f:
+    f.write(f"Seed: {seed}\n\n")
     with redirect_stdout(f):
         model.summary()
 
