@@ -2,6 +2,7 @@
 # https://datagy.io/python-decorators/
 # https://gitpython.readthedocs.io/en/stable/intro.html
 
+import git
 # https://stackoverflow.com/questions/26134026/how-to-get-the-current-checked-out-git-branch-name-through-pygit2
 
 # https://gitpython.readthedocs.io/en/stable/intro.html
@@ -52,7 +53,7 @@ seed = random.randint(1000000, 9000000)
 
 
 batch_size = 200
-epochs = 100
+epochs = 250
 
 pngs = 0
 for folder in os.listdir(image_dir):
@@ -87,6 +88,7 @@ model.compile(optimizer = 'adam',
 
 
 with open(str(version_dir / "Summery.txt"), "w") as f:
+    f.write(f"Seed: {seed}\n\n")
     with redirect_stdout(f):
         model.summary()
 
