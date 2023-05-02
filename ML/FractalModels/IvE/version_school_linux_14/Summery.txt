@@ -21,3 +21,23 @@ Total params: 529,282
 Trainable params: 529,282
 Non-trainable params: 0
 _________________________________________________________________
+
+
+input_layer = tf.keras.Input(shape = (64, 64, 4))
+x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(input_layer)
+x = tf.keras.layers.Dropout(.25)(x)
+x = tf.keras.layers.Conv2D(64, (3, 3), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(x)
+x = tf.keras.layers.Dropout(.25)(x)
+# x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.01))(x)
+# x = tf.keras.layers.Dropout(.25)(x)
+x = tf.keras.layers.Flatten()(x)
+output_layer = tf.keras.layers.Dense(output_classes, activation = "softmax")(x)
+
+model = tf.keras.Model(inputs = input_layer, outputs = output_layer)
+
+model.compile(optimizer = 'adam',
+              loss = 'categorical_crossentropy',
+              #   metrics = ['accuracy'])
+              metrics = [tf.keras.metrics.CategoricalAccuracy()])
+
+And nothing much improves. Breaking this 90% barrier is really tough. I keep hitting 89%. Maybe another layer?
