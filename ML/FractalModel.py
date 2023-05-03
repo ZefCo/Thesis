@@ -70,11 +70,11 @@ steps_per_epoch = int(pngs / batch_size) + 1
 
 input_layer = tf.keras.Input(shape = (64, 64, 4))
 x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(input_layer)
-x = tf.keras.layers.Dropout(.25)(x)
+x = tf.keras.layers.Dropout(.5)(x)
 x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(x)
-x = tf.keras.layers.Dropout(.25)(x)
+x = tf.keras.layers.Dropout(.5)(x)
 x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(x)
-x = tf.keras.layers.Dropout(.25)(x)
+x = tf.keras.layers.Dropout(.5)(x)
 x = tf.keras.layers.Flatten()(x)
 output_layer = tf.keras.layers.Dense(output_classes, activation = "softmax")(x)
 
