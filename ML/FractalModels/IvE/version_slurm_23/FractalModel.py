@@ -8,7 +8,7 @@
 
 import os
 # os.environ["GET_PYTHON_REFRESH"] = "quiet"
-import git
+# import git
 import pandas
 import pathlib
 import re
@@ -33,8 +33,9 @@ from contextlib import redirect_stdout
 
 cwd = pathlib.Path.cwd()
 
-report = git.Repo(search_parent_directories=True)
-branch = report.active_branch
+# report = git.Repo(search_parent_directories=True)
+# branch = report.active_branch
+branch = "slurm"
 
 image_dir = cwd / "FractalImageEvI"
 model_dir = cwd / "FractalModels" / "IvE"
