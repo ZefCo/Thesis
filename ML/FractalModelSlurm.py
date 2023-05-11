@@ -11,6 +11,7 @@ import os
 # import git
 import pandas
 import pathlib
+import shutil
 import re
 # from tensorflow.keras.models import Sequential, load_module
 # from tensorflow.keras.layers import Conv1D
@@ -72,6 +73,8 @@ steps_per_epoch = int(pngs / batch_size) + 1
 # print(steps_per_epoch)
 
 cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath = str(model_dir))
+python_script = pathlib.Path(__file__)
+shutil.copy(str(python_script), str(version_dir / python_script))
 
 input_layer = tf.keras.Input(shape = (64, 64, 4))
 x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(input_layer)
