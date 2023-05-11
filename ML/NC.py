@@ -9,7 +9,7 @@ import GeneClass as Gene
 def main():
     '''
     '''
-    random_samples = 150
+    random_samples = 250
 
 
     cwd = pathlib.Path.cwd()
@@ -59,22 +59,21 @@ def main():
                                            exonStarts=row_of_interest["exonStarts"],
                                            exonEnds=row_of_interest["exonEnds"],
                                            exonFrames=row_of_interest["exonFrames"])
-
+        
 
         gene_of_interest.sequence_breakdown()
         # gene_of_interest.write_sequences(root / "Data_Files" / "NucComp")
 
-        gene_row: pandas.Series = gene_of_interest.new_row()
+        gene_row: pandas.Series = gene_of_interest.new_IE_row()
 
         row_index = gene_row.index
 
         for index in row_index:
-            # print(thing)
+            # print(index)
             if re.search("Seq", index):
                 pass
             else:
                 gene_row = gene_row.drop(index)
-        
 
         # print(gene_row)
         # print(gene_row.shape)
@@ -83,7 +82,7 @@ def main():
             selected_samples = type_sample
 
         gene_row = gene_row.sample(n = selected_samples)
-        # print(gene_row)
+        print(gene_row)
 
         row_index = gene_row.index
         for index in row_index:
@@ -114,7 +113,7 @@ def main():
         # pickle_frame = pickle_frame.reset_index()
         # print(pickle_frame.shape)
         # pickle_set = set(pickle_frame.columns)
-    pickle_frame.to_pickle("TrainingGeneData_v4.pkl")  # Updating Pickle file every iteration.
+    pickle_frame.to_pickle("TrainingGeneData_v5.pkl")  # Updating Pickle file every iteration.
 
     # test_frame: pandas.DataFrame = pandas.read_pickle(cwd / "FUH.pkl")
     # print(test_frame.shape)
