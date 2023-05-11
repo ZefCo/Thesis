@@ -38,10 +38,12 @@ cwd = pathlib.Path.cwd()
 branch = "slurm"
 
 image_dir = cwd / "FractalImageEvI"
-model_dir = cwd / "FractalModels" / "IvE"
-version_num = len(next(os.walk(model_dir))[1]) + 1
-version_dir = model_dir / f"version_{branch}_{version_num}"
+ive_dir = cwd / "FractalModels" / "IvE"
+version_num = len(next(os.walk(ive_dir))[1]) + 1
+version_dir = ive_dir / f"version_{branch}_{version_num}"
 version_dir.mkdir(parents = True, exist_ok = True)
+model_dir = version_dir / "Model"
+model_dir.mkdir(parents = True, exist_ok = True)
 output_classes = 2
 
 # image_dir = cwd / "FractalImageCvIvU"
@@ -69,23 +71,22 @@ valid_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), 
 steps_per_epoch = int(pngs / batch_size) + 1
 # print(steps_per_epoch)
 
-cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath = str(version_dir))
+cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath = str(model_dir))
 
 input_layer = tf.keras.Input(shape = (64, 64, 4))
 x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(input_layer)
 x = tf.keras.layers.Dropout(.5)(x)
 x = tf.keras.layers.BatchNormalization()(x)
-x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(x)
-x = tf.keras.layers.Dropout(.5)(x)
-x = tf.keras.layers.BatchNormalization()(x)
-x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(x)
-x = tf.keras.layers.Dropout(.5)(x)
-x = tf.keras.layers.BatchNormalization()(x)
+# x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(x)
+# x = tf.keras.layers.Dropout(.5)(x)
+# x = tf.keras.layers.BatchNormalization()(x)
+# x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(x)
+# x = tf.keras.layers.Dropout(.5)(x)
+# x = tf.keras.layers.BatchNormalization()(x)
 # x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(x)
 # x = tf.keras.layers.Dropout(.5)(x)
 # x = tf.keras.layers.BatchNormalization()(x)
 x = tf.keras.layers.Flatten()(x)
-# x = tf.keras.layers.GlobalAveragePooling2D()(x)
 x = tf.keras.layers.Dropout(.5)(x)
 output_layer = tf.keras.layers.Dense(output_classes, activation = "softmax")(x)
 model = tf.keras.Model(inputs = input_layer, outputs = output_layer)
