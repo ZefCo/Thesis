@@ -9,7 +9,7 @@ import GeneClass as Gene
 def main():
     '''
     '''
-    random_samples = 250
+    random_samples = 200
 
 
     cwd = pathlib.Path.cwd()
@@ -82,7 +82,7 @@ def main():
             selected_samples = type_sample
 
         gene_row = gene_row.sample(n = selected_samples)
-        print(gene_row)
+        # print(gene_row)
 
         row_index = gene_row.index
         for index in row_index:
