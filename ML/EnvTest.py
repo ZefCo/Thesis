@@ -11,5 +11,6 @@ import numpy as np
 import pandas as pd
 # import plotly.graph_objects as go
 from matplotlib import pyplot as plt
+import git
 
 print(tf.__version__)

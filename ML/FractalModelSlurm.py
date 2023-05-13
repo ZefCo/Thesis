@@ -1,4 +1,4 @@
-# https://towardsdatascience.com/convolutional-neural-networks-understanding-and-organizing-your-data-set-ba3e8b4086cb
+grayscale# https://towardsdatascience.com/convolutional-neural-networks-understanding-and-organizing-your-data-set-ba3e8b4086cb
 # https://datagy.io/python-decorators/
 # https://gitpython.readthedocs.io/en/stable/intro.html
 
@@ -66,8 +66,8 @@ for folder in os.listdir(image_dir):
             pngs += 1
 
 
-train_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (64, 64), seed = seed, subset = "training", validation_split = 0.2, batch_size = batch_size, label_mode = "categorical", color_mode = "rgba")
-valid_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (64, 64), seed = seed, subset = "validation", validation_split = 0.2, batch_size = batch_size, label_mode = "categorical", color_mode = "rgba")
+train_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (64, 64), seed = seed, subset = "training", validation_split = 0.2, batch_size = batch_size, label_mode = "categorical", color_mode = "grayscale")
+valid_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (64, 64), seed = seed, subset = "validation", validation_split = 0.2, batch_size = batch_size, label_mode = "categorical", color_mode = "grayscale")
 
 steps_per_epoch = int(pngs / batch_size) + 1
 # print(steps_per_epoch)
@@ -76,7 +76,7 @@ cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath = str(model_dir))
 python_script = pathlib.Path(__file__)
 shutil.copy(str(python_script), str(version_dir / python_script))
 
-input_layer = tf.keras.Input(shape = (64, 64, 4))
+input_layer = tf.keras.Input(shape = (64, 64, 1))
 x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(input_layer)
 x = tf.keras.layers.Dropout(.5)(x)
 x = tf.keras.layers.BatchNormalization()(x)
