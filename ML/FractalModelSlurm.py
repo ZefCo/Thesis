@@ -1,4 +1,4 @@
-grayscale# https://towardsdatascience.com/convolutional-neural-networks-understanding-and-organizing-your-data-set-ba3e8b4086cb
+# https://towardsdatascience.com/convolutional-neural-networks-understanding-and-organizing-your-data-set-ba3e8b4086cb
 # https://datagy.io/python-decorators/
 # https://gitpython.readthedocs.io/en/stable/intro.html
 
@@ -57,7 +57,7 @@ seed = random.randint(1000000, 9000000)
 
 
 batch_size = 200
-epochs = 250
+epochs = 100
 
 pngs = 0
 for folder in os.listdir(image_dir):
@@ -74,24 +74,24 @@ steps_per_epoch = int(pngs / batch_size) + 1
 
 cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath = str(model_dir))
 python_script = pathlib.Path(__file__)
-shutil.copy(str(python_script), str(version_dir / python_script))
+shutil.copy(str(python_script), str(version_dir / python_script.name))
 
 input_layer = tf.keras.Input(shape = (64, 64, 1))
-x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(input_layer)
-x = tf.keras.layers.Dropout(.5)(x)
-x = tf.keras.layers.BatchNormalization()(x)
-# x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(x)
-# x = tf.keras.layers.Dropout(.5)(x)
-# x = tf.keras.layers.BatchNormalization()(x)
-# x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(x)
-# x = tf.keras.layers.Dropout(.5)(x)
-# x = tf.keras.layers.BatchNormalization()(x)
-# x = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(x)
-# x = tf.keras.layers.Dropout(.5)(x)
-# x = tf.keras.layers.BatchNormalization()(x)
-x = tf.keras.layers.Flatten()(x)
-x = tf.keras.layers.Dropout(.5)(x)
-output_layer = tf.keras.layers.Dense(output_classes, activation = "softmax")(x)
+a = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(input_layer)
+a = tf.keras.layers.Dropout(.5)(a)
+a = tf.keras.layers.BatchNormalization()(a)
+b = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(a)
+b = tf.keras.layers.Dropout(.5)(b)
+b = tf.keras.layers.BatchNormalization()(b)
+c = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(b)
+c = tf.keras.layers.Dropout(.5)(c)
+c = tf.keras.layers.BatchNormalization()(c)
+# d = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(c)
+# d = tf.keras.layers.Dropout(.5)(d)
+# d = tf.keras.layers.BatchNormalization()(d)
+flatten = tf.keras.layers.Flatten()(c)
+final = tf.keras.layers.Dropout(.5)(flatten)
+output_layer = tf.keras.layers.Dense(output_classes, activation = "softmax")(final)
 model = tf.keras.Model(inputs = input_layer, outputs = output_layer)
 
 model.compile(optimizer = 'adam',
