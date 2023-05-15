@@ -65,8 +65,16 @@ for folder in os.listdir(image_dir):
             pngs += 1
 
 
+def normalization(image, label):
+    image = tf.cast(image / 255, tf.float32)
+    return image, label
+
+
 train_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (64, 64), seed = seed, subset = "training", validation_split = 0.2, batch_size = batch_size, label_mode = "categorical", color_mode = "grayscale")
 valid_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (64, 64), seed = seed, subset = "validation", validation_split = 0.2, batch_size = batch_size, label_mode = "categorical", color_mode = "grayscale")
+
+train_set = train_set.map(normalization)
+valid_set = valid_set.map(normalization)
 
 steps_per_epoch = int(pngs / batch_size) + 1
 # print(steps_per_epoch)
