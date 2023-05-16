@@ -26,4 +26,5 @@ Thesis.Rproj
 
 !/ML/FractalModels/IvE/version_school_linux_*/*
 !/ML/FractalModels/IvE/version_home_windows_*/*
-
+!/ML/FractalModels/IvE/version_slurm_*/*
+!/ML/FractalModels/IvE/version_home_fedora_*/*
