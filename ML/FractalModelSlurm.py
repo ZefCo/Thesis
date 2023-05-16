@@ -70,12 +70,12 @@ def normalization(image, label):
     image = tf.cast(image / 255, tf.float32)
     return image, label
 
-
 train_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (64, 64), seed = seed, subset = "training", validation_split = 0.2, batch_size = batch_size, label_mode = "categorical", color_mode = "grayscale")
 valid_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (64, 64), seed = seed, subset = "validation", validation_split = 0.2, batch_size = batch_size, label_mode = "categorical", color_mode = "grayscale")
 
 train_set = train_set.map(normalization)
 valid_set = valid_set.map(normalization)
+
 steps_per_epoch = int(pngs / batch_size) + 1
 # print(steps_per_epoch)
 
@@ -90,13 +90,13 @@ a = tf.keras.layers.BatchNormalization()(a)
 b = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(a)
 b = tf.keras.layers.Dropout(.5)(b)
 b = tf.keras.layers.BatchNormalization()(b)
-c = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(b)
-c = tf.keras.layers.Dropout(.5)(c)
-c = tf.keras.layers.BatchNormalization()(c)
+# c = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(b)
+# c = tf.keras.layers.Dropout(.5)(c)
+# c = tf.keras.layers.BatchNormalization()(c)
 # d = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(c)
 # d = tf.keras.layers.Dropout(.5)(d)
 # d = tf.keras.layers.BatchNormalization()(d)
-flatten = tf.keras.layers.Flatten()(c)
+flatten = tf.keras.layers.Flatten()(b)
 final = tf.keras.layers.Dropout(.5)(flatten)
 output_layer = tf.keras.layers.Dense(output_classes, activation = "softmax")(final)
 model = tf.keras.Model(inputs = input_layer, outputs = output_layer)
