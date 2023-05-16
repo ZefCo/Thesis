@@ -57,7 +57,7 @@ def nucleotide_counter(sequence: str, window_size: int):
 
 
     for i in range(len(sequence) - window_size):
-        seq = sequence[i: i + window_size - 1]
+        seq = sequence[i: i + window_size]
 
         if seq not in keys:
             keys.add(seq)
