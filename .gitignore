@@ -23,6 +23,10 @@ Thesis.Rproj
 /ML/FractalImages
 /ML/Models
 /ML/GIF
+/ML/Seqs.txt
+/ML/Seqs_IL12RB2.txt
+/ML/Seqs_CLIC4.txt
+
 
 !/ML/FractalModels/IvE/version_school_linux_*/*
 !/ML/FractalModels/IvE/version_home_windows_*/*
