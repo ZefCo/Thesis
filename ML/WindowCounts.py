@@ -4,6 +4,7 @@ import pathlib
 cwd = pathlib.Path.cwd()
 import re
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import itertools
 
 
@@ -108,12 +109,14 @@ def create_data(kmer):
     counts_frame = pandas.DataFrame([global_mer, exon_mer, intron_mer]).T
     counts_frame.columns = ["Global", "Exon", "Intron"]
     counts_frame = counts_frame.fillna(0)
-    print(counts_frame)
-    counts_frame.to_pickle(cwd / "KMerCounts.pkl")
+    # print(counts_frame)
+    # counts_frame.to_pickle(cwd / "KMerCounts.pkl")
 
     # print(exon_mer)
     # print(intron_mer)
     # print(global_mer)
+
+    return counts_frame
 
 
 def print_data(kmer):
@@ -225,7 +228,15 @@ def print_data(kmer):
     # fig.update_traces(opacity = 0.75)
     fig.show()
 
-    # # should eventually compare this to all other combinations and display their average, min, and max
+    # should eventually compare this to all other combinations and display their average, min, and max
+
+    # print(perms5)
+    # print(perms3)
+    # print(eerms5)
+    # print(eerms3)
+    # print(ierms5)
+    # print(ierms3)
+
 
 
 def nucleotide_permutations(sequence: str = "ACGT", length: int = 3) -> dict:
@@ -234,7 +245,7 @@ def nucleotide_permutations(sequence: str = "ACGT", length: int = 3) -> dict:
     if len(sequence) < length:
         return None
 
-    perms = itertools.permutations(sequence, length)
+    perms = itertools.product(sequence, repeat=length)
     for p in perms:
 
         key = ""
@@ -246,11 +257,57 @@ def nucleotide_permutations(sequence: str = "ACGT", length: int = 3) -> dict:
     return nuc_perm
 
 
+def window_distribution(kmer):
+    '''
+    '''
+
+    average = 0.25**kmer
+
+    window_plots_dir = cwd / "Window_Plots"
+    window_plots_dir.mkdir(parents = True, exist_ok = True)
+
+    data = create_data(kmer)
+    data.to_csv(str(window_plots_dir / f"{kmer}mer_Frame.csv"), header = True)
+
+    motiffs = list(data.index)
+    for motiff in motiffs:
+        if re.search("N", motiff):
+            data = data.drop(index = (motiff))
+
+    count_global_sum = data["Global"].sum()
+    count_exon_sum = data["Exon"].sum()
+    count_intron_sum = data["Intron"].sum()
+
+    data["G%"] = (data["Global"] / count_global_sum) - average
+    data["E%"] = (data["Exon"] / count_exon_sum) - average
+    data["I%"] = (data["Intron"] / count_intron_sum) - average
+
+    data = data.sort_index()
+
+    fig = go.Figure()
+    fig.add_trace(go.Bar(x = list(data.index), y = data["G%"], name = "Global"))
+    fig.add_trace(go.Bar(x = list(data.index), y = data["E%"], name = "Exon"))
+    fig.add_trace(go.Bar(x = list(data.index), y = data["I%"], name = "Intron"))
+
+    # fig = make_subplots(rows = 3, cols = 1)
+    # fig.add_trace(go.Bar(x = list(data.index), y = data["G%"], name = "Global"), row = 1, col = 1)
+    # fig.add_trace(go.Bar(x = list(data.index), y = data["E%"], name = "Exon"), row = 2, col = 1)
+    # fig.add_trace(go.Bar(x = list(data.index), y = data["I%"], name = "Intron"), row = 3, col = 1)
+
+    fig.update_layout(barmode = "overlay", title = f"Occurences of {kmer}-Mer window Sequences <br> Subtracted by a mean of {average}")
+    fig.update_traces(opacity = 0.85)
+    fig.update_xaxes(showticklabels = False)
+    fig.show()
+    fig.write_html(str(window_plots_dir / f"{kmer}mer_Bars.html"))
+
+
 
 if __name__ in "__main__":
     kmer = 6
 
-    # create_data()
-    print_data(kmer)
+    # # create_data()
+    # print_data(kmer)
     # perms = nucleotide_permutations("ACGT", 2)
     # print(perms)
+    window_distribution(kmer)
+
