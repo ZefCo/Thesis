@@ -265,7 +265,7 @@ class Gene():
                 header_seq, header_cor = f"ExonSeq{j}", f"ExonCord{j}"
                 printable_row[header_cor] = self.exon_cords[j]
                 printable_row[header_seq] = seq
-
+                
         # if isinstance(self.utr5_seq, list):
         #     for j, seq in enumerate(self.utr5_seq):
         #         header_seq, header_cor = f"UTR5Seq{j}", f"UTR5Cord{j}"
@@ -297,7 +297,7 @@ class Gene():
 
                 printable_row[header_cor] = self.intron_cords[j]
                 printable_row[header_seq] = seq
-
+                
         return pandas.Series(printable_row)
 
 
