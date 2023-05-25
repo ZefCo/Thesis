@@ -257,7 +257,7 @@ def nucleotide_permutations(sequence: str = "ACGT", length: int = 3) -> dict:
     return nuc_perm
 
 
-def window_distribution(kmer):
+def window_distribution(kmer, shaded = True):
     '''
     '''
 
@@ -267,7 +267,6 @@ def window_distribution(kmer):
     window_plots_dir.mkdir(parents = True, exist_ok = True)
 
     data = create_data(kmer)
-    data.to_csv(str(window_plots_dir / f"{kmer}mer_Frame.csv"), header = True)
 
     motiffs = list(data.index)
     for motiff in motiffs:
@@ -284,8 +283,10 @@ def window_distribution(kmer):
 
     data = data.sort_index()
 
+    data.to_csv(str(window_plots_dir / f"{kmer}mer_Frame.csv"), header = True)
+
     fig = go.Figure()
-    fig.add_trace(go.Bar(x = list(data.index), y = data["G%"], name = "Global"))
+    fig.add_trace(go.Bar(x = list(data.index), y = data["G%"], name = "Full Seq"))
     fig.add_trace(go.Bar(x = list(data.index), y = data["E%"], name = "Exon"))
     fig.add_trace(go.Bar(x = list(data.index), y = data["I%"], name = "Intron"))
 
@@ -294,20 +295,67 @@ def window_distribution(kmer):
     # fig.add_trace(go.Bar(x = list(data.index), y = data["E%"], name = "Exon"), row = 2, col = 1)
     # fig.add_trace(go.Bar(x = list(data.index), y = data["I%"], name = "Intron"), row = 3, col = 1)
 
+    if shaded:
+        if kmer > 1:
+            sections = (4**kmer)/4
+            fig.add_vrect(x0 =            - 0.5, x1 =   sections - 0.5, col = "all", fillcolor = "red",    opacity = 0.25, annotation_text = "A")
+            fig.add_vrect(x0 =   sections - 0.5, x1 = 2*sections - 0.5, col = "all", fillcolor = "green",  opacity = 0.25, annotation_text = "C")
+            fig.add_vrect(x0 = 2*sections - 0.5, x1 = 3*sections - 0.5, col = "all", fillcolor = "blue",   opacity = 0.25, annotation_text = "G")
+            fig.add_vrect(x0 = 3*sections - 0.5, x1 = 4*sections - 0.5, col = "all", fillcolor = "yellow", opacity = 0.25, annotation_text = "T")
+
+
     fig.update_layout(barmode = "overlay", title = f"Occurences of {kmer}-Mer window Sequences <br> Subtracted by a mean of {average}")
-    fig.update_traces(opacity = 0.85)
+    fig.update_traces(opacity = 0.9)
     fig.update_xaxes(showticklabels = False)
     fig.show()
     fig.write_html(str(window_plots_dir / f"{kmer}mer_Bars.html"))
 
 
+def recreate(filepath: pathlib.Path, kmer, shaded = False, labels = False):
+    '''
+    '''
+    # data.to_csv(str(window_plots_dir / f"{kmer}mer_Frame.csv"), header = True)
+    data = pandas.read_csv(filepath, header = 0)
+    # print(data)
+
+    average = 0.25**kmer
+
+
+    fig = go.Figure()
+    fig.add_trace(go.Bar(x = data["Unnamed: 0"], y = data["G%"], name = "Full Seq"))
+    fig.add_trace(go.Bar(x = data["Unnamed: 0"], y = data["E%"], name = "Exon"))
+    fig.add_trace(go.Bar(x = data["Unnamed: 0"], y = data["I%"], name = "Intron"))
+
+    # fig = make_subplots(rows = 3, cols = 1)
+    # fig.add_trace(go.Bar(x = list(data.index), y = data["G%"], name = "Global"), row = 1, col = 1)
+    # fig.add_trace(go.Bar(x = list(data.index), y = data["E%"], name = "Exon"), row = 2, col = 1)
+    # fig.add_trace(go.Bar(x = list(data.index), y = data["I%"], name = "Intron"), row = 3, col = 1)
+
+    if shaded:
+        if kmer > 1:
+            sections = (4**kmer)/4
+            fig.add_vrect(x0 =            - 0.5, x1 =   sections - 0.5, col = "all", fillcolor = "red",    opacity = 0.25, annotation_text = "A")
+            fig.add_vrect(x0 =   sections - 0.5, x1 = 2*sections - 0.5, col = "all", fillcolor = "green",  opacity = 0.25, annotation_text = "C")
+            fig.add_vrect(x0 = 2*sections - 0.5, x1 = 3*sections - 0.5, col = "all", fillcolor = "blue",   opacity = 0.25, annotation_text = "G")
+            fig.add_vrect(x0 = 3*sections - 0.5, x1 = 4*sections - 0.5, col = "all", fillcolor = "yellow", opacity = 0.25, annotation_text = "T")
+
+
+    fig.update_layout(barmode = "overlay", title = f"Occurences of {kmer}-Mer window Sequences <br> Subtracted by a mean of {average}")
+    fig.update_traces(opacity = 0.9)
+    fig.update_xaxes(showticklabels = labels)
+    fig.show()
+    # fig.write_html(str(window_plots_dir / f"{kmer}mer_Bars.html"))
+
+
 
 if __name__ in "__main__":
-    kmer = 6
+    kmer = 1
 
     # # create_data()
     # print_data(kmer)
     # perms = nucleotide_permutations("ACGT", 2)
     # print(perms)
-    window_distribution(kmer)
+    # window_distribution(kmer, shaded = False)
+    recreate(str(cwd / "Window_Plots" / f"{kmer}mer_Frame.csv"), kmer, labels = True)
+
 
