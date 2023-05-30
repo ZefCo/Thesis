@@ -8,8 +8,8 @@ from PIL import Image
 
 cwd = pathlib.Path.cwd()
 
-exon_images = cwd / "FractalImageEvI" / "EXON"
-intron_images = cwd / "FractalImageEvI" / "INTRON"
+exon_images = cwd / "FractalImageEvI_SL" / "EXON"
+intron_images = cwd / "FractalImageEvI_SL" / "INTRON"
 # utr5_images = cwd / "FractalImage" / "UTR5"
 # utr3_images = cwd / "FractalImage" / "UTR3"
 # exon_images = cwd / "FractalImage" / "Exon"
@@ -57,7 +57,7 @@ def nucleotide_counter(sequence: str, window_size: int):
 
 
     for i in range(len(sequence) - window_size):
-        seq = sequence[i: i + window_size - 1]
+        seq = sequence[i: i + window_size]
 
         if seq not in keys:
             keys.add(seq)
@@ -122,7 +122,7 @@ def gif_generator(path: str, filename: str):
     frames[0].save(filename, format="GIF", append_images=frames[1:], save_all = True, loop = 0, duration = 225) 
 
 
-train_data: pandas.DataFrame = pandas.read_pickle(cwd / "TrainingGeneData_v5.pkl")
+train_data: pandas.DataFrame = pandas.read_pickle(cwd / "TrainingData_SameSize.pkl")
 # print(train_data.shape)
 
 keep = np.where(train_data["Seq"].str.len() >= 100)[0]
