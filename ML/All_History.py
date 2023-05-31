@@ -147,7 +147,78 @@ def History_F():
     all_los.show()
 
 
+def SelectedHistory(*args, **kwargs):
+    '''
+    '''
+    models = pandas.DataFrame()
+
+    if (len(args) > 0) and (len(kwargs) < 1):
+
+        model_count = 0
+
+        for path in args:
+            for _, _, files in os.walk(path):
+                # print(file)
+                for file in files:
+                    if file in "ModelSteps.csv":
+                        model_count += 1
+                        local_model = pandas.read_csv(pathlib.Path(path, file), header = 0)
+                        local_model["ModelIndex"] = f"Model_{model_count}"
+                        local_model["ModelIndex"] = pandas.Categorical(local_model["ModelIndex"])
+                        local_model["Epoch"] = local_model.index + 1
+                
+                        models = pandas.concat([models, local_model])
+                        # print(pathlib.Path(parent, file))
+
+    elif (len(args) < 1) and (len(kwargs) > 0):
+        for model, path in kwargs.items():
+            for _, _, files in os.walk(path):
+                # print(file)
+                for file in files:
+                    if file in "ModelSteps.csv":
+                        local_model = pandas.read_csv(pathlib.Path(path, file), header = 0)
+                        local_model["ModelIndex"] = model
+                        local_model["ModelIndex"] = pandas.Categorical(local_model["ModelIndex"])
+                        local_model["Epoch"] = local_model.index + 1
+                
+                        models = pandas.concat([models, local_model])
+                        # print(pathlib.Path(parent, file))
+
+    
+    models.pop("Unnamed: 0")
+    models = models.reset_index()
+    models.pop("index")
+    # # models["Epoch"]
+    # print(models)
+    # # print(models.shape)
+
+    all_acc = go.Figure()
+    all_los = go.Figure()
+
+    for m, model in enumerate(pandas.unique(models["ModelIndex"])):
+        local_model = models[models["ModelIndex"] == model]
+
+        all_acc.add_trace(go.Scatter(x = local_model["Epoch"], y = local_model["categorical_accuracy"], name = f"Training Acc: {model}", legendgroup = model))
+        all_acc.add_trace(go.Scatter(x = local_model["Epoch"], y = local_model["val_categorical_accuracy"], name = f"Validation Acc: {model}", legendgroup = model))
+
+        all_los.add_trace(go.Scatter(x = local_model["Epoch"], y = local_model["loss"], name = f"Training Loss: {model}", legendgroup = model))
+        all_los.add_trace(go.Scatter(x = local_model["Epoch"], y = local_model["val_loss"], name = f"Validation Loss: {model}", legendgroup = model))
+
+    all_acc.update_xaxes(title = "Epoch")
+    all_los.update_xaxes(title = "Epoch")
+
+    all_acc.update_layout(title = "Accuracy")
+    all_los.update_layout(title = "Loss")
+
+    all_acc.show()
+    all_los.show()
+
+
 
 if __name__ in "__main__":
-    History_1D()
+    # History_1D()
     # History_F()
+    SelectedHistory(Control = cwd / "FractalModels" / "IvE" / "version_slurm_46",
+                    SL11 =  cwd / "FractalModels" / "IvE" / "version_slurm_43",
+                    SLHis = cwd / "FractalModels" / "IvE" / "version_slurm_44",
+                    SLSG = cwd / "FractalModels" / "IvE" / "version_slurm_45")
