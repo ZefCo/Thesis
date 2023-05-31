@@ -38,7 +38,7 @@ cwd = pathlib.Path.cwd()
 # branch = report.active_branch
 branch = "slurm"
 
-image_dir = cwd / "FractalImageEvI_OG"
+image_dir = cwd / "FractalImageEvI_SLSGHis"
 ive_dir = cwd / "FractalModels" / "IvE"
 version_num = len(next(os.walk(ive_dir))[1]) + 1
 version_dir = ive_dir / f"version_{branch}_{version_num}"
