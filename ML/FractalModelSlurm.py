@@ -38,7 +38,7 @@ cwd = pathlib.Path.cwd()
 # branch = report.active_branch
 branch = "slurm"
 
-image_dir = cwd / "FractalImageEvI_SLSGHis"
+image_dir = cwd / "FractalImageEvI_OG"
 ive_dir = cwd / "FractalModels" / "IvE"
 version_num = len(next(os.walk(ive_dir))[1]) + 1
 version_dir = ive_dir / f"version_{branch}_{version_num}"
@@ -90,13 +90,13 @@ a = tf.keras.layers.BatchNormalization()(a)
 b = tf.keras.layers.Conv2D(64, (3, 3), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(a)
 b = tf.keras.layers.Dropout(.5)(b)
 b = tf.keras.layers.BatchNormalization()(b)
-# c = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(b)
-# c = tf.keras.layers.Dropout(.5)(c)
-# c = tf.keras.layers.BatchNormalization()(c)
+c = tf.keras.layers.Conv2D(64, (3, 3), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(b)
+c = tf.keras.layers.Dropout(.5)(c)
+c = tf.keras.layers.BatchNormalization()(c)
 # d = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(c)
 # d = tf.keras.layers.Dropout(.5)(d)
 # d = tf.keras.layers.BatchNormalization()(d)
-flatten = tf.keras.layers.Flatten()(b)
+flatten = tf.keras.layers.Flatten()(c)
 final = tf.keras.layers.Dropout(.5)(flatten)
 output_layer = tf.keras.layers.Dense(output_classes, activation = "softmax")(final)
 model = tf.keras.Model(inputs = input_layer, outputs = output_layer)
