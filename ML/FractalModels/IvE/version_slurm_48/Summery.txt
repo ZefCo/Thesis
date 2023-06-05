@@ -1,0 +1,40 @@
+Seed: 4218432
+
+Model: "model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ input_1 (InputLayer)        [(None, 64, 64, 1)]       0         
+                                                                 
+ conv2d (Conv2D)             (None, 64, 64, 64)        128       
+                                                                 
+ dropout (Dropout)           (None, 64, 64, 64)        0         
+                                                                 
+ batch_normalization (BatchN  (None, 64, 64, 64)       256       
+ ormalization)                                                   
+                                                                 
+ conv2d_1 (Conv2D)           (None, 62, 62, 64)        36928     
+                                                                 
+ dropout_1 (Dropout)         (None, 62, 62, 64)        0         
+                                                                 
+ batch_normalization_1 (Batc  (None, 62, 62, 64)       256       
+ hNormalization)                                                 
+                                                                 
+ conv2d_2 (Conv2D)           (None, 60, 60, 64)        36928     
+                                                                 
+ dropout_2 (Dropout)         (None, 60, 60, 64)        0         
+                                                                 
+ batch_normalization_2 (Batc  (None, 60, 60, 64)       256       
+ hNormalization)                                                 
+                                                                 
+ flatten (Flatten)           (None, 230400)            0         
+                                                                 
+ dropout_3 (Dropout)         (None, 230400)            0         
+                                                                 
+ dense (Dense)               (None, 2)                 460802    
+                                                                 
+=================================================================
+Total params: 535,554
+Trainable params: 535,170
+Non-trainable params: 384
+_________________________________________________________________
