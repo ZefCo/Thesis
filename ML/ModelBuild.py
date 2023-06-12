@@ -1,5 +1,7 @@
 import pandas
 import pathlib
+cwd = pathlib.Path.cwd()
+
 import re
 # from tensorflow.keras.models import Sequential, load_module
 # from tensorflow.keras.layers import Conv1D
@@ -147,20 +149,20 @@ def main(data_filepath, label_filepath, onehot_filepath,
     # validset = validset.repeat()
 
     input_layer = tf.keras.Input(shape = (nuc_length, 4))
-    x = tf.keras.layers.Conv1D(filters = 3, kernel_size = 3)(input_layer)
+    x = tf.keras.layers.Conv1D(filters = 4, kernel_size = 1)(input_layer)
     # x = tf.keras.layers.Dropout(.25)(x)
     # x = tf.keras.layers.Conv1D(filters = 2, kernel_size = 1, activation="tanh")(x)
     # x = tf.keras.layers.Dropout(.25)(x)
     # x = tf.keras.layers.Conv1D(filters = 3, kernel_size = 1, activation="tanh")(x)
     # x = tf.keras.layers.Dropout(.25)(x)
-    x = tf.keras.layers.Conv1D(filters = 20, kernel_size = 3, activation="relu")(x)
+    x = tf.keras.layers.Conv1D(filters = 4, kernel_size = 3, activation="relu")(x)
     # x = tf.keras.layers.Dropout(.4)(x)
-    x = tf.keras.layers.Conv1D(filters = 50, kernel_size = 3, activation="relu")(x)
-    # x = tf.keras.layers.Dropout(.4)(x)
-    x = tf.keras.layers.Conv1D(filters = 200, kernel_size = 3, activation="relu")(x)
-    x = tf.keras.layers.Conv1D(filters = 500, kernel_size = 3, activation="relu")(x)
+    # x = tf.keras.layers.Conv1D(filters = 4, kernel_size = 3, activation="relu")(x)
+    # # x = tf.keras.layers.Dropout(.4)(x)
+    # x = tf.keras.layers.Conv1D(filters = 4, kernel_size = 3, activation="relu")(x)
+    # x = tf.keras.layers.Conv1D(filters = 4, kernel_size = 3, activation="relu")(x)
     x = tf.keras.layers.Flatten()(x)
-    x = tf.keras.layers.Dense(1000, activation = "relu", kernel_regularizer=tf.keras.regularizers.l2(l=0.01))(x)
+    x = tf.keras.layers.Dense(1000, activation = "relu", kernel_regularizer=tf.keras.regularizers.l2(l=0.001))(x)
     x = tf.keras.layers.Dropout(.5)(x)
     output_layer = tf.keras.layers.Dense(4, activation = "softmax")(x)
     # output_layer = tf.keras.layers.Dense(3, activation = "softmax")(x)
@@ -231,8 +233,30 @@ def main(data_filepath, label_filepath, onehot_filepath,
     plt.close()
 
 
+
+def one_hot_from_label(labelinput, onehots = 2):
+    '''
+    '''
+
+    labels = np.load(labelinput)
+    label_shape, _ = np.shape(labels)
+    # print(np.shape(label))
+
+    one_hot = np.ndarray(shape = (label_shape, onehots))
+
+    for row in range(label_shape):
+        label = labels[row]
+
+        if label == 1:
+            one_hot[row] = [1, 0]
+        else:
+            one_hot[row] = [0, 1]
+
+    return one_hot
+
+
+
 if __name__ in "__main__":
-    cwd = pathlib.Path.cwd()
     # print(datetime.datetime.now().year)
     # now = datetime.datetime.now()
     # print(f"Model_Preformance_{now.year}-{now.month}-{now.day}_{now.hour}-{now.minute}-{now.second}.html")
@@ -240,5 +264,15 @@ if __name__ in "__main__":
     # print(now.minute)
     # print(now.day)
 
-    main(str(cwd / "Data_L1000.npy"), str(cwd / "Labels_L1000.npy"), str(cwd / "Labels_OneHots_L1000.npy"),
-        epochs = 100)
+    # one_hot = one_hot_from_label(str(cwd / "Labels_1Dv2.npy"))
+    # np.save(str(cwd / "OneHots_1Dv2"), one_hot)
+
+    # one_hot = np.load(str(cwd / "OneHots_1Dv2.npy"))
+    # print(one_hot)
+
+    # main(str(cwd / "Data_1Dv2.npy"), str(cwd / "OneHots_1Dv2.npy"), str(cwd / "Labels_1Dv2.npy"),
+    #     epochs = 100)
+
+    data = np.load(str(cwd / "Data_1Dv2.npy"))
+
+
