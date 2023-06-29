@@ -273,6 +273,8 @@ if __name__ in "__main__":
     # main(str(cwd / "Data_1Dv2.npy"), str(cwd / "OneHots_1Dv2.npy"), str(cwd / "Labels_1Dv2.npy"),
     #     epochs = 100)
 
-    data = np.load(str(cwd / "Data_1Dv2.npy"))
+    data = np.load(str(cwd / "Data_L1000.npy"))
+    print(data)
+    print(np.shape(data))
 
 
