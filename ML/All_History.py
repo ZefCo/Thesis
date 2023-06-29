@@ -18,6 +18,25 @@ import datetime
 # from contextlib import redirect_stdout
 # import keras
 
+epochs = None
+
+
+def least_squares(x_points: np.array, y_points: np.array):
+    '''
+    '''
+    ave_x = np.mean(x_points)
+    ave_y = np.mean(y_points)
+
+    # print(x_points)
+    # print(y_points)
+
+    m = np.dot(x_points - ave_x, y_points - ave_y) / np.dot(x_points - ave_x, x_points - ave_x)
+    b = ave_y - (m * ave_x)
+
+    ls = {e: m*e + b for e in range(0, x_points.max() + 1)}
+
+    return ls, m, b
+
 
 def History_1D():
     '''
@@ -147,8 +166,9 @@ def History_F():
     all_los.show()
 
 
-def SelectedHistory(*args, **kwargs):
+def SelectedHistory(line_of_best_epochs = None, *args, **kwargs):
     '''
+    Right now this cannot combine args and kwargs, so use only one at a time.
     '''
     models = pandas.DataFrame()
 
@@ -191,27 +211,56 @@ def SelectedHistory(*args, **kwargs):
     # # models["Epoch"]
     # print(models)
     # # print(models.shape)
+    # epochs = models["Epoch"].unique()
+    # print(epochs)
 
     all_acc = go.Figure()
     all_los = go.Figure()
 
     for m, model in enumerate(pandas.unique(models["ModelIndex"])):
-        local_model = models[models["ModelIndex"] == model]
+        # print(model)
+        local_model: pandas.DataFrame = models[models["ModelIndex"] == model]
+        local_model = local_model.set_index("Epoch")
+        # print(local_model)
 
-        all_acc.add_trace(go.Scatter(x = local_model["Epoch"], y = local_model["categorical_accuracy"], name = f"Training Acc: {model}", legendgroup = model))
-        all_acc.add_trace(go.Scatter(x = local_model["Epoch"], y = local_model["val_categorical_accuracy"], name = f"Validation Acc: {model}", legendgroup = model))
+        all_acc.add_trace(go.Scatter(x = local_model.index, y = local_model["categorical_accuracy"], name = f"{model}: TA", legendgroup = model))
+        all_acc.add_trace(go.Scatter(x = local_model.index, y = local_model["val_categorical_accuracy"], name = f"{model}: VA", legendgroup = model))
 
-        all_los.add_trace(go.Scatter(x = local_model["Epoch"], y = local_model["loss"], name = f"Training Loss: {model}", legendgroup = model))
-        all_los.add_trace(go.Scatter(x = local_model["Epoch"], y = local_model["val_loss"], name = f"Validation Loss: {model}", legendgroup = model))
+        all_los.add_trace(go.Scatter(x = local_model.index, y = local_model["loss"], name = f"{model}: TL", legendgroup = model))
+        all_los.add_trace(go.Scatter(x = local_model.index, y = local_model["val_loss"], name = f"{model}: VL", legendgroup = model))
+
+        if line_of_best_epochs is not None:
+            epochs = local_model.index
+
+            acc_range = local_model.loc[line_of_best_epochs:max(epochs) + 1, "categorical_accuracy"].to_numpy()
+            val_range = local_model.loc[line_of_best_epochs:max(epochs) + 1, "val_categorical_accuracy"].to_numpy()
+            
+            x_points = np.array([x for x in range(line_of_best_epochs, max(epochs) + 1)])
+            # print(x_points)
+            # print(acc_range)
+            # print(val_range)
+
+            acc_ls, acc_m, acc_b = least_squares(x_points, acc_range)
+            val_ls, val_m, val_b = least_squares(x_points, val_range)
+
+            # print(acc_ls)
+            
+            all_acc.add_trace(go.Scatter(x = tuple(acc_ls.keys()), y = tuple(acc_ls.values()), name = rf"{model} LoBF starting @ {line_of_best_epochs}<br>y = {round(acc_m, 6)}x + {round(acc_b, 6)}", legendgroup = model))
+            all_acc.add_trace(go.Scatter(x = tuple(val_ls.keys()), y = tuple(val_ls.values()), name = rf"{model} LoBF starting @ {line_of_best_epochs}<br>y = {round(val_m, 6)}x + {round(val_b, 2)}", legendgroup = model))
+
+            # Putting this here in case Dr. G says anything, then I can show him it doesn't work
+            # all_acc.add_annotation(x = 0, y = tuple(acc_ls.values()), text = f"y = {round(acc_m, 6)}x + {round(acc_b, 6)}")
+            # all_acc.add_annotation(x = 0, y = tuple(val_ls.values()), text = f"y = {round(val_m, 6)}x + {round(val_b, 6)}")
+
 
     all_acc.update_xaxes(title = "Epoch")
     all_los.update_xaxes(title = "Epoch")
 
-    all_acc.update_layout(title = "Accuracy")
+    all_acc.update_layout(title = "Accuracy", legend = dict(orientation = "h"))
     all_los.update_layout(title = "Loss")
 
     all_acc.show()
-    all_los.show()
+    # all_los.show()
 
 
 
@@ -221,4 +270,6 @@ if __name__ in "__main__":
     SelectedHistory(Control = cwd / "FractalModels" / "IvE" / "version_slurm_46",
                     SL11 =  cwd / "FractalModels" / "IvE" / "version_slurm_43",
                     SLHis = cwd / "FractalModels" / "IvE" / "version_slurm_44",
-                    SLSG = cwd / "FractalModels" / "IvE" / "version_slurm_45")
+                    SLSG = cwd / "FractalModels" / "IvE" / "version_slurm_45",
+                    SLSGHis = cwd / "FractalModels" / "IvE" / "version_slurm_47",
+                    line_of_best_epochs = epochs)
