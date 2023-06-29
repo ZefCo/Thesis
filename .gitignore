@@ -22,13 +22,16 @@ Thesis.Rproj
 *.zip
 /ML/FractalImages
 /ML/Models
+/ML/GenePerChrome
 /ML/GIF
 /ML/Seqs.txt
 /ML/Seqs_IL12RB2.txt
 /ML/Seqs_CLIC4.txt
+*.pptx
 
 
 !/ML/FractalModels/IvE/version_school_linux_*/*
 !/ML/FractalModels/IvE/version_home_windows_*/*
 !/ML/FractalModels/IvE/version_slurm_*/*
 !/ML/FractalModels/IvE/version_home_fedora_*/*
+!GenePerChrom.pkl

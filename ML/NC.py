@@ -307,6 +307,133 @@ def same_length_same_gene(threshold: float = 0.15):
 
 
 
+def gene_per_chrome():
+    '''
+    '''
+
+    
+    random_samples = 1
+
+    root = cwd.parent
+    # nuc_perm = perm.nucleotide_permutations()
+    # print(nuc_perm)
+    with open(root / "Data_Files" / "Sequence_Files" / "HG19" / "Known_Genes_hg19_noSeq.csv") as known_file:
+    # with open(root / "Data_Files" / "Sequence_Files" / "HG19" / "hg_test.csv") as known_file:
+        known_genes: pandas.DataFrame = pandas.read_csv(known_file, sep = ',', header=0, index_col=0)
+
+    headers = ["name2", "name", "chrom", "strand", "txStart", "txEnd", "cdsStart", "cdsEnd", "exonCount", "exonStarts", "exonEnds", "cdsStartStat", "cdsEndStat", "exonFrames"]
+    known_genes = known_genes[headers]
+
+    known_genes["chrom"] = known_genes["chrom"].astype("category")
+
+    known_genes = known_genes[(known_genes["strand"] == "+") & (known_genes["cdsStartStat"] == "cmpl")]
+    # print(known_genes["cdsStartStat"].unique())
+    # print(known_genes)
+
+    training_genes = pandas.DataFrame()
+    for c in known_genes["chrom"].cat.categories:
+        subframe = known_genes[known_genes["chrom"] == c]
+        subframe = subframe.sample(n = random_samples)
+
+        training_genes = pandas.concat([training_genes, subframe])
+
+    rows, _ = training_genes.shape
+
+    # pickle_frame = pandas.DataFrame(columns=["Name", "gene"])
+    pickle_dict = dict()
+    # gene_rows = list()
+    type_sample = 20
+    running_index = 0
+
+    print(training_genes)
+
+    for row in range(rows):
+        print(f"Working on row {row}")
+        new_gene_row = pandas.Series()
+        row_of_interest = training_genes.iloc[row, :]
+
+        gene_of_interest: Gene = Gene.Gene(row_of_interest["name2"],
+                                           ncibname=row_of_interest["name"], 
+                                           chrm=row_of_interest["chrom"], 
+                                           strand=row_of_interest["strand"], 
+                                           txStart=row_of_interest["txStart"],
+                                           txEnd=row_of_interest["txEnd"],
+                                           cdsStart=row_of_interest["cdsStart"],
+                                           cdsEnd=row_of_interest["cdsEnd"],
+                                           exonCount=row_of_interest["exonCount"],
+                                           exonStarts=row_of_interest["exonStarts"],
+                                           exonEnds=row_of_interest["exonEnds"],
+                                           exonFrames=row_of_interest["exonFrames"])
+        
+
+        gene_of_interest.sequence_breakdown()
+
+        pickle_dict[gene_of_interest.name] = gene_of_interest
+
+    return pickle_dict
+
+
+
+        # print(gene_of_interest.full_seq)
+        # print(gene_of_interest.exon_seq)
+        # print(gene_of_interest.intron_seq)
+
+        # pickle_frame.loc[running_index] = [gene_of_interest.name, gene_of_interest.full_seq, gene_of_interest.exon_seq, gene_of_interest.intron_seq]
+
+    #     # gene_of_interest.write_sequences(root / "Data_Files" / "NucComp")
+
+    #     gene_row: pandas.Series = gene_of_interest.new_IE_row()
+
+
+    #     row_index = gene_row.index
+    #     exon_len_index = []
+    #     intron_len_index = []
+
+    #     for index in row_index:
+    # #         # print(index)
+    #         if re.search("Seq", index):
+    #             if re.search("Exon", index):
+    #                 len_header = re.sub("ExonSeq", "ExonLen", index)
+    #                 exon_len_index.append(len_header)
+
+    #             elif re.search("Intron", index):
+    #                 len_header = re.sub("IntronSeq", "IntronLen", index)
+    #                 intron_len_index.append(len_header)
+
+    #             gene_row[len_header] = len(gene_row[index])
+
+    #         else:
+    #             gene_row = gene_row.drop(index)
+
+    #     # print(new_gene_row)
+    #     # print(gene_row)
+
+    #     for eength_index in exon_len_index:
+    #         eength = gene_row[eength_index]
+
+    #         local_intron_len_index = intron_len_index
+            
+    #         for i, ienght_index in enumerate(local_intron_len_index):
+    #             iength = gene_row[ienght_index]
+
+    #             if percent_diff(eength, iength) <= threshold:
+    #                 exon_header = re.sub("ExonLen", "ExonSeq", eength_index)
+    #                 intron_header = re.sub("IntronLen", "IntronSeq", ienght_index)
+    #                 pickle_frame.loc[running_index] = [gene_row[exon_header], "Exon"]
+    #                 running_index += 1
+
+    #                 pickle_frame.loc[running_index] = [gene_row[intron_header], "Intron"]
+    #                 running_index += 1
+
+    #                 intron_len_index.pop(i)
+
+    #                 break
+
+    # pickle_frame.to_pickle("GenePerChrom.pkl")
+
+
+
+
 
 
 
@@ -314,3 +441,4 @@ if __name__ in '__main__':
     # main()
     # single_image()
     same_length_same_gene()
+    # gene_per_chrome()
