@@ -6,6 +6,9 @@ import numpy as np
 import glob
 from plotly import graph_objects as go
 import timeit
+from scipy.spatial import distance
+
+logplot = False
 
 def main():
     '''
@@ -23,32 +26,47 @@ def main():
         file = pathlib.Path(file)
         # print(file)
         # print(type(file))
-        cgr = np.load(str(file), allow_pickle=True)
+        try:
+            cgr = np.load(str(file), allow_pickle=True)
+        except Exception as e:
+            print(type(e))
+            print(e)
+            print(file)
+            cgr = None
 
-        title = file.name
+        if isinstance(cgr, np.ndarray):
+            title = file.name
 
-        start = timeit.default_timer()
-        correlation_dimension_figure(cgr, title = title)
-        stop = timeit.default_timer()
+            start = timeit.default_timer()
+            correlation_dimension_figure(cgr, title = title, logplot = logplot)
+            stop = timeit.default_timer()
 
-        print(f"Time = {stop - start}")
-        # exit()
+            print(f"Time = {stop - start}")
+            # exit()
 
 
     
-def correlation_dimension_figure(cgr, title = None):
+def correlation_dimension_figure(cgr, title = None, logplot = True):
     '''
     '''
 
     local_c: dict = correlation_dimension(cgr)
 
-    x_values = np.log(list(local_c.keys()), where = list(local_c.keys()) !=0)
-    y_values = np.log(list(local_c.values()), where = list(local_c.values()) !=0)
-    
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x = x_values, y = y_values))
-    fig.update_layout(title = title)
-    fig.show()
+    if isinstance(local_c, dict):
+
+        if logplot:
+            x_values = np.log(list(local_c.keys()), where = list(local_c.keys()) !=0)
+            y_values = np.log(list(local_c.values()), where = list(local_c.values()) !=0)
+
+        else:
+            x_values = list(local_c.keys())
+            y_values = list(local_c.values())
+
+        
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x = x_values, y = y_values))
+        fig.update_layout(title = title)
+        fig.show()
 
 
 
@@ -130,34 +148,43 @@ def correlation_dimension(cgr: np.ndarray) -> dict:
     size = int(np.sqrt(L**2 + W**2)) + 1
 
     D = euc_dis_matrix(cgr)
-    N = D.size**(-1)
+    # print(type(D))
+    # exit()
+    # D = distance.c
 
-    for e in range(size):
-        epsilon = e + 1
-        C[epsilon] = np.count_nonzero((epsilon >= D) & (D > 0))
-        
-    #     for i in non_zero_indices:
-    #         hash_i = hash_index(i)
+    if isinstance(D, np.ndarray):
+        N = (D.size)**(-2)
 
-    #         for j in non_zero_indices:
-    #             hash_j = hash_index(j)
+        for e in range(size):
+            epsilon = e + 1
+            # C[epsilon] = np.count_nonzero((epsilon >= D) & (D > 0))
+            C[epsilon] = np.count_nonzero(epsilon >= D)
+            
+        #     for i in non_zero_indices:
+        #         hash_i = hash_index(i)
 
-    #             # This part is working
-    #             if hash_i not in hash_j:
-                
-    #                 if distances[hash_i][hash_j] == 0:
-    #                     d = heaviside_function(i, j, e)
-    #                     distances[hash_i][hash_j] = d
-    #                     # distances[hash_j][hash_i] = d
+        #         for j in non_zero_indices:
+        #             hash_j = hash_index(j)
 
-    #                 C[e] += distances[hash_i][hash_j]
-                
+        #             # This part is working
+        #             if hash_i not in hash_j:
+                    
+        #                 if distances[hash_i][hash_j] == 0:
+        #                     d = heaviside_function(i, j, e)
+        #                     distances[hash_i][hash_j] = d
+        #                     # distances[hash_j][hash_i] = d
 
-    #     C[e] = C[e] * N  # note the multiplication: all the work for making N be 1/N**2 was taken care of earlier
+        #                 C[e] += distances[hash_i][hash_j]
+                    
 
-    # # exit()
+            C[epsilon] = C[epsilon] * N  # note the multiplication: all the work for making N be 1/N**2 was taken care of earlier
 
-    return C
+        # # exit()
+
+        return C
+    
+    else:
+        return None
 
 
 
@@ -181,6 +208,7 @@ def euc_dis_matrix(matrix) -> np.array:
     '''
     '''
     euc = lambda x1, x2: np.sqrt(((x1[0] - x2[0])**2) + ((x1[1] - x2[1])**2))
+    points = lambda x: (0.5*x**2) - (0.5*x)
 
     x = np.transpose(np.where(matrix > 0))
 
@@ -188,18 +216,70 @@ def euc_dis_matrix(matrix) -> np.array:
     # N = (l*w)**(-2)
     l, _ = x.shape
 
-    D = np.zeros(shape=(l, l))
+    # slower and has same problem
+    # D = distance.cdist(x, x, "euclidean")
+    # return D
 
-    w = len(x)
-    for k in range(w):
-        step = 1 + k
-        for i in range(0, l - k - 1):
-            d = euc(x[i], x[i + step])
+    # fast, but has an issue with the size of the matrix. Takes up to much memory
+    # try:
+    #     D = np.zeros(shape=(l, l))
+    # except np.core._exceptions._ArrayMemoryError as e:
+    #     print("memory error... stupid non root privledge...")
+    #     print(f"Size = {l*l}\tItem Size = 8?\tGB = {l*l*8*1E-9}")
 
-            D[i, i + step] = d
-            D[i + step, i] = d
+    #     return None
 
-    return D
+    # except Exception as e:
+    #     print(type(e))
+    #     print(e)
+
+    #     print(f"Size = {l*l}\tItem Size = 8?\tGB = {l*l*8*1E-9}")
+    #     return None
+    # else:
+
+    #     print(f"Size = {D.size}\tItem Size = {D.itemsize}\tGB = {D.size*D.itemsize*1E-9}")
+
+    #     w = len(x)
+    #     for k in range(w):
+    #         step = 1 + k
+    #         for i in range(0, l - k - 1):
+    #             d = euc(x[i], x[i + step])
+
+    #             D[i, i + step] = d
+    #             D[i + step, i] = d
+
+    #     return D
+
+    p = points(l)
+    try:
+        D = np.zeros(int(p))
+
+    except np.core._exceptions._ArrayMemoryError as e:
+        print("Still have a memory error")
+        print(f"Size = {p}\tItem Size = 8?\tGB = {p*8*1E-9}")
+        return None
+
+    except Exception as e:
+        print(type(e))
+        print(e)
+
+        print(f"Size = {p}\tItem Size = 8?\tGB = {p*8*1E-9}")
+        return None
+
+    else:
+        print(f"Size = {D.size}\tItem Size = {D.itemsize}\tGB = {D.size*D.itemsize*1E-9}")
+
+        w = len(x)
+        for k in range(w):
+            step = 1 + k
+            for i in range(0, l - k - 1):
+                d = euc(x[i], x[i + step])
+
+                D[i] = d
+
+        return D
+
+
 
 
 
