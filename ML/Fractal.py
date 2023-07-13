@@ -8,8 +8,13 @@ from PIL import Image
 
 cwd = pathlib.Path.cwd()
 
-exon_images = cwd / "FractalImageEvI_SL" / "EXON"
-intron_images = cwd / "FractalImageEvI_SL" / "INTRON"
+kmer = 6
+
+data_file: pathlib.Path = pathlib.Path("TrainingGeneData_SLSGHis.pkl")
+new_folder = os.path.splitext(data_file)[0]
+
+exon_images = cwd / new_folder / "EXON"
+intron_images = cwd / new_folder / "INTRON"
 # utr5_images = cwd / "FractalImage" / "UTR5"
 # utr3_images = cwd / "FractalImage" / "UTR3"
 # exon_images = cwd / "FractalImage" / "Exon"
@@ -20,7 +25,7 @@ intron_images.mkdir(parents = True, exist_ok = True)
 # utr3_images.mkdir(parents = True, exist_ok = True)
 # exon_images.mkdir(parents = True, exist_ok = True)
 
-kmer = 6
+print(f"Putting Data into folder\n\t{exon_images}\n\t{intron_images}")
 
 def manhattan_position(nuc: int, x0: int):
     '''
@@ -122,7 +127,7 @@ def gif_generator(path: str, filename: str):
     frames[0].save(filename, format="GIF", append_images=frames[1:], save_all = True, loop = 0, duration = 225) 
 
 
-train_data: pandas.DataFrame = pandas.read_pickle(cwd / "TrainingData_SameSize.pkl")
+train_data: pandas.DataFrame = pandas.read_pickle(cwd / data_file)
 # print(train_data.shape)
 
 keep = np.where(train_data["Seq"].str.len() >= 100)[0]
@@ -138,7 +143,7 @@ train_data = train_data.reset_index()
 # print(train_data.shape)
 # print(train_data)
 
-print(train_data)
+# print(train_data)
 
 
 
