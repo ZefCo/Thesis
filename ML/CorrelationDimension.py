@@ -153,7 +153,8 @@ def correlation_dimension(cgr: np.ndarray) -> dict:
     # D = distance.c
 
     if isinstance(D, np.ndarray):
-        N = (D.size)**(-2)
+        print(D.shape, D.size)
+        N = (D.shape[0] + 1)**(-1)
 
         for e in range(size):
             epsilon = e + 1
