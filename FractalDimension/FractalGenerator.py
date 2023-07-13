@@ -111,7 +111,7 @@ def CGRPerChrome(kmer = 6, maximum_brightness = False, invert_gray = False, min_
 
                 txtf.write(exon_data_line)
 
-                if len(e) >= min_exon:
+                if exon_len >= min_exon:
                         mer = nucleotide_counter(e.upper(), kmer)
                         cgr = chaos_game_representation(mer, kmer)
 
@@ -120,7 +120,7 @@ def CGRPerChrome(kmer = 6, maximum_brightness = False, invert_gray = False, min_
                             cgr[super_threshold_indices] = 1000
 
 
-                        filepath = exon_folder / f"{gname}_E_{exon_count}.png"
+                        filepath = exon_folder / f"{gname}_E_{exon_count}_{exon_len}.png"
                         if invert_gray:
                             plt.imsave(filepath, cgr, cmap = "gray_r")
                         else:
@@ -159,7 +159,7 @@ def CGRPerChrome(kmer = 6, maximum_brightness = False, invert_gray = False, min_
                 super_threshold_indices = cgr > 0
                 cgr[super_threshold_indices] = 100
 
-            full_exon_seq = filepath = fullseq_folder / f"{gname}_ESeq.png"
+            full_exon_seq = filepath = fullseq_folder / f"{gname}_E_Seq_{len(exon_seq)}.png"
             if invert_gray:
                 plt.imsave(filepath, cgr, cmap = "gray_r")
             else:
@@ -206,7 +206,7 @@ def CGRPerChrome(kmer = 6, maximum_brightness = False, invert_gray = False, min_
                     super_threshold_indices = cgr > 0
                     cgr[super_threshold_indices] = 100
 
-                filepath = intron_folder / f"{gname}_I_{intron_count}.png"
+                filepath = intron_folder / f"{gname}_I_{intron_count}_{intron_len}.png"
                 if invert_gray:
                     plt.imsave(filepath, cgr, cmap = "gray_r")
                 else:
@@ -238,7 +238,7 @@ def CGRPerChrome(kmer = 6, maximum_brightness = False, invert_gray = False, min_
                 super_threshold_indices = cgr > 0
                 cgr[super_threshold_indices] = 100
 
-            full_intron_seq = filepath = fullseq_folder / f"{gname}_ISeq.png"
+            full_intron_seq = filepath = fullseq_folder / f"{gname}_I_Seq_{len(intron_seq)}.png"
             if invert_gray:
                 plt.imsave(filepath, cgr, cmap = "gray_r")
             else:
@@ -266,7 +266,7 @@ def CGRPerChrome(kmer = 6, maximum_brightness = False, invert_gray = False, min_
                 super_threshold_indices = cgr > 0
                 cgr[super_threshold_indices] = 100
 
-            full_gene_seq = filepath = fullseq_folder / f"{gname}_FS.png"
+            full_gene_seq = filepath = fullseq_folder / f"{gname}_F_Seq_{len(gene.full_seq[0].upper())}.png"
             if invert_gray:
                 plt.imsave(filepath, cgr, cmap = "gray_r")
             else:
