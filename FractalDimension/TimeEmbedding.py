@@ -16,7 +16,7 @@ import itertools
 def main():
     '''
     '''
-    time_embedding(max_rows = 5000)
+    time_embedding(max_rows = 3000, gap = 20)
     # score_keys()
 
 
@@ -53,7 +53,7 @@ def score_keys(k = 9):
 
 
 
-def time_embedding(k_p = 9, k_m = 9, max_rows = 200):
+def time_embedding(k_p = 9, k_m = 9, gap = 0, max_rows = 200):
     '''
     Will use the G number idea to find the forward and backward number.
 
@@ -68,6 +68,14 @@ def time_embedding(k_p = 9, k_m = 9, max_rows = 200):
 
     Switch from using the Training Data to a single gene from the Fractal Di mension stuff.
     '''
+    image_dir = cwd / "TE_Images"
+    image_dir.mkdir(parents = True, exist_ok = True)
+    exon_dir = image_dir / "Exon"
+    exon_dir.mkdir(parents = True, exist_ok = True)
+    intron_dir = image_dir / "Intron"
+    intron_dir.mkdir(parents = True, exist_ok = True)
+    both_dir = image_dir / "Both"
+    both_dir.mkdir(parents = True, exist_ok = True)
 
     w_p = [(0.25)**n for n in range(1, k_p + 1)]
     w_m = [(0.25)**n for n in range(1, k_m + 1)]
@@ -87,8 +95,9 @@ def time_embedding(k_p = 9, k_m = 9, max_rows = 200):
     # exit()
 
     rows, cols = data.shape
+    print(rows)
 
-    data = data[data["Length"] > (k_m + k_p)]
+    data = data[data["Length"] > (k_m + k_p + gap)]
 
     for row in range(rows):
         sequence = data.loc[row, "Seq"].upper()
@@ -98,8 +107,8 @@ def time_embedding(k_p = 9, k_m = 9, max_rows = 200):
         # ex, ey = [], []
         # ix, iy = [], []
 
-        k_minus = [sequence[k_prime:k_prime + k_m] for k_prime in range(0, length - (k_p + k_m))]
-        k_plus = [sequence[k_prime:k_prime + k_p] for k_prime in range(k_m, length - k_p)]
+        k_minus = [sequence[k_prime:k_prime + k_m] for k_prime in range(0, length - (k_p + k_m + gap))]
+        k_plus = [sequence[k_prime:k_prime + k_p] for k_prime in range(gap + k_m, length - k_p)]
 
         for i, k_prime in enumerate(k_minus):
             n = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in k_prime]
@@ -129,23 +138,26 @@ def time_embedding(k_p = 9, k_m = 9, max_rows = 200):
         fig.add_trace(go.Scatter(x = x, y = y, name = name, legendgroup = legend_group, mode = "markers", marker = dict(size = 1)))
         # fig.add_trace(go.Scatter(x = x, y = y, name = name, legendgroup = legend_group, mode = "lines", line = dict(width = 0.25)))
 
+        if ((row % 1000) == 0):
+            print(f"Finished row {row}")
+
         if row > max_rows:
             break
 
-    fig.update_layout(title = f"Exons and Introns, Time Embedding<br>{e_count + i_count} Total Regions - Unknown how many genes are represented", xaxis_title = "History", yaxis_title = "Future")
+    fig.update_layout(title = f"Exons and Introns, Time Embedding w/ {gap}-mer Gap between + and -<br>{e_count + i_count} Total Regions - Unknown how many genes are represented", xaxis_title = "History, -", yaxis_title = "Future, +")
     # fig.show()
-    fig.update_layout(showlegend = False)
-    fig.write_image(str(cwd / "ExonIntron_HistoryvsFuture.png"))
+    fig.update_layout(showlegend = False, autosize = False, width = 1500, height = 1500)
+    fig.write_image(str(both_dir / f"both_gap_{gap}.png"))
 
-    eig.update_layout(title = f"Exons Only<br>{e_count} total Exons", xaxis_title = "History", yaxis_title = "Future")
+    eig.update_layout(title = f"Exons Only w/ {gap}-mer Gap<br>{e_count} total Exons", xaxis_title = "History, -", yaxis_title = "Future, +")
     # eig.show()
-    eig.update_layout(showlegend = False)
-    eig.write_image(str(cwd / "Exon_HistoryvsFuture.png"))
+    eig.update_layout(showlegend = False, autosize = False, width = 1500, height = 1500)
+    eig.write_image(str(exon_dir / f"exon_gap_{gap}.png"))
 
-    iig.update_layout(title = f"Introns Only<br>{i_count} total Introns", xaxis_title = "History", yaxis_title = "Future")
+    iig.update_layout(title = f"Introns Only w/ {gap}-mer Gap<br>{i_count} total Introns", xaxis_title = "History, -", yaxis_title = "Future, +")
     # iig.show()
-    iig.update_layout(showlegend = False)
-    iig.write_image(str(cwd / "Intron_HistoryvsFuture.png"))
+    iig.update_layout(showlegend = False, autosize = False, width = 1500, height = 1500)
+    iig.write_image(str(intron_dir / f"intron_gap_{gap}.png"))
 
         # exit()
 
