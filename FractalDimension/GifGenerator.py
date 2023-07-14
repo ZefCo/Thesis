@@ -11,19 +11,19 @@ def main():
     '''
     '''
 
-    k_p = 9
+    k_p = 6
     k_m = 9
-    max_rows = 1000
-    gap_min, gap_max = 0, 20
+    max_rows = 5000
+    gap_min, gap_max, gap_step = 0, 2000, 50 
 
     image_dir = cwd / "TE_Images"
     exon_dir = image_dir / "Exon"
     intron_dir = image_dir / "Intron"
     both_dir = image_dir / "Both"
     
-    for gap in range(gap_min, gap_max):
+    for gap in range(gap_min, gap_max + gap_step, gap_step):
         print(f"### Gap = {gap} ###")
-        TE.time_embedding(k_p = k_p, k_m = k_m, max_rows = max_rows, gap = gap)
+        TE.time_embedding_v2(k_p = k_p, k_m = k_m, max_rows = max_rows, gap = gap)
 
     generator(exon_dir, str(cwd / f"Exons_gap_{gap_min}_{gap_max}.gif"))
     generator(intron_dir, str(cwd / f"Introns_gap_{gap_min}_{gap_max}.gif"))
