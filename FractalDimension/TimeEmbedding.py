@@ -8,7 +8,7 @@ from plotly import graph_objects as go
 import timeit
 import DistanceClass as distance
 # from scipy.spatial import distance
-from statsmodels.graphics.tsaplots import plot_acf
+# from statsmodels.graphics.tsaplots import plot_acf
 import pandas
 import pickle
 import itertools

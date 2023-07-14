@@ -13,8 +13,8 @@ def main():
 
     k_p = 9
     k_m = 9
-    max_rows = 1000
-    gap_min, gap_max = 0, 20
+    max_rows = 3000
+    gap_min, gap_max = 0, 100
 
     image_dir = cwd / "TE_Images"
     exon_dir = image_dir / "Exon"
