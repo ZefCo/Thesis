@@ -16,7 +16,8 @@ cwd = pathlib.Path.cwd()
 
 TraningData = cwd.parent / "Data_Files" / "TrainingData"
 
-data_set_1: pandas.DataFrame = pandas.read_pickle(str(TraningData / "TrainingGeneData_v3.pkl"))
+# data_set_1: pandas.DataFrame = pandas.read_pickle(str(TraningData / "TrainingGeneData_v3.pkl"))
+data_set_1: pandas.DataFrame = pandas.read_pickle(cwd / "TrainingGeneData_SLSGHis.pkl")
 print(data_set_1)
 
 data_set_1["Type"] = pandas.Categorical(data_set_1["Type"])
@@ -73,6 +74,7 @@ for row in range(rows):
         image_seq = np.ndarray(shape = (len(seq), 4), dtype = np.uint8)
 
         # image_seq = list()
+        # print(seq)
 
         for x, n in enumerate(seq):
             if n in "A":
@@ -100,17 +102,21 @@ for row in range(rows):
                     image_seq[x, i] = 0
         
         data[row] = image_seq
-        labels[row] = 1 if seq_type in "CDS" else 2 if seq_type in "Intron" else 3 if seq_type in "UTR5" else 4
+        labels[row] = 1 if seq_type in "Exon" else 2 if seq_type in "Intron" else 3 if seq_type in "UTR5" else 4
         # print(image_seq.shape)
         # break
 
         # data = np.concatenate([data, image_seq])
 
+    # print(labels[0])
+    # print(data[0][25])
+    # exit()
+
 # print(labels[0])
 print(np.unique(labels))
 
-np.save(cwd / "Data", data)
-np.save(cwd / "Labels", labels)
+np.save(cwd / "Data_1Dv2", data)
+np.save(cwd / "Labels_1Dv2", labels)
 
 
 # print(data.shape)
