@@ -12,10 +12,10 @@ def main():
     '''
     '''
     # dict_screwup()
-    # getKnownGene(track = "ensGene")
-    hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19_ensGene.pkl",
-                   pathlib.Path("/media/ethanspeakman/Elements/GeneData/Known_Genes_hg19_ensGene_DICT.pkl"), 
-                   ref_track="enst")
+    # pickle_file, csv_file = getKnownGene()
+    hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19_ncbiRefSeqCurated.pkl",
+                   pathlib.Path("/media/ethanspeakman/Elements/GeneData/Known_Genes_hg19_NCBIGene_DICT.pkl"), 
+                   ref_track="ncib")
     # hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19_ncbiRefSeqCurated.pkl")
 
 
@@ -55,6 +55,8 @@ def dict_screwup():
 def getKnownGene(genome = "hg19", track = "ncbiRefSeqCurated"):
     '''
     This will get all the known gene data and load it to a pkl file for later use.
+
+    It will return the names of the files that it outputs, so I can be lazy and use one script to do two things. THAT'S HOW YOU DO IT BENDER!
     '''
     chroms = [f'chr{i}' for i in range(1, 23)]
     chroms.append('chrX')
@@ -94,6 +96,8 @@ def getKnownGene(genome = "hg19", track = "ncbiRefSeqCurated"):
 
     known_genes.to_csv(data_folder / f"Known_Genes_{genome}_{track}.csv")
     known_genes.to_pickle(data_folder / f"Known_Genes_{genome}_{track}.pkl")
+
+    return data_folder / f"Known_Genes_{genome}_{track}.pkl", data_folder / f"Known_Genes_{genome}_{track}.csv"
 
 
 
@@ -161,7 +165,7 @@ def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track
 
     unique_index = 0
     for row in range(rows):
-        print(f"Working on row {row}")
+        print(f"Working on row {row} / {rows}")
         row_of_interest = known_genes.iloc[row, :]
 
         gene_of_interest: Gene = Gene.Gene(name = row_of_interest["name"],
@@ -181,8 +185,8 @@ def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track
         
         gene_of_interest.sequence_breakdown()
 
-        if gene_of_interest.ename in pickle_dict.keys():
-            key = re.split("_", gene_of_interest.ename)[0]
+        if gene_of_interest.ncibname in pickle_dict.keys():
+            key = re.split("_", gene_of_interest.ncibname)[0]
             key = f"{key}_{unique_index}"
             unique_index += 1
         else:
