@@ -16,8 +16,16 @@ import matplotlib.pyplot as plt
 
 def main():
     '''
+    Time embedding v3: make one that goes through a gene (all its different forms) and plots the trajectory of the k windows. Does something happen for the introns and the exons?
+    You'll have to also do the exons and introns seperatly, but we want to see how the trajectory can "jump" from exon to intron: maybe there is something of interest there?
     '''
-    time_embedding_v2(max_rows = 5000, gap = 1000, k_p=6, k_m=9, backwards = False)
+    time_embedding_v2(str(cwd.parent / "ML" / "TrainingData_SameSize.pkl"), 
+                      max_rows = 5000, 
+                      gap = 20, 
+                      k_p = 9, 
+                      k_m = 9, 
+                      backwards = True,
+                      compliment = True)
     # score_keys()
 
 
@@ -183,7 +191,7 @@ def time_embedding(k_p = 9, k_m = 9, gap = 0, max_rows = 200):
 
 
 
-def time_embedding_v2(k_p = 9, k_m = 9, gap = 0, max_rows = 200, backwards = True):
+def time_embedding_v2(pickle_file, k_p = 9, k_m = 9, gap = 0, max_rows = 200, backwards = True, compliment = False):
     '''
     Almost identical to the above, but uses matplotlib to output the images. Doesn't look as slick but does output the images much faster
     '''
@@ -202,9 +210,7 @@ def time_embedding_v2(k_p = 9, k_m = 9, gap = 0, max_rows = 200, backwards = Tru
     if backwards:
         w_m.reverse()
 
-    ML_Folder = cwd.parent / "ML"
-    
-    with open(str(ML_Folder / "TrainingGeneData_SLSGHis.pkl"), "rb") as p:
+    with open(str(pickle_file), "rb") as p:
         data: pandas.DataFrame = pickle.load(p)
 
     if "Length" in data.columns:
@@ -248,14 +254,26 @@ def time_embedding_v2(k_p = 9, k_m = 9, gap = 0, max_rows = 200, backwards = Tru
 
         k_minus = [sequence[k_prime:k_prime + k_m] for k_prime in range(0, length - (k_p + k_m + gap))]
         k_plus = [sequence[k_prime:k_prime + k_p] for k_prime in range(gap + k_m, length - k_p)]
-        for i, k_prime in enumerate(k_minus):
-            n = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in k_prime]
-            k_x = np.dot(w_m, n)
 
-            n = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in k_plus[i]]
-            k_y = np.dot(w_p, n)
+        if compliment:
+            for i, k_prime in enumerate(k_minus):
+                n = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in k_prime]
+                k_x = np.dot(w_m, n)
 
-            xy[i][0], xy[i][1] = k_x, k_y
+                n = [3 if n in "A" else 2 if n in "C" else 1 if n in "G" else 0 if n in "T" else 100 for n in k_plus[i]]
+                k_y = np.dot(w_p, n)
+
+                xy[i][0], xy[i][1] = k_x, k_y
+
+        else:
+            for i, k_prime in enumerate(k_minus):
+                n = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in k_prime]
+                k_x = np.dot(w_m, n)
+
+                n = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in k_plus[i]]
+                k_y = np.dot(w_p, n)
+
+                xy[i][0], xy[i][1] = k_x, k_y
         
         if region in "Exon":
             e_frame.append(xy)
@@ -269,24 +287,25 @@ def time_embedding_v2(k_p = 9, k_m = 9, gap = 0, max_rows = 200, backwards = Tru
         if ((row % 1000) == 0):
             print(f"Finished row {row}")
 
+    # Both Plot
     fig, ax = plt.subplots()
     fig.set_size_inches(20, 20)
     for points in b_frame:
         ax.scatter(points[:, 0], points[:, 1], s = 0.1)
 
     if backwards:
-        b_title = f"Exons and Introns, Time Embedding w/ {gap}-mer Gap between + and -\n{e_count + i_count} Total Regions - Unknown how many genes are represented: weights are forwards and backwards"
-        e_title = f"Exons, Time Embedding w/ {gap}-mer Gap\n{e_count} Total Regions: weights are forwards and backwards"
-        i_title = f"Introns, Time Embedding w/ {gap}-mer Gap\n{i_count} Total Regions: weights are forwards and backwards"
+        b_title = f"Exons and Introns, Time Embedding w/ {gap}-mer Gap between + and -\n{e_count + i_count} Total Regions - Unknown how many genes are represented: weights are forwards and backwards\nCompliment = {compliment}"
+        e_title = f"Exons, Time Embedding w/ {gap}-mer Gap\n{e_count} Total Regions: weights are forwards and backwards\nCompliment = {compliment}"
+        i_title = f"Introns, Time Embedding w/ {gap}-mer Gap\n{i_count} Total Regions: weights are forwards and backwards\nCompliment = {compliment}"
     else:
-        b_title = f"Exons and Introns, Time Embedding w/ {gap}-mer Gap between + and -\n{e_count + i_count} Total Regions - Unknown how many genes are represented: weights are forwards"
-        e_title = f"Exons, Time Embedding w/ {gap}-mer Gap\n{e_count} Total Regions: weights are forwards"
-        i_title = f"Introns, Time Embedding w/ {gap}-mer Gap\n{i_count} Total Regions: weights are forwards"
-    
+        b_title = f"Exons and Introns, Time Embedding w/ {gap}-mer Gap between + and -\n{e_count + i_count} Total Regions - Unknown how many genes are represented: weights are forwards\nCompliment = {compliment}"
+        e_title = f"Exons, Time Embedding w/ {gap}-mer Gap\n{e_count} Total Regions: weights are forwards\nCompliment = {compliment}"
+        i_title = f"Introns, Time Embedding w/ {gap}-mer Gap\n{i_count} Total Regions: weights are forwards\nCompliment = {compliment}"
+
     x_title = f"History: {k_m}-Mer"
     y_title = f"Future: {k_p}-Mer"
 
-    both_file = str(both_dir / f"both_gap_{gap}.png")
+    both_file = str(both_dir / f"both_gap_{gap}_{k_m}v{k_p}_Back_{backwards}_Comp_{compliment}.png")
     plt.title(b_title)
     plt.xlabel(x_title)
     plt.ylabel(y_title)
@@ -294,12 +313,12 @@ def time_embedding_v2(k_p = 9, k_m = 9, gap = 0, max_rows = 200, backwards = Tru
     print(f"Output image to {both_file}")
     plt.close()
 
+    # Exon Plot
     fig, ax = plt.subplots()
     fig.set_size_inches(20, 20)
     for points in e_frame:
         ax.scatter(points[:, 0], points[:, 1], s = 0.1)
-
-    exon_file = str(exon_dir / f"exon_gap_{gap}.png")
+    exon_file = str(exon_dir / f"exon_gap_{gap}_{k_m}v{k_p}_Back_{backwards}_Comp_{compliment}.png")
     plt.title(e_title)
     plt.xlabel(x_title)
     plt.ylabel(y_title)
@@ -307,12 +326,12 @@ def time_embedding_v2(k_p = 9, k_m = 9, gap = 0, max_rows = 200, backwards = Tru
     print(f"Output image to {exon_file}")
     plt.close()
 
+    # Intron Plot
     fig, ax = plt.subplots()
     fig.set_size_inches(20, 20)
     for points in i_frame:
         ax.scatter(points[:, 0], points[:, 1], s = 0.1)
-
-    intron_file = str(intron_dir / f"intron_gap_{gap}.png")
+    intron_file = str(intron_dir / f"intron_gap_{gap}_{k_m}v{k_p}_Back_{backwards}_Comp_{compliment}.png")
     plt.title(i_title)
     plt.xlabel(x_title)
     plt.ylabel(y_title)
