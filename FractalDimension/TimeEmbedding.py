@@ -213,7 +213,16 @@ def time_embedding_v2(k_p = 9, k_m = 9, gap = 0, max_rows = 200, backwards = Tru
         data["Length"] = data.Seq.str.len()
         data = data[data["Length"] > (k_m + k_p + gap)]
 
-    data = data.sample(n = max_rows).reset_index()
+    try:
+        data = data.sample(n = max_rows).reset_index()
+    except ValueError as e:
+        data = data.reset_index()
+    except Exception as e:
+        print(type(e))
+        print(e)
+        print(data.shape)
+        print(max_rows)
+        exit()
     rows, cols = data.shape
 
     # print(data)
@@ -273,12 +282,14 @@ def time_embedding_v2(k_p = 9, k_m = 9, gap = 0, max_rows = 200, backwards = Tru
         b_title = f"Exons and Introns, Time Embedding w/ {gap}-mer Gap between + and -\n{e_count + i_count} Total Regions - Unknown how many genes are represented: weights are forwards"
         e_title = f"Exons, Time Embedding w/ {gap}-mer Gap\n{e_count} Total Regions: weights are forwards"
         i_title = f"Introns, Time Embedding w/ {gap}-mer Gap\n{i_count} Total Regions: weights are forwards"
-
+    
+    x_title = f"History: {k_m}-Mer"
+    y_title = f"Future: {k_p}-Mer"
 
     both_file = str(both_dir / f"both_gap_{gap}.png")
     plt.title(b_title)
-    plt.xlabel("History")
-    plt.ylabel("Future")
+    plt.xlabel(x_title)
+    plt.ylabel(y_title)
     plt.savefig(both_file)
     print(f"Output image to {both_file}")
     plt.close()
@@ -290,8 +301,8 @@ def time_embedding_v2(k_p = 9, k_m = 9, gap = 0, max_rows = 200, backwards = Tru
 
     exon_file = str(exon_dir / f"exon_gap_{gap}.png")
     plt.title(e_title)
-    plt.xlabel("History")
-    plt.ylabel("Future")
+    plt.xlabel(x_title)
+    plt.ylabel(y_title)
     plt.savefig(exon_file)
     print(f"Output image to {exon_file}")
     plt.close()
@@ -303,8 +314,8 @@ def time_embedding_v2(k_p = 9, k_m = 9, gap = 0, max_rows = 200, backwards = Tru
 
     intron_file = str(intron_dir / f"intron_gap_{gap}.png")
     plt.title(i_title)
-    plt.xlabel("History")
-    plt.ylabel("Future")
+    plt.xlabel(x_title)
+    plt.ylabel(y_title)
     plt.savefig(intron_file)
     print(f"Output image to {intron_file}")
     plt.close()
