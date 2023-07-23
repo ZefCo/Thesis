@@ -46,7 +46,7 @@ def various_gaps():
     k_p = 6
     k_m = 9
     max_rows = 5000
-    gap_min, gap_max, gap_step = 0, 2000, 50 
+    gap_min, gap_max, gap_step = 0, 500, 1
 
     image_dir = cwd / "TE_Images"
     exon_dir = image_dir / "Exon"
@@ -55,11 +55,11 @@ def various_gaps():
     
     for gap in range(gap_min, gap_max + gap_step, gap_step):
         print(f"### Gap = {gap} ###")
-        TE.time_embedding_v2(k_p = k_p, k_m = k_m, max_rows = max_rows, gap = gap)
+        TE.time_embedding_v2(k_p = k_p, k_m = k_m, max_rows = max_rows, gap = gap, backwards = True)
 
-    generator(exon_dir, str(cwd / f"Exons_gap_{gap_min}_{gap_max}.gif"))
-    generator(intron_dir, str(cwd / f"Introns_gap_{gap_min}_{gap_max}.gif"))
-    generator(both_dir, str(cwd / f"Both_gap_{gap_min}_{gap_max}.gif"))
+    generator(exon_dir, str(cwd / f"Exons_gap_{gap_min}_{gap_max}_BackAndFor.gif"))
+    generator(intron_dir, str(cwd / f"Introns_gap_{gap_min}_{gap_max}_BackAndFor.gif"))
+    generator(both_dir, str(cwd / f"Both_gap_{gap_min}_{gap_max}_BackAndFor.gif"))
 
 
 def generator(specific_folder: pathlib.Path, output_file):
