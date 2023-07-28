@@ -18,7 +18,16 @@ def main():
     '''
     Time embedding v3: make one that goes through a gene (all its different forms) and plots the trajectory of the k windows. Does something happen for the introns and the exons?
     You'll have to also do the exons and introns seperatly, but we want to see how the trajectory can "jump" from exon to intron: maybe there is something of interest there?
+    Time embedding v3: make one that goes through a gene (all its different forms) and plots the trajectory of the k windows. Does something happen for the introns and the exons?
+    You'll have to also do the exons and introns seperatly, but we want to see how the trajectory can "jump" from exon to intron: maybe there is something of interest there?
     '''
+    time_embedding_v2(str(cwd.parent / "ML" / "TrainingData_SameSize.pkl"), 
+                      max_rows = 5000, 
+                      gap = 20, 
+                      k_p = 9, 
+                      k_m = 9, 
+                      backwards = True,
+                      compliment = True)
     time_embedding_v2(str(cwd.parent / "ML" / "TrainingData_SameSize.pkl"), 
                       max_rows = 5000, 
                       gap = 20, 
@@ -302,10 +311,13 @@ def time_embedding_v2(pickle_file, k_p = 9, k_m = 9, gap = 0, max_rows = 200, ba
         e_title = f"Exons, Time Embedding w/ {gap}-mer Gap\n{e_count} Total Regions: weights are forwards\nCompliment = {compliment}"
         i_title = f"Introns, Time Embedding w/ {gap}-mer Gap\n{i_count} Total Regions: weights are forwards\nCompliment = {compliment}"
 
+    x_title = f"History: {k_m}-Mer"
+    y_title = f"Future: {k_p}-Mer"
+
     both_file = str(both_dir / f"both_gap_{gap}_{k_m}v{k_p}_Back_{backwards}_Comp_{compliment}.png")
     plt.title(b_title)
-    plt.xlabel(f"History {k_m} - mer")
-    plt.ylabel(f"Future {k_p} - mer")
+    plt.xlabel(x_title)
+    plt.ylabel(y_title)
     plt.savefig(both_file)
     print(f"Output image to {both_file}")
     plt.close()
@@ -317,8 +329,8 @@ def time_embedding_v2(pickle_file, k_p = 9, k_m = 9, gap = 0, max_rows = 200, ba
         ax.scatter(points[:, 0], points[:, 1], s = 0.1)
     exon_file = str(exon_dir / f"exon_gap_{gap}_{k_m}v{k_p}_Back_{backwards}_Comp_{compliment}.png")
     plt.title(e_title)
-    plt.xlabel(f"History {k_m} - mer")
-    plt.ylabel(f"Future {k_p} - mer")
+    plt.xlabel(x_title)
+    plt.ylabel(y_title)
     plt.savefig(exon_file)
     print(f"Output image to {exon_file}")
     plt.close()
@@ -330,8 +342,8 @@ def time_embedding_v2(pickle_file, k_p = 9, k_m = 9, gap = 0, max_rows = 200, ba
         ax.scatter(points[:, 0], points[:, 1], s = 0.1)
     intron_file = str(intron_dir / f"intron_gap_{gap}_{k_m}v{k_p}_Back_{backwards}_Comp_{compliment}.png")
     plt.title(i_title)
-    plt.xlabel(f"History {k_m} - mer")
-    plt.ylabel(f"Future {k_p} - mer")
+    plt.xlabel(x_title)
+    plt.ylabel(y_title)
     plt.savefig(intron_file)
     print(f"Output image to {intron_file}")
     plt.close()
