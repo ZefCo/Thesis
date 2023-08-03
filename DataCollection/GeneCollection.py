@@ -119,6 +119,8 @@ def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track
 
     # exit()
 
+    print(f"writing file to\n\t{output_file}\nAfter ever iteration")
+
 
     if gene_file.suffix in ".pkl":
         with open(gene_file, "rb") as p:
@@ -190,12 +192,20 @@ def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track
             key = f"{key}_{unique_index}"
             unique_index += 1
         else:
-            key = gene_of_interest.ename
+            key = gene_of_interest.ncibname
 
         pickle_dict[key] = gene_of_interest
 
-    with open(output_file, 'wb') as p:
-        pickle.dump(pickle_dict, p)
+        # if row > 10:
+        #     break
+        try:
+            with open(output_file, 'wb') as p:
+                pickle.dump(pickle_dict, p)
+        except Exception as e:
+            print(type(e))
+            print(f"Unable to write to file at this time: please check location can be written to")
+            
+    print(f"Wrote file to\n\t{output_file}")
 
 
 if __name__ in '__main__':

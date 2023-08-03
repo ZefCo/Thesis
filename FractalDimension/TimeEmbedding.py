@@ -23,18 +23,18 @@ def main():
     '''
     time_embedding_v2(str(cwd.parent / "ML" / "TrainingData_SameSize.pkl"), 
                       max_rows = 5000, 
-                      gap = 20, 
-                      k_p = 9, 
-                      k_m = 9, 
+                      gap = 0, 
+                      k_p = 6, 
+                      k_m = 6, 
                       backwards = True,
-                      compliment = True)
+                      compliment = False)
     time_embedding_v2(str(cwd.parent / "ML" / "TrainingData_SameSize.pkl"), 
                       max_rows = 5000, 
-                      gap = 20, 
-                      k_p = 9, 
-                      k_m = 9, 
-                      backwards = True,
-                      compliment = True)
+                      gap = 0, 
+                      k_p = 6, 
+                      k_m = 6, 
+                      backwards = False,
+                      compliment = False)
     # score_keys()
 
 
@@ -347,6 +347,57 @@ def time_embedding_v2(pickle_file, k_p = 9, k_m = 9, gap = 0, max_rows = 200, ba
     plt.savefig(intron_file)
     print(f"Output image to {intron_file}")
     plt.close()
+
+
+def time_embedding_v3(sequence: str, k_p = 9, k_m = 9, gap = 0, backwards = True, compliment = False):
+    '''
+    Feeds in a sequence, and it finds the xy coordinates for that sequence.
+    '''
+    seq_length = len(sequence)
+
+    if seq_length < (k_m + k_p + gap):
+        print("Cannont find Trajectory for this gene: to small")
+        return None
+
+    w_p = [(0.25)**n for n in range(1, k_p + 1)]
+    w_m = [(0.25)**n for n in range(1, k_m + 1)]
+
+    if backwards:
+        w_m.reverse()
+
+    b_frame, e_frame, i_frame = [], [], []
+    e_count, i_count = 0, 0
+
+    sequence = sequence.upper()
+
+
+    xy = np.zeros(shape=(seq_length - (k_p + k_m + gap), 2))
+
+    k_minus = [sequence[k_prime:k_prime + k_m] for k_prime in range(0, seq_length - (k_p + k_m + gap))]
+    k_plus = [sequence[k_prime:k_prime + k_p] for k_prime in range(gap + k_m, seq_length - k_p)]
+
+    if compliment:
+        for i, k_prime in enumerate(k_minus):
+            n = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in k_prime]
+            k_x = np.dot(w_m, n)
+
+            n = [3 if n in "A" else 2 if n in "C" else 1 if n in "G" else 0 if n in "T" else 100 for n in k_plus[i]]
+            k_y = np.dot(w_p, n)
+
+            xy[i][0], xy[i][1] = k_x, k_y
+
+    else:
+        for i, k_prime in enumerate(k_minus):
+            n = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in k_prime]
+            k_x = np.dot(w_m, n)
+
+            n = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in k_plus[i]]
+            k_y = np.dot(w_p, n)
+
+            xy[i][0], xy[i][1] = k_x, k_y
+
+    return xy
+
 
 
 
