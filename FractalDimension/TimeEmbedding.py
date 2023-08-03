@@ -23,18 +23,18 @@ def main():
     '''
     time_embedding_v2(str(cwd.parent / "ML" / "TrainingData_SameSize.pkl"), 
                       max_rows = 5000, 
-                      gap = 20, 
-                      k_p = 9, 
-                      k_m = 9, 
+                      gap = 0, 
+                      k_p = 6, 
+                      k_m = 6, 
                       backwards = True,
-                      compliment = True)
+                      compliment = False)
     time_embedding_v2(str(cwd.parent / "ML" / "TrainingData_SameSize.pkl"), 
                       max_rows = 5000, 
-                      gap = 20, 
-                      k_p = 9, 
-                      k_m = 9, 
-                      backwards = True,
-                      compliment = True)
+                      gap = 0, 
+                      k_p = 6, 
+                      k_m = 6, 
+                      backwards = False,
+                      compliment = False)
     # score_keys()
 
 

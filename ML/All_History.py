@@ -21,6 +21,21 @@ import datetime
 epochs = None
 
 
+
+def main():
+    '''
+    '''
+    # History_1D()
+    # History_F()
+    SelectedHistory(Control = cwd / "FractalModels" / "IvE" / "version_slurm_46",
+                    SL11 =  cwd / "FractalModels" / "IvE" / "version_slurm_43",
+                    SLHis = cwd / "FractalModels" / "IvE" / "version_slurm_44",
+                    SLSG = cwd / "FractalModels" / "IvE" / "version_slurm_45",
+                    SLSGHis = cwd / "FractalModels" / "IvE" / "version_slurm_47",
+                    mer9 = cwd / "FractalModels" / "IvE" / "version_slurm_50",
+                    line_of_best_epochs = epochs)
+
+
 def least_squares(x_points: np.array, y_points: np.array):
     '''
     '''
@@ -261,15 +276,11 @@ def SelectedHistory(line_of_best_epochs = None, *args, **kwargs):
 
     all_acc.show()
     # all_los.show()
+    # print(str(cwd / "ML_Acc.html"))
+    all_acc.write_html(str(cwd / "ML_Acc.html"))
+    all_los.write_html(str(cwd / "ML_Losses.html"))
 
 
 
 if __name__ in "__main__":
-    # History_1D()
-    # History_F()
-    SelectedHistory(Control = cwd / "FractalModels" / "IvE" / "version_slurm_46",
-                    SL11 =  cwd / "FractalModels" / "IvE" / "version_slurm_43",
-                    SLHis = cwd / "FractalModels" / "IvE" / "version_slurm_44",
-                    SLSG = cwd / "FractalModels" / "IvE" / "version_slurm_45",
-                    SLSGHis = cwd / "FractalModels" / "IvE" / "version_slurm_47",
-                    line_of_best_epochs = epochs)
+    main()

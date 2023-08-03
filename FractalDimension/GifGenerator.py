@@ -9,7 +9,32 @@ import shutil
 def main():
     '''
     '''
-    various_k_plus()
+    various_k()
+
+
+
+def various_k():
+    '''
+    Generates different vaules for k and puts them in. These will then be put into a gif to compare.
+    '''
+    file = str(cwd.parent / "ML" / "TrainingData_SameSize.pkl")
+    
+    max_rows = 5000
+    gap = 0 
+    k_min, k_max, k_step = 4, 20, 1
+
+    image_dir = cwd / "TE_Images"
+    exon_dir = image_dir / "Exon"
+    intron_dir = image_dir / "Intron"
+    both_dir = image_dir / "Both"
+    
+    for k in range(k_min, k_max + k_step, k_step):
+        print(f"### K Minus = {k} v K Plus = {k} ###")
+        TE.time_embedding_v2(file, k_p = k, k_m = k, max_rows = max_rows, gap = gap)
+
+    generator(exon_dir, str(cwd / f"Exons_gap_{k_min}_{k_max}.gif"))
+    generator(intron_dir, str(cwd / f"Introns_gap_{k_min}_{k_max}.gif"))
+    generator(both_dir, str(cwd / f"Both_gap_{k_min}_{k_max}.gif"))
 
 
 

@@ -34,6 +34,7 @@ Thesis.Rproj
 *.pptx
 *.gif
 */__pycache__
+/ML/FractalTrajectory/
 
 
 !/ML/FractalModels/IvE/version_school_linux_*/*
