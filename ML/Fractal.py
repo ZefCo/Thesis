@@ -8,7 +8,7 @@ from PIL import Image
 
 cwd = pathlib.Path.cwd()
 
-kmer = 6
+kmer = 9
 
 data_file: pathlib.Path = pathlib.Path("TrainingGeneData_SLSGHis.pkl")
 new_folder = os.path.splitext(data_file)[0]
@@ -163,16 +163,22 @@ for row in range(rows):
     # print(cgr)
     # print(np.max(cgr), np.min(cgr))
 
-    plt.imshow(cgr, cmap = "gray")
+    # plt.imshow(cgr, cmap = "gray")
 
     if typ in intname:
         filepath = intron_images / f"Intron_{intron}.png"
-        plt.imsave(filepath, cgr, cmap = "gray")
-        intron += 1
+        try:
+            plt.imsave(filepath, cgr, cmap = "gray")
+            intron += 1
+        except Exception as e:
+            print(type(e))
+            print(e)
 
     elif typ in exname:
-
         filepath = exon_images / f"Exon_{exon}.png"
-        plt.imsave(filepath, cgr, cmap = "gray")
-
-        exon += 1
+        try:
+            plt.imsave(filepath, cgr, cmap = "gray")
+            exon += 1
+        except Exception as e:
+            print(type(e))
+            print(e)
