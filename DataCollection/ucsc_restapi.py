@@ -191,7 +191,15 @@ def convert2frame(track: list) -> pandas.DataFrame:
 def convertRequest(query: requests.Response) -> pandas.DataFrame or str:
     '''
     '''
-    track: dict = json.loads(query.text)
+    try:
+        track: dict = json.loads(query.text)
+    except Exception as e:
+        print(type(e))
+        print(e)
+        exit()
+
+    # print("No error, exiting")
+    # exit()
 
     try:
         # Litterally don't care how many items are returned, we'll grab that later. Only need to know what index to grab

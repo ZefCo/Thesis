@@ -11,11 +11,13 @@ import requests
 def main():
     '''
     '''
+    start_gene = 7828
     # dict_screwup()
     # pickle_file, csv_file = getKnownGene()
     hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19_ncbiRefSeqCurated.pkl",
-                   pathlib.Path("/media/ethanspeakman/Elements/GeneData/Known_Genes_hg19_NCBIGene_DICT.pkl"), 
-                   ref_track="ncib")
+                   pathlib.Path(f"/media/ethanspeakman/Elements/GeneData/Known_Genes_hg19_NCBIGene_DICT_{start_gene}.pkl"), 
+                   ref_track="ncib",
+                   gene_start = start_gene)
     # hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19_ncbiRefSeqCurated.pkl")
 
 
@@ -102,7 +104,7 @@ def getKnownGene(genome = "hg19", track = "ncbiRefSeqCurated"):
 
 
 
-def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track = "ncib"):
+def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track = "ncib", gene_start = 0):
     '''
     This will go to UCSC Genome Browser and grab all HG19 genes, then save them in a pickle file. They will not be chopped up, but instead will
     be preserved in all their glory for chopping up later.
@@ -166,7 +168,7 @@ def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track
     # running_index = 0
 
     unique_index = 0
-    for row in range(rows):
+    for row in range(gene_start, rows):
         print(f"Working on row {row} / {rows}")
         row_of_interest = known_genes.iloc[row, :]
 
