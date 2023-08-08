@@ -202,7 +202,9 @@ def time_embedding(k_p = 9, k_m = 9, gap = 0, max_rows = 200):
 
 def time_embedding_v2(pickle_file, k_p = 9, k_m = 9, gap = 0, max_rows = 200, backwards = True, compliment = False):
     '''
-    Almost identical to the above, but uses matplotlib to output the images. Doesn't look as slick but does output the images much faster
+    Almost identical to the above, but uses matplotlib to output the images. Doesn't look as slick but does output the images much faster.
+
+    References Time Embedding v3 so I can make this more consistent with various changes I make.
     '''
     image_dir = cwd / "TE_Images"
     image_dir.mkdir(parents = True, exist_ok = True)
@@ -212,12 +214,6 @@ def time_embedding_v2(pickle_file, k_p = 9, k_m = 9, gap = 0, max_rows = 200, ba
     intron_dir.mkdir(parents = True, exist_ok = True)
     both_dir = image_dir / "Both"
     both_dir.mkdir(parents = True, exist_ok = True)
-
-    w_p = [(0.25)**n for n in range(1, k_p + 1)]
-    w_m = [(0.25)**n for n in range(1, k_m + 1)]
-
-    if backwards:
-        w_m.reverse()
 
     with open(str(pickle_file), "rb") as p:
         data: pandas.DataFrame = pickle.load(p)
@@ -255,34 +251,9 @@ def time_embedding_v2(pickle_file, k_p = 9, k_m = 9, gap = 0, max_rows = 200, ba
             print(row)
             exit()
 
-        length = data.loc[row, "Length"]
         region = data.loc[row, "Type"]
-        xy = np.zeros(shape=(length - (k_p + k_m + gap), 2))
-        # ex, ey = [], []
-        # ix, iy = [], []
 
-        k_minus = [sequence[k_prime:k_prime + k_m] for k_prime in range(0, length - (k_p + k_m + gap))]
-        k_plus = [sequence[k_prime:k_prime + k_p] for k_prime in range(gap + k_m, length - k_p)]
-
-        if compliment:
-            for i, k_prime in enumerate(k_minus):
-                n = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in k_prime]
-                k_x = np.dot(w_m, n)
-
-                n = [3 if n in "A" else 2 if n in "C" else 1 if n in "G" else 0 if n in "T" else 100 for n in k_plus[i]]
-                k_y = np.dot(w_p, n)
-
-                xy[i][0], xy[i][1] = k_x, k_y
-
-        else:
-            for i, k_prime in enumerate(k_minus):
-                n = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in k_prime]
-                k_x = np.dot(w_m, n)
-
-                n = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in k_plus[i]]
-                k_y = np.dot(w_p, n)
-
-                xy[i][0], xy[i][1] = k_x, k_y
+        xy = time_embedding_v3(sequence, k_p = k_p, k_m = k_m, gap = gap, m_backwards = backwards, compliment = compliment)
         
         if region in "Exon":
             e_frame.append(xy)
@@ -349,49 +320,49 @@ def time_embedding_v2(pickle_file, k_p = 9, k_m = 9, gap = 0, max_rows = 200, ba
     plt.close()
 
 
-def time_embedding_v3(sequence: str, k_p = 9, k_m = 9, gap = 0, backwards = True, compliment = False):
+def time_embedding_v3(sequence: str, k_p = 9, k_m = 9, gap = 0, m_backwards = True, p_backwards = False, compliment = False):
     '''
     Feeds in a sequence, and it finds the xy coordinates for that sequence.
+
+    There is an option for the compliment strand: probably should never be used.
     '''
     seq_length = len(sequence)
 
-    if seq_length < (k_m + k_p + gap):
+    if seq_length < (k_m + k_p + abs(gap)):  # I'm making this an |gap| becuase I don't want to think about how it should be done if g < 0. It has to be a certain length, and that length needs to be long.
         print("Cannont find Trajectory for this gene: to small")
         return None
 
     w_p = [(0.25)**n for n in range(1, k_p + 1)]
     w_m = [(0.25)**n for n in range(1, k_m + 1)]
 
-    if backwards:
+    if m_backwards:
         w_m.reverse()
-
-    b_frame, e_frame, i_frame = [], [], []
-    e_count, i_count = 0, 0
+    if p_backwards:
+        w_p.reverse()
 
     sequence = sequence.upper()
-
 
     xy = np.zeros(shape=(seq_length - (k_p + k_m + gap), 2))
 
     k_minus = [sequence[k_prime:k_prime + k_m] for k_prime in range(0, seq_length - (k_p + k_m + gap))]
     k_plus = [sequence[k_prime:k_prime + k_p] for k_prime in range(gap + k_m, seq_length - k_p)]
 
-    if compliment:
+    if compliment:  # probably should never be used.
         for i, k_prime in enumerate(k_minus):
-            n = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in k_prime]
+            n = [0 if n in "A" else 1 if n in "C" else 2 if n in "T" else 3 if n in "G" else 100 for n in k_prime]
             k_x = np.dot(w_m, n)
 
-            n = [3 if n in "A" else 2 if n in "C" else 1 if n in "G" else 0 if n in "T" else 100 for n in k_plus[i]]
+            n = [3 if n in "A" else 2 if n in "C" else 1 if n in "T" else 0 if n in "G" else 100 for n in k_plus[i]]
             k_y = np.dot(w_p, n)
 
             xy[i][0], xy[i][1] = k_x, k_y
 
     else:
         for i, k_prime in enumerate(k_minus):
-            n = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in k_prime]
+            n = [0 if n in "A" else 1 if n in "C" else 2 if n in "T" else 3 if n in "G" else 100 for n in k_prime]
             k_x = np.dot(w_m, n)
 
-            n = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in k_plus[i]]
+            n = [0 if n in "A" else 1 if n in "C" else 2 if n in "T" else 3 if n in "G" else 100 for n in k_plus[i]]
             k_y = np.dot(w_p, n)
 
             xy[i][0], xy[i][1] = k_x, k_y
