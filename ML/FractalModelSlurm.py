@@ -27,6 +27,7 @@ import pandas as pd
 import datetime
 from matplotlib import pyplot as plt
 from contextlib import redirect_stdout
+from PIL import Image
 # import keras
 # https://stackoverflow.com/questions/53066762/understanding-1d-convolution-of-dna-sequences-encoded-as-a-one-hot-vector
 # https://stackoverflow.com/questions/53514495/what-does-batch-repeat-and-shuffle-do-with-tensorflow-dataset
@@ -34,11 +35,16 @@ from contextlib import redirect_stdout
 
 cwd = pathlib.Path.cwd()
 
+def get_num_pixels(filepath):
+    width, height = Image.open(filepath).size
+    return width, height
+
+
 # report = git.Repo(search_parent_directories=True)
 # branch = report.active_branch
 branch = "slurm"
 
-image_dir = cwd / "FractalImageEvI_OG"
+image_dir = cwd / "FractalImageEvI_7mer"
 ive_dir = cwd / "FractalModels" / "IvE"
 version_num = len(next(os.walk(ive_dir))[1]) + 1
 version_dir = ive_dir / f"version_{branch}_{version_num}"
@@ -52,6 +58,8 @@ output_classes = 2
 # version_num = len(next(os.walk(model_dir))[1])
 # version_dir = model_dir / f"version_{version_num}"
 # output_classes = 4
+
+w, h = get_num_pixels(image_dir / "EXON" / "Exon_0.png")  # probably shouldn't hard code it to the first image, but I'm feeling lazy this morning
 
 seed = random.randint(1000000, 9000000)
 
@@ -70,8 +78,8 @@ def normalization(image, label):
     image = tf.cast(image / 255, tf.float32)
     return image, label
 
-train_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (64, 64), seed = seed, subset = "training", validation_split = 0.2, batch_size = batch_size, label_mode = "categorical", color_mode = "grayscale")
-valid_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (64, 64), seed = seed, subset = "validation", validation_split = 0.2, batch_size = batch_size, label_mode = "categorical", color_mode = "grayscale")
+train_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (w, h), seed = seed, subset = "training", validation_split = 0.2, batch_size = batch_size, label_mode = "categorical", color_mode = "grayscale")
+valid_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (w, h), seed = seed, subset = "validation", validation_split = 0.2, batch_size = batch_size, label_mode = "categorical", color_mode = "grayscale")
 
 train_set = train_set.map(normalization)
 valid_set = valid_set.map(normalization)
@@ -83,11 +91,11 @@ cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath = str(model_dir))
 python_script = pathlib.Path(__file__)
 shutil.copy(str(python_script), str(version_dir / python_script.name))
 
-input_layer = tf.keras.Input(shape = (64, 64, 1))
-a = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(input_layer)
+input_layer = tf.keras.Input(shape = (w, h, 1))
+a = tf.keras.layers.Conv2D(w, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(input_layer)
 a = tf.keras.layers.Dropout(.5)(a)
 a = tf.keras.layers.BatchNormalization()(a)
-b = tf.keras.layers.Conv2D(64, (6, 6), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(a)
+b = tf.keras.layers.Conv2D(h, (6, 6), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(a)
 b = tf.keras.layers.Dropout(.5)(b)
 b = tf.keras.layers.BatchNormalization()(b)
 # c = tf.keras.layers.Conv2D(64, (3, 3), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(b)
