@@ -8,10 +8,17 @@ from PIL import Image
 
 cwd = pathlib.Path.cwd()
 
-kmer = 9
+kmer = 7
 
 data_file: pathlib.Path = pathlib.Path("TrainingGeneData_SLSGHis.pkl")
-new_folder = os.path.splitext(data_file)[0]
+new_folder: str = os.path.splitext(data_file)[0] + f"_{kmer}"
+
+
+def get_num_pixels(filepath):
+    width, height = Image.open(filepath).size
+    return width, height
+
+
 
 exon_images = cwd / new_folder / "EXON"
 intron_images = cwd / new_folder / "INTRON"
@@ -24,6 +31,10 @@ intron_images.mkdir(parents = True, exist_ok = True)
 # utr5_images.mkdir(parents = True, exist_ok = True)
 # utr3_images.mkdir(parents = True, exist_ok = True)
 # exon_images.mkdir(parents = True, exist_ok = True)
+
+h, w = get_num_pixels( exon_images / "Exon_0.png")
+print(h, w)
+exit()
 
 print(f"Putting Data into folder\n\t{exon_images}\n\t{intron_images}")
 
