@@ -20,325 +20,10 @@ def main():
     '''
     '''
     maximum_brightness = True
-    kmer = 9
+    kmer = 6
     invert_gray = False
 
-    CGRPerChrome(kmer = kmer, maximum_brightness = maximum_brightness, invert_gray = invert_gray)
-
-
-def GeneTrajectoryPlots():
-    '''
-    Generates a 2D k-mer Time series plot for the exons and introns of each.
-
-    Probably would be better to use the CGR Generator and have a function pass, but I'm going to be lazy.
-    '''
-    # left_t = top_t = width_t = height_t = Inches(1)
-    # left_p = top_p = Inches(2)
-    # height_p = Inches(5)
-
-    # ppt = Presentation()
-    # power_point_file = str(cwd / "ChromPerGene.pptx")
-
-    # try:
-    #     ppt.save(power_point_file)
-    # except PermissionError as e:
-    #     print("Please close the power point and retry")
-    #     exit()
-    # except Exception as e:
-    #     print("New Error:")
-    #     print(f"{type(e)}")
-    #     print(f"{e}")
-    #     exit()
-
-    # blank_slie_layout = ppt.slide_layouts[6]
-    # comparison_slide_layout = ppt.slide_layouts[4]
-    # title_slide_layout = ppt.slide_layouts[0]
-
-    # master_exon_lens = list()
-    # master_intron_lens = list()
-
-    # gene_folder = cwd / "GenePerChrome"
-    # gene_folder.mkdir(parents = True, exist_ok = True)
-
-    # # pickle_dict: dict = NC.gene_per_chrome()
-    # # with open("GenePerChrom.pkl", "wb") as f:
-    # #     pickle.dump(pickle_dict, f)
-
-    # with open(str(cwd / "GenePerChrom.pkl"), "rb") as f:
-    #     pickle_dict = pickle.load(f)
-
-    # gene: Gene.Gene
-    # for gname, gene in pickle_dict.items():
-    #     gname_folder = gene_folder / f"{gname}"
-    #     gname_folder.mkdir(parents = True, exist_ok = True)
-        
-    #     exon_folder = gname_folder / "EXON"
-    #     intron_folder = gname_folder / "INTRON"
-    #     fullseq_folder = gname_folder / "SEQ"
-
-    #     exon_folder.mkdir(parents=True, exist_ok=True)
-    #     intron_folder.mkdir(parents=True, exist_ok=True)
-    #     fullseq_folder.mkdir(parents=True, exist_ok=True)
-
-    #     with open(str(gname_folder / "Report.txt"), "w+") as txtf:
-
-    #         intron_lens = []
-    #         exon_lens = []
-
-    #         # self.ename, self.gname, self.ncibname = ename, gname, ncibname
-    #         # self.chrm, self.strand = chrm, strand
-    #         gene_data_line = f"{gene.name}\t{gene.ename}\t{gene.gname}\t{gene.ncibname}\nChrome: {gene.chrm}\tStrand: {gene.strand}\n\n"
-            
-    #         slide = ppt.slides.add_slide(title_slide_layout)
-    #         title = slide.shapes.title
-    #         title.text = gene_data_line
-
-    #         txtf.write(gene_data_line)
-
-    #         exon_count, intron_count = 0, 0
-
-    #         exon_seq = ""
-
-    #         e: str
-    #         i: str
-
-    #         slide = ppt.slides.add_slide(title_slide_layout)
-    #         title = slide.shapes.title
-    #         title.text = "Exons"
-
-    #         for e in gene.exon_seq:
-    #             slide = ppt.slides.add_slide(blank_slie_layout)
-
-    #             exon_count += 1
-    #             exon_seq = f"{exon_seq}{e}"
-
-    #             exon_len = len(e)
-    #             exon_lens.append(exon_len)
-    #             master_exon_lens.append(exon_len)
-
-    #             exon_data_line = f"Exon {exon_count}: {exon_len}\n"
-    #             txBox = slide.shapes.add_textbox(left_t, top_t, width_t, height_t)
-    #             tf = txBox.text_frame
-    #             tf.text = exon_data_line
-
-    #             txtf.write(exon_data_line)
-
-    #             if exon_len >= min_exon:
-    #                     mer = nucleotide_counter(e.upper(), kmer)
-    #                     cgr = chaos_game_representation(mer, kmer)
-
-    #                     if maximum_brightness:
-    #                         super_threshold_indices = cgr > 0
-    #                         cgr[super_threshold_indices] = 1000
-
-
-    #                     filepath = exon_folder / f"{gname}_E_{exon_count}_{exon_len}.png"
-    #                     if invert_gray:
-    #                         plt.imsave(filepath, cgr, cmap = "gray_r")
-    #                     else:
-    #                         plt.imsave(filepath, cgr, cmap = "gray")
-    #                     pic = slide.shapes.add_picture(str(filepath), left_p, top_p, height = height_p)
-    #                     cgr_filepath = pathlib.Path(os.path.splitext(filepath)[0]).with_suffix(".npy")
-    #                     with open(cgr_filepath, "wb") as c:
-    #                         np.save(c, cgr)
-                        
-
-    #             # exit()
-
-
-    #         slide = ppt.slides.add_slide(blank_slie_layout)
-
-    #         exon_full_data_line = f"\nExon Full Sequence: {len(exon_seq)}\n"
-    #         exon_data_meta_line = f"Ave Exon Lenght: {int(len(exon_seq) / exon_count)}\tMin Intron Length: {min(exon_lens)}\tMax Intron Length: {max(exon_lens)}\n\n"
-
-    #         txBox = slide.shapes.add_textbox(left_t, top_t, width_t, height_t)
-    #         tf = txBox.text_frame
-    #         tf.text = "Full Exon Sequence"
-            
-    #         p = tf.add_paragraph()
-    #         p.text = exon_full_data_line
-
-    #         p = tf.add_paragraph()
-    #         p.text = exon_data_meta_line
-
-    #         txtf.write(exon_full_data_line)
-    #         txtf.write(exon_data_meta_line)
-
-    #         mer = nucleotide_counter(exon_seq, kmer)
-    #         cgr = chaos_game_representation(mer, kmer)
-
-    #         if maximum_brightness:
-    #             super_threshold_indices = cgr > 0
-    #             cgr[super_threshold_indices] = 100
-
-    #         full_exon_seq = filepath = fullseq_folder / f"{gname}_E_Seq_{len(exon_seq)}.png"
-    #         if invert_gray:
-    #             plt.imsave(filepath, cgr, cmap = "gray_r")
-    #         else:
-    #             plt.imsave(filepath, cgr, cmap = "gray")
-    #         cgr_filepath = pathlib.Path(os.path.splitext(filepath)[0]).with_suffix(".npy")
-    #         with open(cgr_filepath, "wb") as c:
-    #             np.save(c, cgr)
-            
-
-    #         pic = slide.shapes.add_picture(str(filepath), left_p, top_p, height = height_p)
-
-    #         slide = ppt.slides.add_slide(title_slide_layout)
-    #         title = slide.shapes.title
-    #         title.text = "Introns"
-
-            
-    #         intron_seq = ""
-
-    #         for i in gene.intron_seq:
-
-    #             slide = ppt.slides.add_slide(blank_slie_layout)
-
-    #             intron_count += 1
-    #             intron_seq = f"{intron_seq}{i}"
-
-
-    #             intron_len = len(i)
-    #             intron_lens.append(intron_len)
-    #             master_intron_lens.append(intron_len)
-
-    #             intron_data_line = f"Intron {intron_count}: {intron_len}\n"
-
-    #             exon_data_line = f"Intron {intron_count}: {intron_len}\n"
-    #             txBox = slide.shapes.add_textbox(left_t, top_t, width_t, height_t)
-    #             tf = txBox.text_frame
-    #             tf.text = exon_data_line
-
-    #             txtf.write(intron_data_line)
-                
-    #             mer = nucleotide_counter(i.upper(), kmer)
-    #             cgr = chaos_game_representation(mer, kmer)
-
-    #             if maximum_brightness:
-    #                 super_threshold_indices = cgr > 0
-    #                 cgr[super_threshold_indices] = 100
-
-    #             filepath = intron_folder / f"{gname}_I_{intron_count}_{intron_len}.png"
-    #             if invert_gray:
-    #                 plt.imsave(filepath, cgr, cmap = "gray_r")
-    #             else:
-    #                 plt.imsave(filepath, cgr, cmap = "gray")
-
-    #             cgr_filepath = pathlib.Path(os.path.splitext(filepath)[0]).with_suffix(".npy")
-    #             with open(cgr_filepath, "wb") as c:
-    #                 np.save(c, cgr)
-                
-
-    #             pic = slide.shapes.add_picture(str(filepath), left_p, top_p, height = height_p)
-
-
-    #         intron_data_meta_line = f"\nAve Intron Lenght: {int(sum(intron_lens) / intron_count)}\tMin Exon Length: {min(intron_lens)}\tMax Exon Length: {max(intron_lens)}\n\n"
-
-    #         slide = ppt.slides.add_slide(blank_slie_layout)
-    #         txBox = slide.shapes.add_textbox(left_t, top_t, width_t, height_t)
-    #         tf = txBox.text_frame
-    #         tf.text = "Combined Intron Sequence"
-    #         # tf.text = intron_data_meta_line
-
-    #         p = tf.add_paragraph()
-    #         txtf.write(intron_data_meta_line)
-
-    #         mer = nucleotide_counter(intron_seq, kmer)
-    #         cgr = chaos_game_representation(mer, kmer)
-
-    #         if maximum_brightness:
-    #             super_threshold_indices = cgr > 0
-    #             cgr[super_threshold_indices] = 100
-
-    #         full_intron_seq = filepath = fullseq_folder / f"{gname}_I_Seq_{len(intron_seq)}.png"
-    #         if invert_gray:
-    #             plt.imsave(filepath, cgr, cmap = "gray_r")
-    #         else:
-    #             plt.imsave(filepath, cgr, cmap = "gray")
-
-    #         cgr_filepath = pathlib.Path(os.path.splitext(filepath)[0]).with_suffix(".npy")
-    #         with open(cgr_filepath, "wb") as c:
-    #             np.save(c, cgr)
-            
-
-    #         pic = slide.shapes.add_picture(str(filepath), left_p, top_p, height = height_p)
-
-    #         gene_full_len_line = f"Full Sequence: {len(gene.full_seq[0].upper())}"
-
-    #         slide = ppt.slides.add_slide(blank_slie_layout)
-    #         txBox = slide.shapes.add_textbox(left_t, top_t, width_t, height_t)
-    #         tf = txBox.text_frame
-    #         tf.text = gene_full_len_line
-
-    #         txtf.write(gene_full_len_line)
-    
-    #         mer = nucleotide_counter(gene.full_seq[0].upper(), kmer)
-    #         cgr = chaos_game_representation(mer, kmer)
-    #         if maximum_brightness:
-    #             super_threshold_indices = cgr > 0
-    #             cgr[super_threshold_indices] = 100
-
-    #         full_gene_seq = filepath = fullseq_folder / f"{gname}_F_Seq_{len(gene.full_seq[0].upper())}.png"
-    #         if invert_gray:
-    #             plt.imsave(filepath, cgr, cmap = "gray_r")
-    #         else:
-    #             plt.imsave(filepath, cgr, cmap = "gray")
-
-    #         cgr_filepath = pathlib.Path(os.path.splitext(filepath)[0]).with_suffix(".npy")
-    #         with open(cgr_filepath, "wb") as c:
-    #             np.save(c, cgr)
-            
-            
-    #         pic = slide.shapes.add_picture(str(filepath), left_p, top_p, height = height_p)
-
-    #         slide = ppt.slides.add_slide(blank_slie_layout)
-    #         txBox = slide.shapes.add_textbox(left_t, Inches(0.5), width_t, height_t)
-    #         tf = txBox.text_frame
-    #         tf.text = "Full Gene Sequence"
-    #         pic = slide.shapes.add_picture(str(full_gene_seq), Inches(0.5), top_p, height = Inches(3.5))
-
-    #         txBox = slide.shapes.add_textbox(Inches(5), Inches(0.5), width_t, height_t)
-    #         tf = txBox.text_frame
-    #         tf.text = "Full Exon Sequence"
-    #         pic = slide.shapes.add_picture(str(full_exon_seq), Inches(5), top_p, height = Inches(3.5))
-
-
-    #         slide = ppt.slides.add_slide(blank_slie_layout)
-    #         txBox = slide.shapes.add_textbox(left_t, Inches(0.5), width_t, height_t)
-    #         tf = txBox.text_frame
-    #         tf.text = "Full Intron Sequence"
-    #         pic = slide.shapes.add_picture(str(full_intron_seq), Inches(0.5), top_p, height = Inches(3.5))
-
-    #         txBox = slide.shapes.add_textbox(Inches(5), Inches(0.5), width_t, height_t)
-    #         tf = txBox.text_frame
-    #         tf.text = "Full Exon Sequence"
-    #         pic = slide.shapes.add_picture(str(full_exon_seq), Inches(5), top_p, height = Inches(3.5))
-
-
-    #         slide = ppt.slides.add_slide(blank_slie_layout)
-    #         txBox = slide.shapes.add_textbox(left_t, Inches(0.5), width_t, height_t)
-    #         tf = txBox.text_frame
-    #         tf.text = "Full Gene Sequence"
-    #         pic = slide.shapes.add_picture(str(full_gene_seq), Inches(0.5), top_p, height = Inches(3.5))
-
-    #         txBox = slide.shapes.add_textbox(Inches(5), Inches(0.5), width_t, height_t)
-    #         tf = txBox.text_frame
-    #         tf.text = "Full Intron Sequence"
-    #         pic = slide.shapes.add_picture(str(full_intron_seq), Inches(5), top_p, height = Inches(3.5))
-
-    #     # exit()
-
-    # fig = go.Figure()
-    # fig.add_trace(go.Histogram(x = master_exon_lens, name = "exon"))
-    # fig.add_trace(go.Histogram(x = master_intron_lens, name = "intron"))
-
-    # # fig.show()
-    # fig.write_image(str(cwd / "ChromPerGene.png"))
-    # slide = ppt.slides.add_slide(blank_slie_layout)
-    # pic = slide.shapes.add_picture(str(filepath), left_p, top_p, height = height_p)
-
-    # ppt.save(str(cwd / "ChromPerGene.pptx"))
-
+    CGRPerChrome(kmer = kmer, maximum_brightness = maximum_brightness, invert_gray = invert_gray, image_type = "KTA")
 
 
 
@@ -349,9 +34,15 @@ def CGRPerChrome(kmer = 6, maximum_brightness = False, invert_gray = False, min_
     There also get put into a PPTX presentation, because fuck doing that by hand.
 
     Ways that images can be generated:
-        CGR = chaos game representation
+        CGR = chaos game representation (default)
         KTA = K-mer time analysis
+
+        KTA takes a while longer then CGR, not sure why. I think it's from the KTA method, where I have it figure out the same key over and over again.
     '''
+    if image_type in "KTA":
+        pass
+    else:
+        image_type = "CGR"  #this is just because I'm too lazy to dig thorugh this code and write the if CGR elif KTA properly.
 
     left_t = top_t = width_t = height_t = Inches(1)
     left_p = top_p = Inches(2)
@@ -450,7 +141,7 @@ def CGRPerChrome(kmer = 6, maximum_brightness = False, invert_gray = False, min_
                             plot_data = chaos_game_representation(mer, kmer)
                         elif image_type in "KTA":
                             xy = KTA.time_embedding_v3(e, *args, **kwargs)
-                            plot_data = 0
+                            plot_data = KTA_plot(xy, *args, **kwargs)
 
                         if maximum_brightness:
                             super_threshold_indices = plot_data > 0
@@ -459,13 +150,13 @@ def CGRPerChrome(kmer = 6, maximum_brightness = False, invert_gray = False, min_
 
                         filepath = exon_folder / f"{gname}_E_{exon_count}_{exon_len}.png"
                         if invert_gray:
-                            plt.imsave(filepath, cgr, cmap = "gray_r")
+                            plt.imsave(filepath, plot_data, cmap = "gray_r")
                         else:
-                            plt.imsave(filepath, cgr, cmap = "gray")
+                            plt.imsave(filepath, plot_data, cmap = "gray")
                         pic = slide.shapes.add_picture(str(filepath), left_p, top_p, height = height_p)
-                        cgr_filepath = pathlib.Path(os.path.splitext(filepath)[0]).with_suffix(".npy")
-                        with open(cgr_filepath, "wb") as c:
-                            np.save(c, cgr)
+                        plot_filepath = pathlib.Path(os.path.splitext(filepath)[0]).with_suffix(".npy")
+                        with open(plot_filepath, "wb") as c:
+                            np.save(c, plot_data)
                         
 
                 # exit()
@@ -489,21 +180,29 @@ def CGRPerChrome(kmer = 6, maximum_brightness = False, invert_gray = False, min_
             txtf.write(exon_full_data_line)
             txtf.write(exon_data_meta_line)
 
-            mer = nucleotide_counter(exon_seq, kmer)
-            cgr = chaos_game_representation(mer, kmer)
+            # mer = nucleotide_counter(exon_seq, kmer)
+            # cgr = chaos_game_representation(mer, kmer)
+
+            if image_type in "CGR":
+                mer = nucleotide_counter(exon_seq, kmer)
+                plot_data = chaos_game_representation(mer, kmer)
+            elif image_type in "KTA":
+                xy = KTA.time_embedding_v3(exon_seq, *args, **kwargs)
+                plot_data = KTA_plot(xy, *args, **kwargs)
+
 
             if maximum_brightness:
-                super_threshold_indices = cgr > 0
-                cgr[super_threshold_indices] = 100
+                super_threshold_indices = plot_data > 0
+                plot_data[super_threshold_indices] = 100
 
             full_exon_seq = filepath = fullseq_folder / f"{gname}_E_Seq_{len(exon_seq)}.png"
             if invert_gray:
-                plt.imsave(filepath, cgr, cmap = "gray_r")
+                plt.imsave(filepath, plot_data, cmap = "gray_r")
             else:
-                plt.imsave(filepath, cgr, cmap = "gray")
-            cgr_filepath = pathlib.Path(os.path.splitext(filepath)[0]).with_suffix(".npy")
-            with open(cgr_filepath, "wb") as c:
-                np.save(c, cgr)
+                plt.imsave(filepath, plot_data, cmap = "gray")
+            plot_filepath = pathlib.Path(os.path.splitext(filepath)[0]).with_suffix(".npy")
+            with open(plot_filepath, "wb") as c:
+                np.save(c, plot_data)
             
 
             pic = slide.shapes.add_picture(str(filepath), left_p, top_p, height = height_p)
@@ -536,22 +235,30 @@ def CGRPerChrome(kmer = 6, maximum_brightness = False, invert_gray = False, min_
 
                 txtf.write(intron_data_line)
                 
-                mer = nucleotide_counter(i.upper(), kmer)
-                cgr = chaos_game_representation(mer, kmer)
+                # mer = nucleotide_counter(i.upper(), kmer)
+                # cgr = chaos_game_representation(mer, kmer)
+
+                if image_type in "CGR":
+                    mer = nucleotide_counter(i.upper(), kmer)
+                    plot_data = chaos_game_representation(mer, kmer)
+                elif image_type in "KTA":
+                    xy = KTA.time_embedding_v3(i.upper(), *args, **kwargs)
+                    plot_data = KTA_plot(xy, *args, **kwargs)
+
 
                 if maximum_brightness:
-                    super_threshold_indices = cgr > 0
-                    cgr[super_threshold_indices] = 100
+                    super_threshold_indices = plot_data > 0
+                    plot_data[super_threshold_indices] = 100
 
                 filepath = intron_folder / f"{gname}_I_{intron_count}_{intron_len}.png"
                 if invert_gray:
-                    plt.imsave(filepath, cgr, cmap = "gray_r")
+                    plt.imsave(filepath, plot_data, cmap = "gray_r")
                 else:
-                    plt.imsave(filepath, cgr, cmap = "gray")
+                    plt.imsave(filepath, plot_data, cmap = "gray")
 
-                cgr_filepath = pathlib.Path(os.path.splitext(filepath)[0]).with_suffix(".npy")
-                with open(cgr_filepath, "wb") as c:
-                    np.save(c, cgr)
+                plot_filepath = pathlib.Path(os.path.splitext(filepath)[0]).with_suffix(".npy")
+                with open(plot_filepath, "wb") as c:
+                    np.save(c, plot_data)
                 
 
                 pic = slide.shapes.add_picture(str(filepath), left_p, top_p, height = height_p)
@@ -568,22 +275,29 @@ def CGRPerChrome(kmer = 6, maximum_brightness = False, invert_gray = False, min_
             p = tf.add_paragraph()
             txtf.write(intron_data_meta_line)
 
-            mer = nucleotide_counter(intron_seq, kmer)
-            cgr = chaos_game_representation(mer, kmer)
+            # mer = nucleotide_counter(intron_seq, kmer)
+            # cgr = chaos_game_representation(mer, kmer)
+
+            if image_type in "CGR":
+                mer = nucleotide_counter(intron_seq, kmer)
+                plot_data = chaos_game_representation(mer, kmer)
+            elif image_type in "KTA":
+                xy = KTA.time_embedding_v3(intron_seq, *args, **kwargs)
+                plot_data = KTA_plot(xy, *args, **kwargs)
 
             if maximum_brightness:
-                super_threshold_indices = cgr > 0
-                cgr[super_threshold_indices] = 100
+                super_threshold_indices = plot_data > 0
+                plot_data[super_threshold_indices] = 100
 
             full_intron_seq = filepath = fullseq_folder / f"{gname}_I_Seq_{len(intron_seq)}.png"
             if invert_gray:
-                plt.imsave(filepath, cgr, cmap = "gray_r")
+                plt.imsave(filepath, plot_data, cmap = "gray_r")
             else:
-                plt.imsave(filepath, cgr, cmap = "gray")
+                plt.imsave(filepath, plot_data, cmap = "gray")
 
-            cgr_filepath = pathlib.Path(os.path.splitext(filepath)[0]).with_suffix(".npy")
-            with open(cgr_filepath, "wb") as c:
-                np.save(c, cgr)
+            plot_filepath = pathlib.Path(os.path.splitext(filepath)[0]).with_suffix(".npy")
+            with open(plot_filepath, "wb") as c:
+                np.save(c, plot_data)
             
 
             pic = slide.shapes.add_picture(str(filepath), left_p, top_p, height = height_p)
@@ -597,21 +311,29 @@ def CGRPerChrome(kmer = 6, maximum_brightness = False, invert_gray = False, min_
 
             txtf.write(gene_full_len_line)
     
-            mer = nucleotide_counter(gene.full_seq[0].upper(), kmer)
-            cgr = chaos_game_representation(mer, kmer)
+            # mer = nucleotide_counter(gene.full_seq[0].upper(), kmer)
+            # cgr = chaos_game_representation(mer, kmer)
+
+            if image_type in "CGR":
+                mer = nucleotide_counter(gene.full_seq[0].upper(), kmer)
+                plot_data = chaos_game_representation(mer, kmer)
+            elif image_type in "KTA":
+                xy = KTA.time_embedding_v3(gene.full_seq[0].upper(), *args, **kwargs)
+                plot_data = KTA_plot(xy, *args, **kwargs)
+
             if maximum_brightness:
-                super_threshold_indices = cgr > 0
-                cgr[super_threshold_indices] = 100
+                super_threshold_indices = plot_data > 0
+                plot_data[super_threshold_indices] = 100
 
             full_gene_seq = filepath = fullseq_folder / f"{gname}_F_Seq_{len(gene.full_seq[0].upper())}.png"
             if invert_gray:
-                plt.imsave(filepath, cgr, cmap = "gray_r")
+                plt.imsave(filepath, plot_data, cmap = "gray_r")
             else:
-                plt.imsave(filepath, cgr, cmap = "gray")
+                plt.imsave(filepath, plot_data, cmap = "gray")
 
-            cgr_filepath = pathlib.Path(os.path.splitext(filepath)[0]).with_suffix(".npy")
-            with open(cgr_filepath, "wb") as c:
-                np.save(c, cgr)
+            plot_filepath = pathlib.Path(os.path.splitext(filepath)[0]).with_suffix(".npy")
+            with open(plot_filepath, "wb") as c:
+                np.save(c, plot_data)
             
             
             pic = slide.shapes.add_picture(str(filepath), left_p, top_p, height = height_p)
@@ -678,6 +400,24 @@ def CGRPerChrome(kmer = 6, maximum_brightness = False, invert_gray = False, min_
 # # exon_images.mkdir(parents = True, exist_ok = True)
 
 # kmer = 6
+
+def KTA_plot(xy: np.ndarray, k_shape: int = 6, *args, **kwargs):
+    '''
+    turns xy data into a KTA plot.
+    '''
+    pixels = 4**k_shape
+
+    norm_key = {(value * (1/pixels)): value for value in range(pixels)}
+    plot = np.zeros(shape = (pixels, pixels))
+
+    for r in xy:
+        x, y = r[0], r[1]
+        xp, yp = norm_key[x], norm_key[y]
+
+        plot[xp][yp] = 1
+
+    return plot
+
 
 def manhattan_position(nuc: int, x0: int):
     '''
