@@ -128,6 +128,8 @@ def doeverything(plotlog = True, plotboth = False, autocorplot = False, dot_size
 
 def load_cgr(file):
     '''
+    Even though this is called "load cgr" it's more of a general loading a numpy file. It's called "load_cgr" because it was meant to load up cgrs
+    of various genes that were saved as .npy, but it's really just a generic file loader.
     '''
     try:
         cgr = np.load(str(file), allow_pickle = True)

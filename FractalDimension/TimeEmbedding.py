@@ -324,12 +324,16 @@ def time_embedding_v2(pickle_file, k_p = 9, k_m = 9, gap = 0, max_rows = 200, ba
     plt.close()
 
 
-def time_embedding_v3(sequence: str, k_p = 9, k_m = 9, gap = 0, m_backwards = True, p_backwards = False, compliment = False):
+def time_embedding_v3(sequence: str, k_p: int = 6, k_m: int = 6, gap: int = 0, m_backwards: bool = True, p_backwards: bool = False, compliment: bool = False, nucsequence: str = "AGCT"):
     '''
     Feeds in a sequence, and it finds the xy coordinates for that sequence.
 
+    The nucleotide to number order can be altered. By default it is A = 0, G = 1, T = 2, C = 3. To alter it just feed in a new str with your prefered order. The first index is 0, the next
+    index is 1, and so on.
+
     There is an option for the compliment strand: probably should never be used.
     '''
+    nucsequence = nucsequence.upper() # Just in case someone puts in a different order and forgets to capitalize everything
     seq_length = len(sequence)
 
     if seq_length < (k_m + k_p + abs(gap)):  # I'm making this an |gap| becuase I don't want to think about how it should be done if g < 0. It has to be a certain length, and that length needs to be long.
@@ -353,20 +357,20 @@ def time_embedding_v3(sequence: str, k_p = 9, k_m = 9, gap = 0, m_backwards = Tr
 
     if compliment:  # probably should never be used.
         for i, k_prime in enumerate(k_minus):
-            n = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in k_prime]
+            n = [0 if n in nucsequence[0] else 1 if n in nucsequence[1] else 2 if n in nucsequence[2] else 3 if n in nucsequence[3] else 100 for n in k_prime]
             k_x = np.dot(w_m, n)
 
-            n = [3 if n in "A" else 2 if n in "C" else 1 if n in "G" else 0 if n in "T" else 100 for n in k_plus[i]]
+            n = [3 if n in nucsequence[0] else 2 if n in nucsequence[1] else 1 if n in nucsequence[2] else 0 if n in nucsequence[3] else 100 for n in k_plus[i]]
             k_y = np.dot(w_p, n)
 
             xy[i][0], xy[i][1] = k_x, k_y
 
     else:
         for i, k_prime in enumerate(k_minus):
-            n = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in k_prime]
+            n = [0 if n in nucsequence[0] else 1 if n in nucsequence[1] else 2 if n in nucsequence[2] else 3 if n in nucsequence[3] else 100 for n in k_prime]
             k_x = np.dot(w_m, n)
 
-            n = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in k_plus[i]]
+            n = [0 if n in nucsequence[0] else 1 if n in nucsequence[1] else 2 if n in nucsequence[2] else 3 if n in nucsequence[3] else 100 for n in k_plus[i]]
             k_y = np.dot(w_p, n)
 
             xy[i][0], xy[i][1] = k_x, k_y
