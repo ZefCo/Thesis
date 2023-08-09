@@ -16,8 +16,8 @@ import pickle
 def main():
     '''
     '''
-    # doeverything(plotlog = True, plotboth = False, autocorplot = False, dot_size = 2, line_width = 0.25)
-    doExonIntron()
+    doeverything(plotlog = True, plotboth = False, autocorplot = False, dot_size = 2, line_width = 0.25)
+    # doExonIntron()
 
 
 
