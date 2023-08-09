@@ -16,6 +16,10 @@ import matplotlib.pyplot as plt
 
 def main():
     '''
+    I really need a new name for this, Time Embedding doens't work.
+
+    k-Mer Time Series. That's a better name.
+
     Time embedding v3: make one that goes through a gene (all its different forms) and plots the trajectory of the k windows. Does something happen for the introns and the exons?
     You'll have to also do the exons and introns seperatly, but we want to see how the trajectory can "jump" from exon to intron: maybe there is something of interest there?
     Time embedding v3: make one that goes through a gene (all its different forms) and plots the trajectory of the k windows. Does something happen for the introns and the exons?
@@ -28,13 +32,13 @@ def main():
                       k_m = 6, 
                       backwards = True,
                       compliment = False)
-    time_embedding_v2(str(cwd.parent / "ML" / "TrainingData_SameSize.pkl"), 
-                      max_rows = 5000, 
-                      gap = 0, 
-                      k_p = 6, 
-                      k_m = 6, 
-                      backwards = False,
-                      compliment = False)
+    # time_embedding_v2(str(cwd.parent / "ML" / "TrainingData_SameSize.pkl"), 
+    #                   max_rows = 5000, 
+    #                   gap = 0, 
+    #                   k_p = 6, 
+    #                   k_m = 6, 
+    #                   backwards = False,
+    #                   compliment = False)
     # score_keys()
 
 
@@ -349,20 +353,20 @@ def time_embedding_v3(sequence: str, k_p = 9, k_m = 9, gap = 0, m_backwards = Tr
 
     if compliment:  # probably should never be used.
         for i, k_prime in enumerate(k_minus):
-            n = [0 if n in "A" else 1 if n in "C" else 2 if n in "T" else 3 if n in "G" else 100 for n in k_prime]
+            n = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in k_prime]
             k_x = np.dot(w_m, n)
 
-            n = [3 if n in "A" else 2 if n in "C" else 1 if n in "T" else 0 if n in "G" else 100 for n in k_plus[i]]
+            n = [3 if n in "A" else 2 if n in "C" else 1 if n in "G" else 0 if n in "T" else 100 for n in k_plus[i]]
             k_y = np.dot(w_p, n)
 
             xy[i][0], xy[i][1] = k_x, k_y
 
     else:
         for i, k_prime in enumerate(k_minus):
-            n = [0 if n in "A" else 1 if n in "C" else 2 if n in "T" else 3 if n in "G" else 100 for n in k_prime]
+            n = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in k_prime]
             k_x = np.dot(w_m, n)
 
-            n = [0 if n in "A" else 1 if n in "C" else 2 if n in "T" else 3 if n in "G" else 100 for n in k_plus[i]]
+            n = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in k_plus[i]]
             k_y = np.dot(w_p, n)
 
             xy[i][0], xy[i][1] = k_x, k_y
