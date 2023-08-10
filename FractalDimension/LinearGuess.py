@@ -8,28 +8,53 @@ from plotly import graph_objects as go
 import timeit
 import DistanceClass as distance
 # from scipy.spatial import distance
-from statsmodels.graphics.tsaplots import plot_acf
+# from statsmodels.graphics.tsaplots import plot_acf
 import pandas
+import pickle
+import CorrelationDimension as CD
 
 
 
 def main():
     '''
     '''
-    plotlog = True
-    plotboth = False
-    autocorplot = False
-    dot_size = 2
-    line_width = 0.25
+    # plotlog = True
+    # plotboth = False
+    # autocorplot = False
+    # dot_size = 2
+    # line_width = 0.25
 
-    random_list = walk_directory(str(cwd / "GenePerCrhome"))
+    dict_list = walk_directory(str(cwd / "Distance_Dict"), extension=".pkl")
+    load_plot(dict_list)
+    # TESTFILE = cwd / "Distance_Dict" / "EXON" / "TUBGCP5_E_23_587_4096x4096.pkl"
 
-    
+    # with open(TESTFILE, "rb") as p:
+    #     test_file = pickle.load(p)
+
+    # print(test_file)
 
 
-
-def walk_directory(folder: str or pathlib.Path) -> list:
+def load_plot(list_of_files: list):
     '''
+    Loads the pickle file and puts it into a plot.
+    '''
+
+    for file in list_of_files:
+        with open(file, "rb") as p:
+            data = pickle.load(p)
+
+        CD.correlation_dimension_figure_v2(data, title = str(file))
+
+        # break
+
+
+
+
+def walk_directory(folder: str or pathlib.Path, extension = ".npy") -> list:
+    '''
+    Simply walks thorugh the directory.
+
+    I should really build a common script file for things like this. I use this type of thing over and over again and am tired of rewriting it.
     '''
 
     file: str
@@ -39,7 +64,7 @@ def walk_directory(folder: str or pathlib.Path) -> list:
 
     for r, _, f in os.walk(str(folder)):
         for file in f:
-            if file.endswith(".npy"):
+            if file.endswith(extension):
                 files.append(pathlib.Path(os.path.join(r, file)))
 
     return files
