@@ -2,9 +2,15 @@ import numpy as np
 
 
 class DistanceMatrix():
-    def __init__(self, x: np.array, method = "euclidean"):
-        self.x: np.ndarray = x
-        self.l = self.x.shape[0]
+    '''
+    method are 
+        manhattan
+        euclidean_square
+        euclidean (default)
+    '''
+    def __init__(self, x: np.array, method = "euclidean", *args, **kwargs):
+        self.x: np.ndarray = x  # the data points being sent in. This is just their x and y position on a 2D matrix.
+        self.l = self.x.shape[0]  # the total number of points that need to be computed - stores only half the values since the other half are duplicates
         self.p = int(self.points(self.l))
 
         if method in "manhattan":
@@ -14,7 +20,7 @@ class DistanceMatrix():
         else:
             self.func = self.euclidean
         
-        self.compute_dist()
+        self.compute_dist(*args, **kwargs)
 
 
     def manhattan(self, xy1, xy2):
@@ -37,17 +43,22 @@ class DistanceMatrix():
 
     def points(self, l: float):
         '''
+        This was a super important thing... but I should have written it down.
         '''
         return (0.5*(l**2)) - (0.5*l)
 
 
-    def _init_zero(self, d = 1):
+    def _init_zero(self, d = 1, nearest_neighbor = False):
         '''
+        initalizes a d Dimesional zero matrix.
         '''
 
         try:
             if d == 1:
-                self.D1 = np.zeros(self.p)
+                if nearest_neighbor:
+                    self.D1 = np.zeros(self.l)
+                else:
+                    self.D1 = np.zeros(self.p)
             elif d == 2:
                 self.D2 = np.zeros(shape = (self.l, self.l))
 
@@ -66,27 +77,44 @@ class DistanceMatrix():
             self.D1 = None
 
 
-    def compute_dist(self):
+    def compute_dist(self, nearest_neighbor = False):
         '''
-        '''
-        self._init_zero()
+        Computes the distance between all points and returns a 1D vector
 
-        if isinstance(self.D1, np.ndarray):
-            i = 0
-            for k in range(self.l - 1):
-                for kk in range(k + 1, self.l):
-                    d = self.func(self.x[k], self.x[kk])
+        if nearest_neighbor is set to TRUE it will only compute the distance for the next point - assuming the data is ordered this gives the nearest neighbor distance.
+        '''
+        self._init_zero(nearest_neighbor = nearest_neighbor)
+        print(f"Shape of init zero = {self.D1.shape}")
+
+        if nearest_neighbor:
+            if isinstance(self.D1, np.ndarray):
+                i = 0
+                for k in range(self.l - 1):
+                    d = self.func(self.x[k], self.x[k + 1])
                     self.D1[i] = d
                     i += 1
 
-            return self.D1
-        
+                return self.D1
+            else:
+                return None
+
         else:
-            return None
+            if isinstance(self.D1, np.ndarray):
+                i = 0
+                for k in range(self.l - 1):
+                    for kk in range(k + 1, self.l):
+                        d = self.func(self.x[k], self.x[kk])
+                        self.D1[i] = d
+                        i += 1
+
+                return self.D1
+            else:
+                return None
         
 
     def matrix2d(self):
         '''
+        Returns the 2D version of the distance matrix. To save on memory this is done as a 1D vector, but the 2D can be reconstructed.
         '''
         self._init_zero(d = 2)
 
