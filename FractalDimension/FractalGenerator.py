@@ -402,7 +402,7 @@ def CGRPerChrome(kmer = 6, maximum_brightness = False, invert_gray = False, min_
 
 # kmer = 6
 
-def KTA_plot(xy: np.ndarray, k_shape: int = 6, *args, **kwargs):
+def KTA_plot(xy: np.ndarray, k_shape: int = 6, *args, **kwargs) -> np.ndarray:
     '''
     turns xy data into a KTA plot.
     '''
