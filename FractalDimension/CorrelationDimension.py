@@ -16,16 +16,47 @@ import pickle
 def main():
     '''
     '''
-    doeverything(plotlog = True, plotboth = False, autocorplot = False, dot_size = 2, line_width = 0.25)
-    # doExonIntron()
+    # doeverything(plotlog = True, plotboth = False, autocorplot = False, dot_size = 2, line_width = 0.25)
+    doExonIntron()
 
 
 
-def doExonIntron():
+def doExonIntron(max_length = 5000):
     '''
+    Finds the correlation dimension for exons and introns only. This will take a while because of how long the introns are (and sometimes the exons). This could be sped
+    up by putting a limit on how long the introns/exons can be.
     '''
+
+    def walk_dir(list_of_files: list, destination_folder: pathlib.Path):
+        '''
+        This will walk through a directory and generate the log data, then save it.
+        '''
+        for file in list_of_files:
+            cgr: np.ndarray = load_cgr(file)
+
+            if isinstance(cgr, np.ndarray):
+                file_name = file.stem
+                length = int(re.split("_", file_name)[3])
+                
+                if length <= max_length:
+                    L, W = cgr.shape
+                    new_file = f"{file_name}_{L}x{W}"
+                    new_file = pathlib.Path(new_file).with_suffix(".pkl")
+
+                    start = timeit.default_timer()
+                    _, local_c = correlation_dimension(cgr)
+                    log_c = log_plot(local_c, normalize = False)
+
+                    print(f"Saving to {new_file}")
+                    with open(str(destination_folder / new_file), "wb") as f:
+                        pickle.dump(log_c, f)
+
+                    stop = timeit.default_timer()
+
+                    print(f"Time = {stop - start}")
+                    # exit()
+
     gene_folder = cwd / "GenePerChrome"
-    cgr: np.ndarray
 
     exon_files, intron_files = walk_exon_intron(gene_folder)
 
@@ -36,45 +67,28 @@ def doExonIntron():
     E_folder.mkdir(parents = True, exist_ok = True)
     I_folder.mkdir(parents = True, exist_ok = True)
 
-    for file in exon_files:
-        cgr = load_cgr(file)
+    walk_dir(exon_files, E_folder)
+    walk_dir(intron_files, I_folder)
 
-        if isinstance(cgr, np.ndarray):
-            L, W = cgr.shape
-            new_file = f"{file.stem}_{L}x{W}"
-            new_file = pathlib.Path(new_file).with_suffix(".pkl")
+    # for file in intron_files:
+    #     cgr = load_cgr(file)
 
-            start = timeit.default_timer()
-            _, local_c = correlation_dimension(cgr)
-            log_c = log_plot(local_c, normalize = False)
+    #     if isinstance(cgr, np.ndarray):
+    #         L, W = cgr.shape
+    #         new_file = f"{file.stem}_{L}x{W}"
+    #         new_file = pathlib.Path(new_file).with_suffix(".pkl")
 
-            with open(str(E_folder / new_file), "wb") as f:
-                pickle.dump(log_c, f)
+    #         start = timeit.default_timer()
+    #         _, local_c = correlation_dimension(cgr)
+    #         log_c = log_plot(local_c, normalize = False)
 
-            stop = timeit.default_timer()
+    #         with open(str(I_folder / new_file), "wb") as f:
+    #             pickle.dump(log_c, f)
 
-            print(f"Time = {stop - start}")
-            # exit()
+    #         stop = timeit.default_timer()
 
-    for file in intron_files:
-        cgr = load_cgr(file)
-
-        if isinstance(cgr, np.ndarray):
-            L, W = cgr.shape
-            new_file = f"{file.stem}_{L}x{W}"
-            new_file = pathlib.Path(new_file).with_suffix(".pkl")
-
-            start = timeit.default_timer()
-            _, local_c = correlation_dimension(cgr)
-            log_c = log_plot(local_c, normalize = False)
-
-            with open(str(I_folder / new_file), "wb") as f:
-                pickle.dump(log_c, f)
-
-            stop = timeit.default_timer()
-
-            print(f"Time = {stop - start}")
-            # exit()
+    #         print(f"Time = {stop - start}")
+    #         # exit()
 
 
 
@@ -195,13 +209,32 @@ def walk_directory(folder: str or pathlib.Path) -> list:
                 files.append(pathlib.Path(os.path.join(r, file)))
 
     return files
+
+
+
+def correlation_dimension_figure_v2(plot_data: dict, title: str = None, dot_size: float = 2, line_width: float = 0.25, save_fig = False, *args, **kwargs):
+    '''
+    Probably a more useful one. Instead of finding the correlation dimension and the log plots and then plotting them, it just plots whatever you shove into it.
+
+    So you already have to find the Correlation Dimension.
+    '''
+    x_values = tuple(plot_data.keys())
+    y_values = tuple(plot_data.values())
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x = x_values, y = y_values, name = "Log Transform", mode = "lines+markers", marker = dict(size = dot_size), line = dict(width = line_width)))
+    fig.update_layout(title = title, yaxis_range = [0, 20])
+
+    if save_fig:
+        fig.write_html(*args, **kwargs)
+    fig.show()
     
 
 
     
 def correlation_dimension_figure(cgr, title = None, plotlog = True, plotboth = False, autocorplot = False, dot_size = 2, line_width = 0.25):
     '''
-    Plot both will plot both the log and the non log plots. This will superseed the logplot.
+    This plots the correlation data put into it.
     '''
     local_c: dict
     local_n: dict

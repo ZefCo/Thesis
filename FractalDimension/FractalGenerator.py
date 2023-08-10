@@ -22,8 +22,9 @@ def main():
     maximum_brightness = True
     kmer = 6
     invert_gray = False
+    min_exon = 2*kmer
 
-    CGRPerChrome(kmer = kmer, maximum_brightness = maximum_brightness, invert_gray = invert_gray, image_type = "KTA")
+    CGRPerChrome(kmer = kmer, maximum_brightness = maximum_brightness, invert_gray = invert_gray, image_type = "KTA", min_exon = min_exon)
 
 
 
