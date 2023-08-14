@@ -25,13 +25,13 @@ def main():
     Time embedding v3: make one that goes through a gene (all its different forms) and plots the trajectory of the k windows. Does something happen for the introns and the exons?
     You'll have to also do the exons and introns seperatly, but we want to see how the trajectory can "jump" from exon to intron: maybe there is something of interest there?
     '''
+
     time_embedding_v2(str(cwd.parent / "ML" / "TrainingData_SameSize.pkl"), 
                       max_rows = 5000, 
                       gap = 0, 
-                      k_p = 6, 
-                      k_m = 6, 
-                      backwards = True,
-                      compliment = False)
+                      k_p = 12, 
+                      k_m = 12)
+
     # time_embedding_v2(str(cwd.parent / "ML" / "TrainingData_SameSize.pkl"), 
     #                   max_rows = 5000, 
     #                   gap = 0, 
@@ -39,14 +39,14 @@ def main():
     #                   k_m = 6, 
     #                   backwards = False,
     #                   compliment = False)
-    # score_keys()
 
 
 
-def score_keys(k = 9):
+def score_keys(k = 9, nucsequence: str = "AGTC"):
     '''
+    Generates a score key. The sequence used by default is AGTC, which can be changed by inputing a new string as CGTA (for example).
     '''
-    perms = tuple(itertools.product(["A", "C", "G", "T"], repeat = k))
+    perms = tuple(itertools.product([nucsequence[0], nucsequence[1], nucsequence[2], nucsequence[3]], repeat = k))
 
     w_p = [(0.25)**n for n in range(1, k + 1)]
     w_m = [(0.25)**n for n in range(1, k + 1)]
@@ -60,7 +60,7 @@ def score_keys(k = 9):
 
         scores[key] = {"history": 0, "future": 0}
 
-        digital = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in key]
+        digital = [0 if n in nucsequence[0] else 1 if n in nucsequence[1] else 2 if n in nucsequence[2] else 3 if n in nucsequence[3] else 100 for n in key]
 
         score_p = np.dot(w_p, digital)
         score_m = np.dot(w_m, digital)
@@ -71,7 +71,7 @@ def score_keys(k = 9):
     scores = pandas.DataFrame(data = scores).T
     print(scores)
 
-    scores.to_csv(cwd / "ScoreKey.csv")
+    scores.to_csv(cwd / f"ScoreKey_kmer_{k}_{nucsequence}.csv")
 
 
 
@@ -324,7 +324,11 @@ def time_embedding_v2(pickle_file, k_p = 9, k_m = 9, gap = 0, max_rows = 200, ba
     plt.close()
 
 
-def time_embedding_v3(sequence: str, k_p: int = 6, k_m: int = 6, gap: int = 0, m_backwards: bool = True, p_backwards: bool = False, compliment: bool = False, nucsequence: str = "AGCT"):
+def time_embedding_v3(sequence: str, 
+                      k_p: int = 6, k_m: int = 6, gap: int = 0, 
+                      m_backwards: bool = True, p_backwards: bool = False, 
+                      compliment: bool = False, 
+                      nucsequence: str = "AGTC"):
     '''
     Feeds in a sequence, and it finds the xy coordinates for that sequence.
 

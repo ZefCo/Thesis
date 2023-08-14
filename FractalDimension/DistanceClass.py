@@ -56,7 +56,7 @@ class DistanceMatrix():
         try:
             if d == 1:
                 if nearest_neighbor:
-                    self.D1 = np.zeros(self.l)
+                    self.D1 = np.zeros(self.l - 1)
                 else:
                     self.D1 = np.zeros(self.p)
             elif d == 2:
@@ -84,7 +84,7 @@ class DistanceMatrix():
         if nearest_neighbor is set to TRUE it will only compute the distance for the next point - assuming the data is ordered this gives the nearest neighbor distance.
         '''
         self._init_zero(nearest_neighbor = nearest_neighbor)
-        print(f"Shape of init zero = {self.D1.shape}")
+        # print(f"Shape of init zero = {self.D1.shape}")
 
         if nearest_neighbor:
             if isinstance(self.D1, np.ndarray):
@@ -94,7 +94,7 @@ class DistanceMatrix():
                     self.D1[i] = d
                     i += 1
 
-                return self.D1
+                return self.D1  # why did I do this as a return? I honeslty don't know, nor do I really care as it doesn't really effect anything. But why did I do it like this?
             else:
                 return None
 
@@ -114,7 +114,7 @@ class DistanceMatrix():
 
     def matrix2d(self):
         '''
-        Returns the 2D version of the distance matrix. To save on memory this is done as a 1D vector, but the 2D can be reconstructed.
+        Returns the 2D version of the distance matrix. To save on memory everything is done as a 1D vector, but this constructs the 2D distance matrix when requried.
         '''
         self._init_zero(d = 2)
 
@@ -123,6 +123,18 @@ class DistanceMatrix():
                 self.D2[k][i] = self.D2[i][k] = self.D1[k]
 
         return self.D2
+    
+
+    def F_number(self):
+        '''
+        Finds the F number = a(n - 1) - a(n - 2) / a(n) - a(n - 1)
+
+        Also this isn't really useful here. Just here for fun.
+        '''
+        self.F = np.zeros(self.D1.shape[0] - 1)
+
+        for n in range(self.F.shape[0]):
+            self.F[n] = self.D1[n] / self.D1[n + 1]
 
 
 
