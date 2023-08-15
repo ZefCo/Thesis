@@ -11,7 +11,7 @@ import requests
 def main():
     '''
     '''
-    start_gene = 7828
+    start_gene = 16391
     # dict_screwup()
     # pickle_file, csv_file = getKnownGene()
     hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19_ncbiRefSeqCurated.pkl",
