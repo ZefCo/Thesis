@@ -13,6 +13,7 @@ from pptx import Presentation
 from pptx.util import Inches, Pt
 import GeneClass as Gene
 import TimeEmbedding as KTA
+import pywt
 
 
 
@@ -24,13 +25,559 @@ def main():
     invert_gray = False
     min_exon = 2*kmer
 
-    CGRPerChrome(kmer = kmer, maximum_brightness = maximum_brightness, invert_gray = invert_gray, image_type = "KTA", min_exon = min_exon)
+    # CGRPerChrome(kmer = kmer, maximum_brightness = maximum_brightness, invert_gray = invert_gray, image_type = "KTA", min_exon = min_exon)
+    CGR_1D_plot(walk = "CGR", wav = "db38")
+    # toy_example()
+
+
+def distance(x1, x2: float, method = "euclidean") -> tuple:
+    '''
+    finds the distance between two points.
+
+    By default it finds the euclidean distance, but can also find the manhattan distance.
+
+    Returns a tuple of: (np.array(x, y), d)
+    '''
+    dx = 0.5 * (x1 - x2)
+
+    if method in "manhattan":
+        d = abs(dx[1]) + abs(dx[0])
+    else:
+        d = np.sqrt(dx[0]**2 + dx[1]**2)
+
+    # print(x1, x2)
+    # print(dx)
+    # print(d)
+    # exit()
+
+    return dx, d
+
+
+def nucleotide_walk(sequence: str) -> np.array:
+    '''
+    '''
+    sequence = sequence.upper()
+    di = np.zeros(shape = (len(sequence), 2))
+
+    for i, n in enumerate(sequence):
+        if n in "A":
+            d = 1
+        elif n in "G":
+            d = 2
+        elif n in "T":
+            d = -1
+        elif n in "C":
+            d = -2
+        else:
+            d = 10
+
+        di[i][0] = i
+        if i == 0:
+            di[i][1] = d
+        else:
+            di[i][1] = di[i - 1][1] + d
+
+    return di
+
+
+def CGR_1D_distance(sequence: str, continuous = True, *args, **kwargs) -> np.array:
+    '''
+    '''
+    sequence = sequence.upper()
+    x0 = np.array([0.5, 0.5])
+    di = np.zeros(shape = (len(sequence), 2))
+
+    for i, n in enumerate(sequence):
+        if n in "A":
+            x = np.array([0, 1])
+            p = 1
+        elif n in "T":
+            x = np.array([0, 0])
+            p = -1
+        elif n in "C":
+            x = np.array([1, 0])
+            p = -1
+        elif n in "G":
+            x = np.array([1, 1])
+            p = 1
+        # print(n, p, x)
+
+        dx, d = distance(x, x0, *args, **kwargs)
+
+        d = d*p
+        di[i][0] = i
+        if continuous:
+            if i == 0:
+                di[i][1] = d
+            else:
+                di[i][1] = d + di[i - 1][1]
+
+        else:
+            di[i][1] = d
+
+        # print(x0)
+        x0 += dx
+        # print(x0)
+        # exit()
+
+    return di
+
+
+def dna_walk(seq: str):
+    '''
+    '''
+    seq = seq.upper()
+
+    di = np.zeros(shape = (len(seq), 2))
+    for i, n in enumerate(seq):
+        if (n in "A") or (n in  "G"):
+            d = 1
+        elif (n in "T") or (n in "C"):
+            d = -1
+
+        di[i][0] = i
+        if i == 0:
+            di[i][1] = d
+        else:
+            di[i][1] = di[i - 1][1] + d
+
+    return di
+
+
+# def toy_example():
+#     '''
+#     '''
+
+#     x = [3, 7, 1, 1, -2, 5, 4, 6]
+#     cA, cD = pywt.dwt(x, "haar")
+#     print(type(cA), cA.shape)
+#     # exit()
+    
+#     fig = go.Figure()
+#     fig.add_trace(go.Scatter(x = [x for x in range(cA.shape[0])], y = cA, name = "cA"))
+#     fig.add_trace(go.Scatter(x = [x for x in range(cD.shape[0])], y = cD, name = "cD"))
+#     fig.update_layout(title = "Wavelet Transform")
+#     fig.show()
+
+
+
+
+def CGR_1D_plot(walk = "CGR", wav = "coif14", *args, **kwargs):
+    '''
+    types of walks: CGR, DNA, NUC
+    List of Discrete Wavelets:
+
+    bior1.1   bior1.3   bior1.5   bior2.2   bior2.4   bior2.6   bior2.8   bior3.1   bior3.3   bior3.5   bior3.7   bior3.9   bior4.4   bior5.5   bior6.8   
+    coif1   coif2   coif3   coif4   coif5   coif6   coif7   coif8   coif9   coif10   coif11   coif12   coif13   coif14   coif15   coif16   coif17   
+    db1   db2   db3   db4   db5   db6   db7   db8   db9   db10   db11   db12   db13   db14   db15   db16   db17   db18   db19   db20   db21   db22   db23   db24   db25   db26   db27   db28   db29   db30   db31   db32   db33   db34   db35   db36   db37   db38   
+    dmey   
+    haar   
+    rbio1.1   rbio1.3   rbio1.5   rbio2.2   rbio2.4   rbio2.6   rbio2.8   rbio3.1   rbio3.3   rbio3.5   rbio3.7   rbio3.9   rbio4.4   rbio5.5   rbio6.8   
+    sym2   sym3   sym4   sym5   sym6   sym7   sym8   sym9   sym10   sym11   sym12   sym13   sym14   sym15   sym16   sym17   sym18   sym19   sym20
+    '''
+    with open(str(cwd / "GenePerChrom.pkl"), "rb") as f:
+        pickle_dict: dict = pickle.load(f)
+
+    data: Gene.Gene
+    for gene, data in pickle_dict.items():
+        seq = data.full_seq[0]
+        
+        if walk in "CGR":
+            di = CGR_1D_distance(seq, continuous = True)
+        elif walk in "DNA":
+            di = dna_walk(seq)
+        elif walk in "NUC":
+            di = nucleotide_walk(seq)
+
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x = di[:, 0], y = di[:, 1]))
+        fig.update_layout(title = f"{gene} Full Sequence<br>Length = {len(seq)}", xaxis_title = "Nucleotide Position", yaxis_title = "Cummulative Distance<br>Pyrimidine = -1, Purine = +1")
+        fig.show()
+
+        cA, cD = pywt.dwt(di, wav, mode = "zero")
+        wave = go.Figure()
+        # wave.add_trace(go.Scatter(x = cA[:, 0], y = cD[:, 0], name = "cA = x, cD = y"))
+        wave.add_trace(go.Scatter(x = [x for x in range(cA.shape[0])], y = cA[:, 0], name = "cA"))
+        wave.add_trace(go.Scatter(x = [x for x in range(cD.shape[0])], y = cD[:, 0], name = "cD"))
+        wave.update_layout(title = f"Wavelet Transform<br>{wav}")
+        wave.show()
+
+
+        # for wav in wavlist:
+        #     cA, cD = pywt.dwt(di, wav)
+        #     wave = go.Figure()
+        #     # wave.add_trace(go.Scatter(x = cA[:, 0], y = cD[:, 0], name = "cA = x, cD = y"))
+        #     wave.add_trace(go.Scatter(x = [x for x in range(cA.shape[0])], y = cA[:, 0], name = "cA"))
+        #     wave.add_trace(go.Scatter(x = [x for x in range(cD.shape[0])], y = cD[:, 0], name = "cD"))
+        #     wave.update_layout(title = f"Wavelet Transform<br>{wav}")
+        #     wave.show()
+
+        exit()
+
+
+def ImageGenerator(kmer = 6, maximum_brightness = False, invert_gray = False, min_exon = 10, image_type = "CGR", *args, **kwargs):
+    '''
+    This will generate 
+
+
+    Ways that images can be generated:
+        CGR = chaos game representation (default)
+        KTA = K-mer time analysis
+
+        KTA takes a while longer then CGR, not sure why. I think it's from the KTA method, where I have it figure out the same key over and over again.
+    '''
+    if image_type in "KTA":
+        pass
+    else:
+        image_type = "CGR"  #this is just because I'm too lazy to dig thorugh this code and write the if CGR elif KTA properly.
+
+    left_t = top_t = width_t = height_t = Inches(1)
+    left_p = top_p = Inches(2)
+    height_p = Inches(5)
+
+    ppt = Presentation()
+    power_point_file = str(cwd / "ChromPerGene.pptx")
+
+    try:
+        ppt.save(power_point_file)
+    except PermissionError as e:
+        print("Please close the power point and retry")
+        exit()
+    except Exception as e:
+        print("New Error:")
+        print(f"{type(e)}")
+        print(f"{e}")
+        exit()
+
+    blank_slie_layout = ppt.slide_layouts[6]
+    comparison_slide_layout = ppt.slide_layouts[4]
+    title_slide_layout = ppt.slide_layouts[0]
+
+    master_exon_lens = list()
+    master_intron_lens = list()
+
+    gene_folder = cwd / "GenePerChrome"
+    gene_folder.mkdir(parents = True, exist_ok = True)
+
+    # pickle_dict: dict = NC.gene_per_chrome()
+    # with open("GenePerChrom.pkl", "wb") as f:
+    #     pickle.dump(pickle_dict, f)
+
+    with open(str(cwd / "GenePerChrom.pkl"), "rb") as f:
+        pickle_dict = pickle.load(f)
+
+    gene: Gene.Gene
+    for gname, gene in pickle_dict.items():
+        gname_folder = gene_folder / f"{gname}"
+        gname_folder.mkdir(parents = True, exist_ok = True)
+        
+        exon_folder = gname_folder / "EXON"
+        intron_folder = gname_folder / "INTRON"
+        fullseq_folder = gname_folder / "SEQ"
+
+        exon_folder.mkdir(parents=True, exist_ok=True)
+        intron_folder.mkdir(parents=True, exist_ok=True)
+        fullseq_folder.mkdir(parents=True, exist_ok=True)
+
+        with open(str(gname_folder / "Report.txt"), "w+") as txtf:
+
+            intron_lens = []
+            exon_lens = []
+
+            # self.ename, self.gname, self.ncibname = ename, gname, ncibname
+            # self.chrm, self.strand = chrm, strand
+            gene_data_line = f"{gene.name}\t{gene.ename}\t{gene.gname}\t{gene.ncibname}\nChrome: {gene.chrm}\tStrand: {gene.strand}\n\n"
+            
+            slide = ppt.slides.add_slide(title_slide_layout)
+            title = slide.shapes.title
+            title.text = gene_data_line
+
+            txtf.write(gene_data_line)
+
+            exon_count, intron_count = 0, 0
+
+            exon_seq = ""
+
+            e: str
+            i: str
+
+            slide = ppt.slides.add_slide(title_slide_layout)
+            title = slide.shapes.title
+            title.text = "Exons"
+
+            for e in gene.exon_seq:
+                slide = ppt.slides.add_slide(blank_slie_layout)
+
+                exon_count += 1
+                exon_seq = f"{exon_seq}{e}"
+
+                exon_len = len(e)
+                exon_lens.append(exon_len)
+                master_exon_lens.append(exon_len)
+
+                exon_data_line = f"Exon {exon_count}: {exon_len}\n"
+                txBox = slide.shapes.add_textbox(left_t, top_t, width_t, height_t)
+                tf = txBox.text_frame
+                tf.text = exon_data_line
+
+                txtf.write(exon_data_line)
+
+                if exon_len >= min_exon:
+                        if image_type in "CGR":
+                            mer = nucleotide_counter(e.upper(), kmer)
+                            plot_data = chaos_game_representation(mer, kmer)
+                        elif image_type in "KTA":
+                            xy = KTA.time_embedding_v3(e, *args, **kwargs)
+                            plot_data = KTA_plot(xy, *args, **kwargs)
+
+                        if maximum_brightness:
+                            super_threshold_indices = plot_data > 0
+                            plot_data[super_threshold_indices] = 1000
+
+
+                        filepath = exon_folder / f"{gname}_E_{exon_count}_{exon_len}.png"
+                        if invert_gray:
+                            plt.imsave(filepath, plot_data, cmap = "gray_r")
+                        else:
+                            plt.imsave(filepath, plot_data, cmap = "gray")
+                        pic = slide.shapes.add_picture(str(filepath), left_p, top_p, height = height_p)
+                        plot_filepath = pathlib.Path(os.path.splitext(filepath)[0]).with_suffix(".npy")
+                        with open(plot_filepath, "wb") as c:
+                            np.save(c, plot_data)
+                        
+
+                # exit()
+
+
+            slide = ppt.slides.add_slide(blank_slie_layout)
+
+            exon_full_data_line = f"\nExon Full Sequence: {len(exon_seq)}\n"
+            exon_data_meta_line = f"Ave Exon Lenght: {int(len(exon_seq) / exon_count)}\tMin Intron Length: {min(exon_lens)}\tMax Intron Length: {max(exon_lens)}\n\n"
+
+            txBox = slide.shapes.add_textbox(left_t, top_t, width_t, height_t)
+            tf = txBox.text_frame
+            tf.text = "Full Exon Sequence"
+            
+            p = tf.add_paragraph()
+            p.text = exon_full_data_line
+
+            p = tf.add_paragraph()
+            p.text = exon_data_meta_line
+
+            txtf.write(exon_full_data_line)
+            txtf.write(exon_data_meta_line)
+
+            # mer = nucleotide_counter(exon_seq, kmer)
+            # cgr = chaos_game_representation(mer, kmer)
+
+            if image_type in "CGR":
+                mer = nucleotide_counter(exon_seq, kmer)
+                plot_data = chaos_game_representation(mer, kmer)
+            elif image_type in "KTA":
+                xy = KTA.time_embedding_v3(exon_seq, *args, **kwargs)
+                plot_data = KTA_plot(xy, *args, **kwargs)
+
+
+            if maximum_brightness:
+                super_threshold_indices = plot_data > 0
+                plot_data[super_threshold_indices] = 100
+
+            full_exon_seq = filepath = fullseq_folder / f"{gname}_E_Seq_{len(exon_seq)}.png"
+            if invert_gray:
+                plt.imsave(filepath, plot_data, cmap = "gray_r")
+            else:
+                plt.imsave(filepath, plot_data, cmap = "gray")
+            plot_filepath = pathlib.Path(os.path.splitext(filepath)[0]).with_suffix(".npy")
+            with open(plot_filepath, "wb") as c:
+                np.save(c, plot_data)
+            
+
+            pic = slide.shapes.add_picture(str(filepath), left_p, top_p, height = height_p)
+
+            slide = ppt.slides.add_slide(title_slide_layout)
+            title = slide.shapes.title
+            title.text = "Introns"
+
+            
+            intron_seq = ""
+
+            for i in gene.intron_seq:
+
+                slide = ppt.slides.add_slide(blank_slie_layout)
+
+                intron_count += 1
+                intron_seq = f"{intron_seq}{i}"
+
+
+                intron_len = len(i)
+                intron_lens.append(intron_len)
+                master_intron_lens.append(intron_len)
+
+                intron_data_line = f"Intron {intron_count}: {intron_len}\n"
+
+                exon_data_line = f"Intron {intron_count}: {intron_len}\n"
+                txBox = slide.shapes.add_textbox(left_t, top_t, width_t, height_t)
+                tf = txBox.text_frame
+                tf.text = exon_data_line
+
+                txtf.write(intron_data_line)
+                
+                # mer = nucleotide_counter(i.upper(), kmer)
+                # cgr = chaos_game_representation(mer, kmer)
+
+                if image_type in "CGR":
+                    mer = nucleotide_counter(i.upper(), kmer)
+                    plot_data = chaos_game_representation(mer, kmer)
+                elif image_type in "KTA":
+                    xy = KTA.time_embedding_v3(i.upper(), *args, **kwargs)
+                    plot_data = KTA_plot(xy, *args, **kwargs)
+
+
+                if maximum_brightness:
+                    super_threshold_indices = plot_data > 0
+                    plot_data[super_threshold_indices] = 100
+
+                filepath = intron_folder / f"{gname}_I_{intron_count}_{intron_len}.png"
+                if invert_gray:
+                    plt.imsave(filepath, plot_data, cmap = "gray_r")
+                else:
+                    plt.imsave(filepath, plot_data, cmap = "gray")
+
+                plot_filepath = pathlib.Path(os.path.splitext(filepath)[0]).with_suffix(".npy")
+                with open(plot_filepath, "wb") as c:
+                    np.save(c, plot_data)
+                
+
+                pic = slide.shapes.add_picture(str(filepath), left_p, top_p, height = height_p)
+
+
+            intron_data_meta_line = f"\nAve Intron Lenght: {int(sum(intron_lens) / intron_count)}\tMin Exon Length: {min(intron_lens)}\tMax Exon Length: {max(intron_lens)}\n\n"
+
+            slide = ppt.slides.add_slide(blank_slie_layout)
+            txBox = slide.shapes.add_textbox(left_t, top_t, width_t, height_t)
+            tf = txBox.text_frame
+            tf.text = "Combined Intron Sequence"
+            # tf.text = intron_data_meta_line
+
+            p = tf.add_paragraph()
+            txtf.write(intron_data_meta_line)
+
+            # mer = nucleotide_counter(intron_seq, kmer)
+            # cgr = chaos_game_representation(mer, kmer)
+
+            if image_type in "CGR":
+                mer = nucleotide_counter(intron_seq, kmer)
+                plot_data = chaos_game_representation(mer, kmer)
+            elif image_type in "KTA":
+                xy = KTA.time_embedding_v3(intron_seq, *args, **kwargs)
+                plot_data = KTA_plot(xy, *args, **kwargs)
+
+            if maximum_brightness:
+                super_threshold_indices = plot_data > 0
+                plot_data[super_threshold_indices] = 100
+
+            full_intron_seq = filepath = fullseq_folder / f"{gname}_I_Seq_{len(intron_seq)}.png"
+            if invert_gray:
+                plt.imsave(filepath, plot_data, cmap = "gray_r")
+            else:
+                plt.imsave(filepath, plot_data, cmap = "gray")
+
+            plot_filepath = pathlib.Path(os.path.splitext(filepath)[0]).with_suffix(".npy")
+            with open(plot_filepath, "wb") as c:
+                np.save(c, plot_data)
+            
+
+            pic = slide.shapes.add_picture(str(filepath), left_p, top_p, height = height_p)
+
+            gene_full_len_line = f"Full Sequence: {len(gene.full_seq[0].upper())}"
+
+            slide = ppt.slides.add_slide(blank_slie_layout)
+            txBox = slide.shapes.add_textbox(left_t, top_t, width_t, height_t)
+            tf = txBox.text_frame
+            tf.text = gene_full_len_line
+
+            txtf.write(gene_full_len_line)
+    
+            # mer = nucleotide_counter(gene.full_seq[0].upper(), kmer)
+            # cgr = chaos_game_representation(mer, kmer)
+
+            if image_type in "CGR":
+                mer = nucleotide_counter(gene.full_seq[0].upper(), kmer)
+                plot_data = chaos_game_representation(mer, kmer)
+            elif image_type in "KTA":
+                xy = KTA.time_embedding_v3(gene.full_seq[0].upper(), *args, **kwargs)
+                plot_data = KTA_plot(xy, *args, **kwargs)
+
+            if maximum_brightness:
+                super_threshold_indices = plot_data > 0
+                plot_data[super_threshold_indices] = 100
+
+            full_gene_seq = filepath = fullseq_folder / f"{gname}_F_Seq_{len(gene.full_seq[0].upper())}.png"
+            if invert_gray:
+                plt.imsave(filepath, plot_data, cmap = "gray_r")
+            else:
+                plt.imsave(filepath, plot_data, cmap = "gray")
+
+            plot_filepath = pathlib.Path(os.path.splitext(filepath)[0]).with_suffix(".npy")
+            with open(plot_filepath, "wb") as c:
+                np.save(c, plot_data)
+            
+            
+            pic = slide.shapes.add_picture(str(filepath), left_p, top_p, height = height_p)
+
+            slide = ppt.slides.add_slide(blank_slie_layout)
+            txBox = slide.shapes.add_textbox(left_t, Inches(0.5), width_t, height_t)
+            tf = txBox.text_frame
+            tf.text = "Full Gene Sequence"
+            pic = slide.shapes.add_picture(str(full_gene_seq), Inches(0.5), top_p, height = Inches(3.5))
+
+            txBox = slide.shapes.add_textbox(Inches(5), Inches(0.5), width_t, height_t)
+            tf = txBox.text_frame
+            tf.text = "Full Exon Sequence"
+            pic = slide.shapes.add_picture(str(full_exon_seq), Inches(5), top_p, height = Inches(3.5))
+
+
+            slide = ppt.slides.add_slide(blank_slie_layout)
+            txBox = slide.shapes.add_textbox(left_t, Inches(0.5), width_t, height_t)
+            tf = txBox.text_frame
+            tf.text = "Full Intron Sequence"
+            pic = slide.shapes.add_picture(str(full_intron_seq), Inches(0.5), top_p, height = Inches(3.5))
+
+            txBox = slide.shapes.add_textbox(Inches(5), Inches(0.5), width_t, height_t)
+            tf = txBox.text_frame
+            tf.text = "Full Exon Sequence"
+            pic = slide.shapes.add_picture(str(full_exon_seq), Inches(5), top_p, height = Inches(3.5))
+
+
+            slide = ppt.slides.add_slide(blank_slie_layout)
+            txBox = slide.shapes.add_textbox(left_t, Inches(0.5), width_t, height_t)
+            tf = txBox.text_frame
+            tf.text = "Full Gene Sequence"
+            pic = slide.shapes.add_picture(str(full_gene_seq), Inches(0.5), top_p, height = Inches(3.5))
+
+            txBox = slide.shapes.add_textbox(Inches(5), Inches(0.5), width_t, height_t)
+            tf = txBox.text_frame
+            tf.text = "Full Intron Sequence"
+            pic = slide.shapes.add_picture(str(full_intron_seq), Inches(5), top_p, height = Inches(3.5))
+
+        # exit()
+
+    fig = go.Figure()
+    fig.add_trace(go.Histogram(x = master_exon_lens, name = "exon"))
+    fig.add_trace(go.Histogram(x = master_intron_lens, name = "intron"))
+
+    # fig.show()
+    fig.write_image(str(cwd / "ChromPerGene.png"))
+    slide = ppt.slides.add_slide(blank_slie_layout)
+    pic = slide.shapes.add_picture(str(filepath), left_p, top_p, height = height_p)
+
+    ppt.save(str(cwd / "ChromPerGene.pptx"))
 
 
 
 def CGRPerChrome(kmer = 6, maximum_brightness = False, invert_gray = False, min_exon = 10, image_type = "CGR", *args, **kwargs):
     '''
-    Loads up and outputs a gene from every chromosome and generates CGR for each of its exons and introns.
+    Loads up and outputs a gene from every chromosome and generates CGR for each of its exons and introns. This also generates a PPTX file to go along with the images.
 
     There also get put into a PPTX presentation, because fuck doing that by hand.
 
