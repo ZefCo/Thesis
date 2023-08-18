@@ -26,8 +26,9 @@ def main():
     min_exon = 2*kmer
 
     # CGRPerChrome(kmer = kmer, maximum_brightness = maximum_brightness, invert_gray = invert_gray, image_type = "KTA", min_exon = min_exon)
-    CGR_1D_plot(walk = "CGR", wav = "db38")
+    # CGR_1D_plot(walk = "CGR", wav = "bior6.8")
     # toy_example()
+    print(pywt.wavelist(kind='continuous'))
 
 
 def distance(x1, x2: float, method = "euclidean") -> tuple:
@@ -165,6 +166,7 @@ def dna_walk(seq: str):
 def CGR_1D_plot(walk = "CGR", wav = "coif14", *args, **kwargs):
     '''
     types of walks: CGR, DNA, NUC
+
     List of Discrete Wavelets:
 
     bior1.1   bior1.3   bior1.5   bior2.2   bior2.4   bior2.6   bior2.8   bior3.1   bior3.3   bior3.5   bior3.7   bior3.9   bior4.4   bior5.5   bior6.8   
@@ -174,12 +176,26 @@ def CGR_1D_plot(walk = "CGR", wav = "coif14", *args, **kwargs):
     haar   
     rbio1.1   rbio1.3   rbio1.5   rbio2.2   rbio2.4   rbio2.6   rbio2.8   rbio3.1   rbio3.3   rbio3.5   rbio3.7   rbio3.9   rbio4.4   rbio5.5   rbio6.8   
     sym2   sym3   sym4   sym5   sym6   sym7   sym8   sym9   sym10   sym11   sym12   sym13   sym14   sym15   sym16   sym17   sym18   sym19   sym20
+
+    List of Continuous Wavelets:
+    cgau1   cgau2   cgau3   cgau4   cgau5   cgau6   cgau7   cgau8   
+    cmor   
+    fbsp   
+    gaus1   gaus2   gaus3   gaus4   gaus5   gaus6   gaus7   gaus8   
+    mexh   
+    morl   
+    shan
     '''
     with open(str(cwd / "GenePerChrom.pkl"), "rb") as f:
         pickle_dict: dict = pickle.load(f)
 
     data: Gene.Gene
     for gene, data in pickle_dict.items():
+
+        first_exon = data.exonStarts[0]
+        exons = np.array(list(zip(data.exonStarts, data.exonEnds)))
+        exons = exons - first_exon  # converts the global locations of the exons to a local one.
+
         seq = data.full_seq[0]
         
         if walk in "CGR":
@@ -190,17 +206,19 @@ def CGR_1D_plot(walk = "CGR", wav = "coif14", *args, **kwargs):
             di = nucleotide_walk(seq)
 
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x = di[:, 0], y = di[:, 1]))
+        fig.add_trace(go.Scatter(x = di[:, 0], y = di[:, 1], name = "Full Sequence"))
         fig.update_layout(title = f"{gene} Full Sequence<br>Length = {len(seq)}", xaxis_title = "Nucleotide Position", yaxis_title = "Cummulative Distance<br>Pyrimidine = -1, Purine = +1")
+        for e, exon in enumerate(exons):
+            fig.add_trace(go.Scatter(x = [i for i in range(exon[0], exon[1])], y = [0 for _ in range(exon[0], exon[1])], marker = dict(color = "green"), name = f"Exon {e + 1}"))
         fig.show()
 
-        cA, cD = pywt.dwt(di, wav, mode = "zero")
-        wave = go.Figure()
-        # wave.add_trace(go.Scatter(x = cA[:, 0], y = cD[:, 0], name = "cA = x, cD = y"))
-        wave.add_trace(go.Scatter(x = [x for x in range(cA.shape[0])], y = cA[:, 0], name = "cA"))
-        wave.add_trace(go.Scatter(x = [x for x in range(cD.shape[0])], y = cD[:, 0], name = "cD"))
-        wave.update_layout(title = f"Wavelet Transform<br>{wav}")
-        wave.show()
+        # cA, cD = pywt.dwt(di, wav, mode = "zero")
+        # wave = go.Figure()
+        # # wave.add_trace(go.Scatter(x = cA[:, 0], y = cD[:, 0], name = "cA = x, cD = y"))
+        # wave.add_trace(go.Scatter(x = [x for x in range(cA.shape[0])], y = cA[:, 0], name = "cA"))
+        # wave.add_trace(go.Scatter(x = [x for x in range(cD.shape[0])], y = cD[:, 0], name = "cD"))
+        # wave.update_layout(title = f"Wavelet Transform<br>{wav}")
+        # wave.show()
 
 
         # for wav in wavlist:
@@ -212,7 +230,7 @@ def CGR_1D_plot(walk = "CGR", wav = "coif14", *args, **kwargs):
         #     wave.update_layout(title = f"Wavelet Transform<br>{wav}")
         #     wave.show()
 
-        exit()
+        # exit()
 
 
 def ImageGenerator(kmer = 6, maximum_brightness = False, invert_gray = False, min_exon = 10, image_type = "CGR", *args, **kwargs):
