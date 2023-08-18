@@ -10,8 +10,10 @@ import requests
 
 def main():
     '''
+    Might need to look at this a bit more: at gene 31298 I start getting Type Errors and it never clears up. 31297 is plent of genes to start
+    with, but why is it coming up with an error now?
     '''
-    start_gene = 16391
+    start_gene = 31298
     # dict_screwup()
     # pickle_file, csv_file = getKnownGene()
     hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19_ncbiRefSeqCurated.pkl",
@@ -187,7 +189,12 @@ def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track
                                            exonEnds = row_of_interest["exonEnds"],
                                            exonFrames = row_of_interest["exonFrames"])
         
-        gene_of_interest.sequence_breakdown()
+        try:
+            gene_of_interest.sequence_breakdown()
+        except Exception as e:
+            print("Error: skipping")
+            print(type(e))
+            continue
 
         if gene_of_interest.ncibname in pickle_dict.keys():
             key = re.split("_", gene_of_interest.ncibname)[0]
