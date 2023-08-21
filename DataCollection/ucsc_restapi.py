@@ -22,17 +22,21 @@ def base_urls():
 def compliment_strand(sequence: str) -> str:
     '''
     '''
-    compliment_sequence = ''
+    if isinstance(sequence, str):
+        compliment_sequence = ''
 
-    for n in sequence:
-        if n in "A":
-            compliment_sequence = f"{compliment_sequence}T"
-        if n in "C":
-            compliment_sequence = f"{compliment_sequence}G"
-        if n in "G":
-            compliment_sequence = f"{compliment_sequence}C"
-        if n in "T":
-            compliment_sequence = f"{compliment_sequence}A"
+        for n in sequence:
+            if n in "A":
+                compliment_sequence = f"{compliment_sequence}T"
+            if n in "C":
+                compliment_sequence = f"{compliment_sequence}G"
+            if n in "G":
+                compliment_sequence = f"{compliment_sequence}C"
+            if n in "T":
+                compliment_sequence = f"{compliment_sequence}A"
+
+    else:
+        compliment_sequence = None
 
     return compliment_sequence
 
@@ -134,6 +138,8 @@ def sequence(genome: str = "hg19", chrom: str = None, start: int = None, end: in
         # logger_output(message_title="New Error when trying to query UCSC Database", data=f"Error: {e}\n\tType: {type(e)}\nQuery URL:\n{query_url}")
 
         query = e
+        print(query)
+        print(type(query))
 
     if isinstance(query, requests.models.Response):
         query = convertRequest(query)
@@ -143,7 +149,8 @@ def sequence(genome: str = "hg19", chrom: str = None, start: int = None, end: in
         # query = query[::-1]
 
     if reverse_dir:
-        query = query[::-1]  # the reason these are seperate: sometimes I don't want to reverse the strand.
+        if isinstance(query, str):
+            query = query[::-1]  # the reason these are seperate: sometimes I don't want to reverse the strand.
 
     return query, seqURL
 
