@@ -17,6 +17,22 @@ def main():
 
     # print(data["NM_001351428.2"])
     # print(data["NM_001351428.2"].full_seq)
+    test_dict(pathlib.Path("D:\Downloads\GeneData\Known_Genes_hg19_NCBIGene_DICT_37188.pkl"))
+
+
+def test_dict(file_path: pathlib.Path):
+    '''
+    Opens and prints the contents of the dictioanry. Makes sure things are where they should be.
+    '''
+
+    with open(file_path, "rb") as p:
+        x: dict = pickle.load(p)
+
+    keys = tuple(x.keys())
+
+    print(x)
+    print(x[keys[0]])
+    print(x[keys[0]].full_seq[0])
 
 
 def select_data(n = 20_000):

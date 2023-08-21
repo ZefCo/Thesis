@@ -12,12 +12,20 @@ def main():
     '''
     Might need to look at this a bit more: at gene 31298 I start getting Type Errors and it never clears up. 31297 is plent of genes to start
     with, but why is it coming up with an error now?
+
+    But as of 8/19/23 31298 seems to be fine when doing this at home. Now I get an error at 37188...
+
+    I keep getting various HTTP errors... have I hit a maximum number of times I can access this data? There can't be a hard limit on it, so what is going on?
+
+    OK So I'm getting connection erros and I'm not totally sure how to handle all of them. Basically I'm getting kicked off the UCSC Genome Browser, and I think it's either because
+    I'm pinging them too much so they kick me off, or I have weak internet and I get kicked off. Either way, I keep getting these inturruptions. One thing I could do: if I loose connection,
+    just skip that intron/exon.
     '''
-    start_gene = 31298
+    start_gene = 37188
     # dict_screwup()
     # pickle_file, csv_file = getKnownGene()
     hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19_ncbiRefSeqCurated.pkl",
-                   pathlib.Path(f"/media/ethanspeakman/Elements/GeneData/Known_Genes_hg19_NCBIGene_DICT_{start_gene}.pkl"), 
+                   pathlib.Path(f"D:/Downloads/GeneData/Known_Genes_hg19_NCBIGene_DICT_{start_gene}.pkl"), 
                    ref_track="ncib",
                    gene_start = start_gene)
     # hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19_ncbiRefSeqCurated.pkl")
@@ -124,8 +132,9 @@ def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track
     # exit()
 
     print(f"writing file to\n\t{output_file}\nAfter ever iteration")
-
-
+    folder_target = output_file.parent
+    folder_target.mkdir(parents = True, exist_ok = True)
+    
     if gene_file.suffix in ".pkl":
         with open(gene_file, "rb") as p:
             known_genes: pandas.DataFrame = pickle.load(p)
@@ -189,12 +198,15 @@ def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track
                                            exonEnds = row_of_interest["exonEnds"],
                                            exonFrames = row_of_interest["exonFrames"])
         
-        try:
-            gene_of_interest.sequence_breakdown()
-        except Exception as e:
-            print("Error: skipping")
-            print(type(e))
-            continue
+        gene_of_interest.sequence_breakdown()
+
+        # try:
+        #     gene_of_interest.sequence_breakdown()
+        # except Exception as e:
+        #     print("Error: exiting")
+        #     print(type(e))
+        #     # continue
+        #     exit()
 
         if gene_of_interest.ncibname in pickle_dict.keys():
             key = re.split("_", gene_of_interest.ncibname)[0]

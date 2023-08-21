@@ -1,11 +1,13 @@
 from cmath import exp
 from textwrap import wrap
 import requests
+from requests.adapters import HTTPAdapter
 import logging
 import traceback
 from inspect import currentframe, getframeinfo
 import re
 import time
+import urllib3
 
 # Establish logging: because it's better then print
 logger = logging.getLogger(__name__)
@@ -42,14 +44,42 @@ def query(url: str) -> requests.models.Response:
     return url_query
 
 
-def query_response(url: str):
+def query_response(url: str, max_connctions: int = 2, timeout: float = 30):
     '''
+    Gets the actual querry.
+
+    The requests exceptions Connect Timeout error should pause the script for 10 minutes and then try again to get the request. I think that's what is happeneing: too many requests from the same IP.
     '''
-    try:
-        query: requests.models.Response = requests.get(url)
-    except Exception as e:
-        query = None
-        logger_output(message_title="New Exception", data=f"Line {getframeinfo(currentframe()).lineno -3}\nError: {e}\n\tType: {type(e)}\n\nTraceback:\n{traceback.format_exc()}")
+    session = requests.Session()
+    retry = urllib3.util.retry.Retry(connect = max_connctions, backoff_factor = timeout)
+    adapter = HTTPAdapter(max_retries = retry)
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+
+    query = session.get(url)
+
+    # query: requests.models.Response = requests.get(url, timeout = timeout)
+
+    # for _ in range(max_iterations):
+    #     try:
+    #         query: requests.models.Response = requests.get(url, timeout = timeout)
+    #         break
+        
+    #     except requests.exceptions.ConnectTimeout as e:
+    #         print(f"\tPausing for 10 minutes due to HTTP Error")
+    #         logger_output(message_title="#### HTTP Error", data=f"--- URL: {url}\nLine {getframeinfo(currentframe()).lineno -5}?\nError: {e}\n\tType: {type(e)}\n\nTraceback:\n{traceback.format_exc()}\n### End Log ###\n\n")
+    #         time.sleep(600)
+    #     except requests.exceptions.ReadTimeout as e:
+    #         print("\tRead Timeout: Pausing for 10 minutes")
+    #         logger_output(message_title="#### Read Timeout", data=f"--- URL: {url}\nLine {getframeinfo(currentframe()).lineno -5}?\nError: {e}\n\tType: {type(e)}\n\nTraceback:\n{traceback.format_exc()}\n### End Log ###\n\n")
+    #         time.sleep(60)
+    #     except Exception as e:
+    #         query = None
+    #         logger_output(message_title="#### New Exception ####", data=f"--- URL: {url}\nLine {getframeinfo(currentframe()).lineno -9}?\nError: {e}\n\tType: {type(e)}\n\nTraceback:\n{traceback.format_exc()}\n### End Log ###\n\n")
+    #         break
+    # else:
+    #     logger_output(message_title="Failed to get query", data=f"--- URL: {url}\nLine {getframeinfo(currentframe()).lineno -13}?\nError: {e}\n\tType: {type(e)}\n\nTraceback:\n{traceback.format_exc()}\n### End Log ###\n\n")
+    #     query = None
 
     return query
 
