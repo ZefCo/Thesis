@@ -30,7 +30,8 @@ def main():
                       max_rows = 5000, 
                       gap = 0, 
                       k_p = 12, 
-                      k_m = 12)
+                      k_m = 12,
+                      PyPu = True)
 
     # time_embedding_v2(str(cwd.parent / "ML" / "TrainingData_SameSize.pkl"), 
     #                   max_rows = 5000, 
@@ -204,7 +205,7 @@ def time_embedding(k_p = 9, k_m = 9, gap = 0, max_rows = 200):
 
 
 
-def time_embedding_v2(pickle_file, k_p = 9, k_m = 9, gap = 0, max_rows = 200, backwards = True, compliment = False):
+def time_embedding_v2(pickle_file, k_p = 9, k_m = 9, gap = 0, max_rows = 200, backwards = True, PyPu = False, nucsequence: str = "AGTC"):
     '''
     Almost identical to the above, but uses matplotlib to output the images. Doesn't look as slick but does output the images much faster.
 
@@ -257,7 +258,10 @@ def time_embedding_v2(pickle_file, k_p = 9, k_m = 9, gap = 0, max_rows = 200, ba
 
         region = data.loc[row, "Type"]
 
-        xy = time_embedding_v3(sequence, k_p = k_p, k_m = k_m, gap = gap, m_backwards = backwards, compliment = compliment)
+        if PyPu:
+            xy = time_embedding_PyPu(sequence, k_p = k_p, k_m = k_m, gap = gap, m_backwards = backwards)
+        else:
+            xy = time_embedding_v3(sequence, k_p = k_p, k_m = k_m, gap = gap, m_backwards = backwards, nucsequence = nucsequence)
         
         if region in "Exon":
             e_frame.append(xy)
@@ -277,19 +281,31 @@ def time_embedding_v2(pickle_file, k_p = 9, k_m = 9, gap = 0, max_rows = 200, ba
     for points in b_frame:
         ax.scatter(points[:, 0], points[:, 1], s = 0.1)
 
+    b_title = f"Exons and Introns, Time Embedding w/ {gap}-mer Gap between + and -\n{e_count + i_count} Total Regions - Unknown number of genes are represented"
+    e_title = f"Exons, Time Embedding w/ {gap}-mer Gap\n{e_count} Total Regions: weights are forwards and backwards"
+    i_title = f"Introns, Time Embedding w/ {gap}-mer Gap\n{i_count} Total Regions: weights are forwards and backwards"
+
     if backwards:
-        b_title = f"Exons and Introns, Time Embedding w/ {gap}-mer Gap between + and -\n{e_count + i_count} Total Regions - Unknown how many genes are represented: weights are forwards and backwards\nCompliment = {compliment}"
-        e_title = f"Exons, Time Embedding w/ {gap}-mer Gap\n{e_count} Total Regions: weights are forwards and backwards\nCompliment = {compliment}"
-        i_title = f"Introns, Time Embedding w/ {gap}-mer Gap\n{i_count} Total Regions: weights are forwards and backwards\nCompliment = {compliment}"
+        weights = ": weights are forwards and backwards"
     else:
-        b_title = f"Exons and Introns, Time Embedding w/ {gap}-mer Gap between + and -\n{e_count + i_count} Total Regions - Unknown how many genes are represented: weights are forwards\nCompliment = {compliment}"
-        e_title = f"Exons, Time Embedding w/ {gap}-mer Gap\n{e_count} Total Regions: weights are forwards\nCompliment = {compliment}"
-        i_title = f"Introns, Time Embedding w/ {gap}-mer Gap\n{i_count} Total Regions: weights are forwards\nCompliment = {compliment}"
+        weights = ": weights are forwards"
+
+    if PyPu:
+        NS = f"\nPy = 0, Pu = 1"
+        file_NS = f"_PyPu_{PyPu}"
+    else:
+        NS = f"\n{nucsequence}"
+        file_NS = f"_NucSeq_{nucsequence}"
+
+    b_title = f"{b_title}{weights}{NS}"
+    e_title = f"{e_title}{weights}{NS}"
+    i_title = f"{i_title}{weights}{NS}"
+
 
     x_title = f"History: {k_m}-Mer"
     y_title = f"Future: {k_p}-Mer"
 
-    both_file = str(both_dir / f"both_gap_{gap}_{k_m}v{k_p}_Back_{backwards}_Comp_{compliment}.png")
+    both_file = str(both_dir / f"both_gap_{gap}_{k_m}v{k_p}_Back_{backwards}{file_NS}.png")
     plt.title(b_title)
     plt.xlabel(x_title)
     plt.ylabel(y_title)
@@ -302,7 +318,7 @@ def time_embedding_v2(pickle_file, k_p = 9, k_m = 9, gap = 0, max_rows = 200, ba
     fig.set_size_inches(20, 20)
     for points in e_frame:
         ax.scatter(points[:, 0], points[:, 1], s = 0.1)
-    exon_file = str(exon_dir / f"exon_gap_{gap}_{k_m}v{k_p}_Back_{backwards}_Comp_{compliment}.png")
+    exon_file = str(exon_dir / f"exon_gap_{gap}_{k_m}v{k_p}_Back_{backwards}{file_NS}.png")
     plt.title(e_title)
     plt.xlabel(x_title)
     plt.ylabel(y_title)
@@ -315,7 +331,7 @@ def time_embedding_v2(pickle_file, k_p = 9, k_m = 9, gap = 0, max_rows = 200, ba
     fig.set_size_inches(20, 20)
     for points in i_frame:
         ax.scatter(points[:, 0], points[:, 1], s = 0.1)
-    intron_file = str(intron_dir / f"intron_gap_{gap}_{k_m}v{k_p}_Back_{backwards}_Comp_{compliment}.png")
+    intron_file = str(intron_dir / f"intron_gap_{gap}_{k_m}v{k_p}_Back_{backwards}{file_NS}.png")
     plt.title(i_title)
     plt.xlabel(x_title)
     plt.ylabel(y_title)
@@ -327,7 +343,7 @@ def time_embedding_v2(pickle_file, k_p = 9, k_m = 9, gap = 0, max_rows = 200, ba
 def time_embedding_v3(sequence: str, 
                       k_p: int = 6, k_m: int = 6, gap: int = 0, 
                       m_backwards: bool = True, p_backwards: bool = False, 
-                      compliment: bool = False, 
+                    #   compliment: bool = False, 
                       nucsequence: str = "AGTC"):
     '''
     Feeds in a sequence, and it finds the xy coordinates for that sequence.
@@ -337,6 +353,7 @@ def time_embedding_v3(sequence: str,
 
     There is an option for the compliment strand: probably should never be used.
     '''
+    sequence = sequence.upper()
     nucsequence = nucsequence.upper() # Just in case someone puts in a different order and forgets to capitalize everything
     seq_length = len(sequence)
 
@@ -352,36 +369,72 @@ def time_embedding_v3(sequence: str,
     if p_backwards:
         w_p.reverse()
 
-    sequence = sequence.upper()
 
     xy = np.zeros(shape=(seq_length - (k_p + k_m + gap), 2))
 
     k_minus = [sequence[k_prime:k_prime + k_m] for k_prime in range(0, seq_length - (k_p + k_m + gap))]
     k_plus = [sequence[k_prime:k_prime + k_p] for k_prime in range(gap + k_m, seq_length - k_p)]
 
-    if compliment:  # probably should never be used.
-        for i, k_prime in enumerate(k_minus):
-            n = [0 if n in nucsequence[0] else 1 if n in nucsequence[1] else 2 if n in nucsequence[2] else 3 if n in nucsequence[3] else 100 for n in k_prime]
-            k_x = np.dot(w_m, n)
+    # if compliment:  # probably should never be used.
+    #     for i, k_prime in enumerate(k_minus):
+    #         n = [0 if n in nucsequence[0] else 1 if n in nucsequence[1] else 2 if n in nucsequence[2] else 3 if n in nucsequence[3] else 100 for n in k_prime]
+    #         k_x = np.dot(w_m, n)
 
-            n = [3 if n in nucsequence[0] else 2 if n in nucsequence[1] else 1 if n in nucsequence[2] else 0 if n in nucsequence[3] else 100 for n in k_plus[i]]
-            k_y = np.dot(w_p, n)
+    #         n = [3 if n in nucsequence[0] else 2 if n in nucsequence[1] else 1 if n in nucsequence[2] else 0 if n in nucsequence[3] else 100 for n in k_plus[i]]
+    #         k_y = np.dot(w_p, n)
 
-            xy[i][0], xy[i][1] = k_x, k_y
+    #         xy[i][0], xy[i][1] = k_x, k_y
 
-    else:
-        for i, k_prime in enumerate(k_minus):
-            n = [0 if n in nucsequence[0] else 1 if n in nucsequence[1] else 2 if n in nucsequence[2] else 3 if n in nucsequence[3] else 100 for n in k_prime]
-            k_x = np.dot(w_m, n)
+    # else:
+    for i, k_prime in enumerate(k_minus):
+        n = [0 if n in nucsequence[0] else 1 if n in nucsequence[1] else 2 if n in nucsequence[2] else 3 if n in nucsequence[3] else 100 for n in k_prime]
+        k_x = np.dot(w_m, n)
 
-            n = [0 if n in nucsequence[0] else 1 if n in nucsequence[1] else 2 if n in nucsequence[2] else 3 if n in nucsequence[3] else 100 for n in k_plus[i]]
-            k_y = np.dot(w_p, n)
+        n = [0 if n in nucsequence[0] else 1 if n in nucsequence[1] else 2 if n in nucsequence[2] else 3 if n in nucsequence[3] else 100 for n in k_plus[i]]
+        k_y = np.dot(w_p, n)
 
-            xy[i][0], xy[i][1] = k_x, k_y
+        xy[i][0], xy[i][1] = k_x, k_y
 
     return xy
 
 
+def time_embedding_PyPu(sequence: str, 
+                        k_p: int = 6, k_m: int = 6, gap: int = 0, 
+                        m_backwards: bool = True, p_backwards: bool = False):
+    '''
+    Does the time embedding, but this one is based off of Pyrimdines and Purines.
+    '''
+    sequence = sequence.upper()
+    seq_length = len(sequence)
+
+    if seq_length < (k_m + k_p + abs(gap)):  # I'm making this an |gap| becuase I don't want to think about how it should be done if g < 0. It has to be a certain length, and that length needs to be long.
+        print("Cannont find Trajectory for this gene: to small")
+        return None
+
+    w_p = [(0.5)**n for n in range(1, k_p + 1)]
+    w_m = [(0.5)**n for n in range(1, k_m + 1)]
+
+    if m_backwards:
+        w_m.reverse()
+    if p_backwards:
+        w_p.reverse()
+
+
+    xy = np.zeros(shape=(seq_length - (k_p + k_m + gap), 2))
+
+    k_minus = [sequence[k_prime:k_prime + k_m] for k_prime in range(0, seq_length - (k_p + k_m + gap))]
+    k_plus = [sequence[k_prime:k_prime + k_p] for k_prime in range(gap + k_m, seq_length - k_p)]
+
+    for i, k_prime in enumerate(k_minus):
+        n = [0 if ((n in "A") or (n in "G")) else 1 if ((n in "C") or (n in "T")) else 100 for n in k_prime]
+        k_x = np.dot(w_m, n)
+
+        n = [0 if ((n in "A") or (n in "G")) else 1 if ((n in "C") or (n in "T")) else 100 for n in k_plus[i]]
+        k_y = np.dot(w_p, n)
+
+        xy[i][0], xy[i][1] = k_x, k_y
+
+    return xy
 
 
 def scoring(N: list):

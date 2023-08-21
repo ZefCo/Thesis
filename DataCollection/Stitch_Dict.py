@@ -17,13 +17,18 @@ def main():
 
     # print(data["NM_001351428.2"])
     # print(data["NM_001351428.2"].full_seq)
-    test_dict(pathlib.Path("D:\Downloads\GeneData\Known_Genes_hg19_NCBIGene_DICT_37188.pkl"))
+    test_dict(pathlib.Path("/media/ethanspeakman/Elements/GeneData/Known_Genes_hg19_NCBIGene_DICT_31298.pkl"), "NM_001329675.2")
 
 
-def test_dict(file_path: pathlib.Path):
+def test_dict(file_path: pathlib.Path, test_key = None):
     '''
     Opens and prints the contents of the dictioanry. Makes sure things are where they should be.
     '''
+    def check_key(dic: dict, key: str):
+        if key in dic.keys():
+            print(f"{dic[key].full_seq[0]}")
+        else:
+            print(f"Key {key} not present")
 
     with open(file_path, "rb") as p:
         x: dict = pickle.load(p)
@@ -33,6 +38,10 @@ def test_dict(file_path: pathlib.Path):
     print(x)
     print(x[keys[0]])
     print(x[keys[0]].full_seq[0])
+
+    if test_key is not None:
+        check_key(x, test_key)
+
 
 
 def select_data(n = 20_000):
