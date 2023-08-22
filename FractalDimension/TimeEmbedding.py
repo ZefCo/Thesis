@@ -13,6 +13,7 @@ import pandas
 import pickle
 import itertools
 import matplotlib.pyplot as plt
+import GeneClass as Gene
 
 def main():
     '''
@@ -76,7 +77,7 @@ def score_keys(k = 9, nucsequence: str = "AGTC"):
 
 
 
-def time_embedding(k_p = 9, k_m = 9, gap = 0, max_rows = 200):
+def old_time_embedding_plotly(k_p = 9, k_m = 9, gap = 0, max_rows = 200):
     '''
     Will use the G number idea to find the forward and backward number.
 
@@ -205,7 +206,7 @@ def time_embedding(k_p = 9, k_m = 9, gap = 0, max_rows = 200):
 
 
 
-def time_embedding_v2(pickle_file, k_p = 9, k_m = 9, gap = 0, max_rows = 200, backwards = True, PyPu = False, nucsequence: str = "AGTC"):
+def old_time_embedding_matplot(pickle_file, k_p = 9, k_m = 9, gap = 0, max_rows = 200, backwards = True, PyPu = False, nucsequence: str = "AGTC"):
     '''
     Almost identical to the above, but uses matplotlib to output the images. Doesn't look as slick but does output the images much faster.
 
@@ -261,7 +262,7 @@ def time_embedding_v2(pickle_file, k_p = 9, k_m = 9, gap = 0, max_rows = 200, ba
         if PyPu:
             xy = time_embedding_PyPu(sequence, k_p = k_p, k_m = k_m, gap = gap, m_backwards = backwards)
         else:
-            xy = time_embedding_v3(sequence, k_p = k_p, k_m = k_m, gap = gap, m_backwards = backwards, nucsequence = nucsequence)
+            xy = time_embedding(sequence, k_p = k_p, k_m = k_m, gap = gap, m_backwards = backwards, nucsequence = nucsequence)
         
         if region in "Exon":
             e_frame.append(xy)
@@ -340,7 +341,7 @@ def time_embedding_v2(pickle_file, k_p = 9, k_m = 9, gap = 0, max_rows = 200, ba
     plt.close()
 
 
-def time_embedding_v3(sequence: str, 
+def time_embedding(sequence: str, 
                       k_p: int = 6, k_m: int = 6, gap: int = 0, 
                       m_backwards: bool = True, p_backwards: bool = False, 
                     #   compliment: bool = False, 
@@ -447,6 +448,25 @@ def scoring(N: list):
     print(w)
 
     return np.dot(np.array(w), np.array(n))
+
+
+def time_embedding_v2(data: dict):
+    '''
+    Actually ignore this: I will update this later. I'm going to seperate the data and generate reports before I put it here. This will probably just take a pandas dataframe
+
+    The new way of doing things with the updated data. You can put a pathlib in place of a dictionary which then opens that file, but that data better be a dictionary. I'm not going to code
+    other ways of handeling that data. It's a dictionary. Deal with it. WE'RE DEALING WITH THINGS TED!
+    '''
+
+    if isinstance(data, pathlib.Path):
+        with open(data, "rb") as p:
+            data = pickle.load(p)
+
+    gene: Gene.Gene
+    ncib: str
+    for ncib, gene in data.items():
+        pass
+
 
 
 
