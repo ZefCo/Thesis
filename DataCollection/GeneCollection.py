@@ -20,6 +20,8 @@ def main():
     OK So I'm getting connection erros and I'm not totally sure how to handle all of them. Basically I'm getting kicked off the UCSC Genome Browser, and I think it's either because
     I'm pinging them too much so they kick me off, or I have weak internet and I get kicked off. Either way, I keep getting these inturruptions. One thing I could do: if I loose connection,
     just skip that intron/exon.
+
+    Stopped at 40587 at school. Stopped at a different number at home. Both from a json decode error.
     '''
     start_gene = 37188
     # dict_screwup()
