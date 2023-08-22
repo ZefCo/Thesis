@@ -21,7 +21,7 @@ def main():
     I'm pinging them too much so they kick me off, or I have weak internet and I get kicked off. Either way, I keep getting these inturruptions. One thing I could do: if I loose connection,
     just skip that intron/exon.
     '''
-    start_gene = 37188
+    start_gene = 37647
     # dict_screwup()
     # pickle_file, csv_file = getKnownGene()
     hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19_ncbiRefSeqCurated.pkl",
