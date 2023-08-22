@@ -23,7 +23,7 @@ def main():
 
     Stopped at 40587 at school. Stopped at a different number at home. Both from a json decode error.
     '''
-    start_gene = 37188
+    start_gene = 37647
     # dict_screwup()
     # pickle_file, csv_file = getKnownGene()
     hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19_ncbiRefSeqCurated.pkl",
