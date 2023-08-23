@@ -128,6 +128,8 @@ def generate_trajectories(data_file: pathlib.Path, choices: int = 5000, kp: int 
 def time_embedding_v3(sequence: str, k_p = 9, k_m = 9, gap = 0, backwards = True, compliment = False):
     '''
     Feeds in a sequence, and it finds the xy coordinates for that sequence.
+
+    This is out of date. Do not use
     '''
     seq_length = len(sequence)
 

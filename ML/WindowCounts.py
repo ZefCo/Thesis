@@ -8,6 +8,19 @@ from plotly.subplots import make_subplots
 import itertools
 
 
+def main():
+    '''
+    '''
+    kmer = 1
+
+    # # create_data()
+    # print_data(kmer)
+    # perms = nucleotide_permutations("ACGT", 2)
+    # print(perms)
+    # window_distribution(kmer, shaded = False)
+    recreate(str(cwd / "Window_Plots" / f"{kmer}mer_Frame.csv"), kmer, labels = True)
+
+
 def nucleotide_counter(sequence: str, window_size: int):
     '''
     '''
@@ -349,13 +362,7 @@ def recreate(filepath: pathlib.Path, kmer, shaded = False, labels = False):
 
 
 if __name__ in "__main__":
-    kmer = 1
+    main()
 
-    # # create_data()
-    # print_data(kmer)
-    # perms = nucleotide_permutations("ACGT", 2)
-    # print(perms)
-    # window_distribution(kmer, shaded = False)
-    recreate(str(cwd / "Window_Plots" / f"{kmer}mer_Frame.csv"), kmer, labels = True)
 
 

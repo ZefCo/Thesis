@@ -27,21 +27,7 @@ def main():
     You'll have to also do the exons and introns seperatly, but we want to see how the trajectory can "jump" from exon to intron: maybe there is something of interest there?
     '''
 
-    time_embedding_v2(str(cwd.parent / "ML" / "TrainingData_SameSize.pkl"), 
-                      max_rows = 5000, 
-                      gap = 0, 
-                      k_p = 12, 
-                      k_m = 12,
-                      PyPu = True)
-
-    # time_embedding_v2(str(cwd.parent / "ML" / "TrainingData_SameSize.pkl"), 
-    #                   max_rows = 5000, 
-    #                   gap = 0, 
-    #                   k_p = 6, 
-    #                   k_m = 6, 
-    #                   backwards = False,
-    #                   compliment = False)
-
+    time_embedding_v2(pathlib.Path("G:\Data_Set_1.pkl"))
 
 
 def score_keys(k = 9, nucsequence: str = "AGTC"):
@@ -450,24 +436,142 @@ def scoring(N: list):
     return np.dot(np.array(w), np.array(n))
 
 
-def time_embedding_v2(data: dict):
+def time_embedding_v2(data: pandas.DataFrame, 
+                      k_p: int = 6, k_m: int = 6, gap: int = 0, 
+                      backwards: bool = True, 
+                      nucsequence: str = "AGTC", PyPu: bool = False,
+                      sequence_name: str = "Seq",
+                      classification_name: str = "Classificaion"):
     '''
-    Actually ignore this: I will update this later. I'm going to seperate the data and generate reports before I put it here. This will probably just take a pandas dataframe
+    The new way of doing things with the updated data. You can put a pathlib in place of a Dataframe which then opens that file, but that data better be a Dataframe. I'm not going to code
+    other ways of handeling that data. It's a Dataframe. Deal with it. WE'RE DEALING WITH THINGS TED!
 
-    The new way of doing things with the updated data. You can put a pathlib in place of a dictionary which then opens that file, but that data better be a dictionary. I'm not going to code
-    other ways of handeling that data. It's a dictionary. Deal with it. WE'RE DEALING WITH THINGS TED!
+    The classification & sequence name is because I've done this a few different times with different data standards... and I probably screwed myself for that. But now I get to try to salvage that...
+    And yes, that says Classificaion, because I misspelled something.
     '''
 
     if isinstance(data, pathlib.Path):
         with open(data, "rb") as p:
             data = pickle.load(p)
 
-    gene: Gene.Gene
-    ncib: str
-    for ncib, gene in data.items():
-        pass
+    print(data.columns)
+
+    image_dir = cwd / "TE_Images_ForPaper"
+    image_dir.mkdir(parents = True, exist_ok = True)
+    exon_dir = image_dir / "Exon"
+    exon_dir.mkdir(parents = True, exist_ok = True)
+    intron_dir = image_dir / "Intron"
+    intron_dir.mkdir(parents = True, exist_ok = True)
+    both_dir = image_dir / "Both"
+    both_dir.mkdir(parents = True, exist_ok = True)
+
+    # gene: Gene.Gene
+    # ncib: str
+
+    rows, cols = data.shape
+
+    if "Length" in data.columns:
+        data = data[data["Length"] > (k_m + k_p + gap)]
+    else:
+        data["Length"] = data.Seq.str.len()
+        data = data[data["Length"] > (k_m + k_p + gap)]
+
+    b_frame, e_frame, i_frame = {}, {}, {}  # OK this may seem weird, but hear me out: lists are slow, especially when you have a very large N in a list. But a dictionary is hashable, so I can store the lists in the dictionary, who cares about the key, and it should be faster for large N
+    b_count, e_count, i_count = 0, 0, 0
+
+    for row in range(rows):
+        try:
+            sequence = data.loc[row, sequence_name].upper()
+        except Exception as e:
+            print(type(e))
+            print(e)
+            print(row)
+            exit()
+
+        region = data.loc[row, classification_name]
+
+        if PyPu:
+            xy = time_embedding_PyPu(sequence, k_p = k_p, k_m = k_m, gap = gap, m_backwards = backwards)
+        else:
+            xy = time_embedding(sequence, k_p = k_p, k_m = k_m, gap = gap, m_backwards = backwards, nucsequence = nucsequence)
+        
+        if (region in "Exon") or (region in "exon") or (region in "e"):  # because I realized I was doing this like 3 different ways... I probably should have been more precise.
+            e_frame[e_count] = xy
+            e_count += 1
+        elif (region in "Intron") or (region in "intron") or (region in "i"):
+            i_frame[i_count] = xy
+            i_count += 1
+
+        b_frame[b_count] = xy
+        b_count += 1
+
+        if ((row % 1000) == 0):
+            print(f"Finished row {row} or {rows}")
 
 
+    # Both Plot
+    # fig, ax = plt.subplots()
+    # fig.set_size_inches(20, 20)
+    # for points in b_frame:
+    #     ax.scatter(points[:, 0], points[:, 1], s = 0.1)
+
+    # b_title = f"Exons and Introns, Time Embedding w/ {gap}-mer Gap between + and -\n{e_count + i_count} Total Regions - Unknown number of genes are represented"
+    e_title = f"Exons, Time Embedding w/ {gap}-mer Gap\n{e_count} Total Regions: weights are forwards and backwards"
+    i_title = f"Introns, Time Embedding w/ {gap}-mer Gap\n{i_count} Total Regions: weights are forwards and backwards"
+
+    if backwards:
+        weights = ": weights are forwards and backwards"
+    else:
+        weights = ": weights are forwards"
+
+    if PyPu:
+        NS = f"\nPy = 0, Pu = 1"
+        file_NS = f"_PyPu_{PyPu}"
+    else:
+        NS = f"\n{nucsequence}"
+        file_NS = f"_NucSeq_{nucsequence}"
+
+    # b_title = f"{b_title}{weights}{NS}"
+    e_title = f"{e_title}{weights}{NS}"
+    i_title = f"{i_title}{weights}{NS}"
+
+
+    x_title = f"History: {k_m}-Mer"
+    y_title = f"Future: {k_p}-Mer"
+
+    # both_file = str(both_dir / f"both_gap_{gap}_{k_m}v{k_p}_Back_{backwards}{file_NS}.png")
+    # plt.title(b_title)
+    # plt.xlabel(x_title)
+    # plt.ylabel(y_title)
+    # plt.savefig(both_file)
+    # print(f"Output image to {both_file}")
+    # plt.close()
+
+    # Exon Plot
+    fig, ax = plt.subplots()
+    fig.set_size_inches(20, 20)
+    for points in e_frame.values():
+        ax.scatter(points[:, 0], points[:, 1], s = 0.1)
+    exon_file = str(exon_dir / f"exon_gap_{gap}_{k_m}v{k_p}_Back_{backwards}{file_NS}.png")
+    plt.title(e_title)
+    plt.xlabel(x_title)
+    plt.ylabel(y_title)
+    plt.savefig(exon_file)
+    print(f"Output image to {exon_file}")
+    plt.close()
+
+    # Intron Plot
+    fig, ax = plt.subplots()
+    fig.set_size_inches(20, 20)
+    for points in i_frame.values():
+        ax.scatter(points[:, 0], points[:, 1], s = 0.1)
+    intron_file = str(intron_dir / f"intron_gap_{gap}_{k_m}v{k_p}_Back_{backwards}{file_NS}.png")
+    plt.title(i_title)
+    plt.xlabel(x_title)
+    plt.ylabel(y_title)
+    plt.savefig(intron_file)
+    print(f"Output image to {intron_file}")
+    plt.close()
 
 
 if __name__ in "__main__":
