@@ -8,8 +8,20 @@ from PIL import Image
 
 cwd = pathlib.Path.cwd()
 
-exon_images = cwd / "FractalImageEvI" / "EXON"
-intron_images = cwd / "FractalImageEvI" / "INTRON"
+kmer = 7
+
+data_file: pathlib.Path = pathlib.Path("TrainingGeneData_SLSGHis.pkl")
+new_folder: str = os.path.splitext(data_file)[0] + f"_{kmer}"
+
+
+def get_num_pixels(filepath):
+    width, height = Image.open(filepath).size
+    return width, height
+
+
+
+exon_images = cwd / new_folder / "EXON"
+intron_images = cwd / new_folder / "INTRON"
 # utr5_images = cwd / "FractalImage" / "UTR5"
 # utr3_images = cwd / "FractalImage" / "UTR3"
 # exon_images = cwd / "FractalImage" / "Exon"
@@ -20,7 +32,11 @@ intron_images.mkdir(parents = True, exist_ok = True)
 # utr3_images.mkdir(parents = True, exist_ok = True)
 # exon_images.mkdir(parents = True, exist_ok = True)
 
-kmer = 6
+h, w = get_num_pixels( exon_images / "Exon_0.png")
+print(h, w)
+exit()
+
+print(f"Putting Data into folder\n\t{exon_images}\n\t{intron_images}")
 
 def manhattan_position(nuc: int, x0: int):
     '''
@@ -57,7 +73,7 @@ def nucleotide_counter(sequence: str, window_size: int):
 
 
     for i in range(len(sequence) - window_size):
-        seq = sequence[i: i + window_size - 1]
+        seq = sequence[i: i + window_size]
 
         if seq not in keys:
             keys.add(seq)
@@ -122,7 +138,7 @@ def gif_generator(path: str, filename: str):
     frames[0].save(filename, format="GIF", append_images=frames[1:], save_all = True, loop = 0, duration = 225) 
 
 
-train_data: pandas.DataFrame = pandas.read_pickle(cwd / "TrainingGeneData_v5.pkl")
+train_data: pandas.DataFrame = pandas.read_pickle(cwd / data_file)
 # print(train_data.shape)
 
 keep = np.where(train_data["Seq"].str.len() >= 100)[0]
@@ -138,7 +154,7 @@ train_data = train_data.reset_index()
 # print(train_data.shape)
 # print(train_data)
 
-print(train_data)
+# print(train_data)
 
 
 
@@ -158,16 +174,22 @@ for row in range(rows):
     # print(cgr)
     # print(np.max(cgr), np.min(cgr))
 
-    plt.imshow(cgr, cmap = "gray")
+    # plt.imshow(cgr, cmap = "gray")
 
     if typ in intname:
         filepath = intron_images / f"Intron_{intron}.png"
-        plt.imsave(filepath, cgr, cmap = "gray")
-        intron += 1
+        try:
+            plt.imsave(filepath, cgr, cmap = "gray")
+            intron += 1
+        except Exception as e:
+            print(type(e))
+            print(e)
 
     elif typ in exname:
-
         filepath = exon_images / f"Exon_{exon}.png"
-        plt.imsave(filepath, cgr, cmap = "gray")
-
-        exon += 1
+        try:
+            plt.imsave(filepath, cgr, cmap = "gray")
+            exon += 1
+        except Exception as e:
+            print(type(e))
+            print(e)
