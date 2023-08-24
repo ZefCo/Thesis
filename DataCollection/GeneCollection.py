@@ -23,10 +23,10 @@ def main():
 
     Stopped at 40587 at school. Stopped at a different number at home. Both from a json decode error.
     '''
-    start_gene = 37647
+    start_gene = 0
     # dict_screwup()
     # pickle_file, csv_file = getKnownGene()
-    hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19_ncbiRefSeqCurated.pkl",
+    hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19.csv",
                    pathlib.Path(f"D:/Downloads/GeneData/Known_Genes_hg19_NCBIGene_DICT_{start_gene}.pkl"), 
                    ref_track="ncib",
                    gene_start = start_gene)
@@ -227,6 +227,7 @@ def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track
         except Exception as e:
             print(type(e))
             print(f"Unable to write to file at this time: please check location can be written to")
+            exit()
             
     print(f"Wrote file to\n\t{output_file}")
 

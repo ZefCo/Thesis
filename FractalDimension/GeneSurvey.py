@@ -23,9 +23,16 @@ def main():
     '''
     kmer = 2
 
-    data = pathlib.Path("G:\Data_Set_1.pkl")  # I know the method says it was a dataframe, but I also coded it where it can just take a pathlib and load the data. I got lazy
-    output_file = cwd / "GeneSurvey.pkl"
-    survey(data, output_file, kmer)
+    data_1 = pathlib.Path("G:\Gene_Data_Sets\Data_Set_1_frame.pkl")  # I know the method says it was a dataframe, but I also coded it where it can just take a pathlib and load the data. I got lazy
+    output_file_1 = cwd / "GeneSurvey_1.pkl"
+    data_2 = pathlib.Path("G:\Gene_Data_Sets\Data_Set_2_frame.pkl")  # I know the method says it was a dataframe, but I also coded it where it can just take a pathlib and load the data. I got lazy
+    output_file_2 = cwd / "GeneSurvey_2.pkl"
+
+    # print(data_1)
+    # survey(data_1, output_file_1, kmer)
+    # survey(data_2, output_file_2, kmer)
+    recreate(output_file_1, kmer, title = "Dataset 1 Histogram Method", labels = True, output_file = pathlib.Path(cwd / "GeneSurvey_Dataset1.html"))
+    recreate(output_file_2, kmer, title = "Dataset 2 Histogram Method", labels = True, output_file = pathlib.Path(cwd / "GeneSurvey_Dataset2.html"))
 
 
 def count_occurences(sequence: str, permutations: list):
@@ -147,8 +154,58 @@ def survey(data: pandas.DataFrame or pathlib.Path, output_file: pathlib.Path, km
             global_mer[key] = value
 
     counts_frame = statistics(global_mer, exon_mer, intron_mer, kmer)
+    print(counts_frame)
 
-    counts_frame.to_pickle(output_file)
+    counts_frame.to_pickle(output_file, )
+
+
+def recreate(filepath: pathlib.Path, kmer, output_file: pathlib.Path = None, 
+             shaded = False, labels = False, title = None, 
+             read_type = "pkl"):
+    '''
+    creates the plots. It's called recreate as a holdover from when I first did this, which is the WindowCounts.py script.
+
+    Note the read_type: that can be pkl or csv right now. By default it's pkl
+    '''
+    if read_type in "pkl":
+        data: pandas.DataFrame = pandas.read_pickle(filepath)
+        x_column = data.index
+    elif read_type in "csv":
+        data: pandas.DataFrame = pandas.read_csv(filepath, header = 0)
+        x_column = data["Unnamed: 0"]
+    # print(data)
+
+    average = 0.25**kmer
+
+    fig = go.Figure()
+    fig.add_trace(go.Bar(x = x_column, y = data["G%"], name = "Full Seq"))
+    fig.add_trace(go.Bar(x = x_column, y = data["E%"], name = "Exon"))
+    fig.add_trace(go.Bar(x = x_column, y = data["I%"], name = "Intron"))
+
+    # fig = make_subplots(rows = 3, cols = 1)
+    # fig.add_trace(go.Bar(x = list(data.index), y = data["G%"], name = "Global"), row = 1, col = 1)
+    # fig.add_trace(go.Bar(x = list(data.index), y = data["E%"], name = "Exon"), row = 2, col = 1)
+    # fig.add_trace(go.Bar(x = list(data.index), y = data["I%"], name = "Intron"), row = 3, col = 1)
+
+    if shaded:
+        if kmer > 1:
+            sections = (4**kmer)/4
+            fig.add_vrect(x0 =            - 0.5, x1 =   sections - 0.5, col = "all", fillcolor = "red",    opacity = 0.25, annotation_text = "A")
+            fig.add_vrect(x0 =   sections - 0.5, x1 = 2*sections - 0.5, col = "all", fillcolor = "green",  opacity = 0.25, annotation_text = "C")
+            fig.add_vrect(x0 = 2*sections - 0.5, x1 = 3*sections - 0.5, col = "all", fillcolor = "blue",   opacity = 0.25, annotation_text = "G")
+            fig.add_vrect(x0 = 3*sections - 0.5, x1 = 4*sections - 0.5, col = "all", fillcolor = "yellow", opacity = 0.25, annotation_text = "T")
+
+    if title is None:
+        title = f"Occurences of {kmer}-Mer window Sequences <br> Subtracted by a mean of {average}"
+    else:
+        title = f"{title}<br>Occurences of {kmer}-Mer window Sequences <br> Subtracted by a mean of {average}"
+    fig.update_layout(barmode = "overlay", title = title)
+    fig.update_traces(opacity = 0.9)
+    fig.update_xaxes(showticklabels = labels)
+    fig.show()
+    if output_file is not None:
+        fig.write_html(str(output_file))
+
 
 
 if __name__ in "__main__":

@@ -27,7 +27,7 @@ def main():
     You'll have to also do the exons and introns seperatly, but we want to see how the trajectory can "jump" from exon to intron: maybe there is something of interest there?
     '''
 
-    time_embedding_v2(pathlib.Path("G:\Data_Set_1.pkl"))
+    time_embedding_v2(pathlib.Path("G:\Gene_Data_Sets\Data_Set_1_histogram.pkl"), output_file = "Santiy_biggerPoint", n = 10_000)
 
 
 def score_keys(k = 9, nucsequence: str = "AGTC"):
@@ -437,14 +437,18 @@ def scoring(N: list):
 
 
 def time_embedding_v2(data: pandas.DataFrame, 
+                      n: int,
                       k_p: int = 6, k_m: int = 6, gap: int = 0, 
                       backwards: bool = True, 
                       nucsequence: str = "AGTC", PyPu: bool = False,
                       sequence_name: str = "Seq",
-                      classification_name: str = "Classificaion"):
+                      classification_name: str = "Classificaion",
+                      output_file: str = None):
     '''
     The new way of doing things with the updated data. You can put a pathlib in place of a Dataframe which then opens that file, but that data better be a Dataframe. I'm not going to code
     other ways of handeling that data. It's a Dataframe. Deal with it. WE'RE DEALING WITH THINGS TED!
+
+    n represents the number of samples to be taken. I can't use all of them because some datasets have as much as 150,000, which basically freezes matplotlib.
 
     The classification & sequence name is because I've done this a few different times with different data standards... and I probably screwed myself for that. But now I get to try to salvage that...
     And yes, that says Classificaion, because I misspelled something.
@@ -453,6 +457,18 @@ def time_embedding_v2(data: pandas.DataFrame,
     if isinstance(data, pathlib.Path):
         with open(data, "rb") as p:
             data = pickle.load(p)
+
+    try:
+        data = data.sample(n = n).reset_index()
+    except ValueError as e:
+        data = data.reset_index()
+    except Exception as e:
+        print(type(e))
+        print(e)
+        print(data.shape)
+        print(n)
+        exit()
+
 
     print(data.columns)
 
@@ -486,6 +502,7 @@ def time_embedding_v2(data: pandas.DataFrame,
             print(type(e))
             print(e)
             print(row)
+            continue
             exit()
 
         region = data.loc[row, classification_name]
@@ -506,7 +523,7 @@ def time_embedding_v2(data: pandas.DataFrame,
         b_count += 1
 
         if ((row % 1000) == 0):
-            print(f"Finished row {row} or {rows}")
+            print(f"Finished row {row} of {rows}")
 
 
     # Both Plot
@@ -516,8 +533,8 @@ def time_embedding_v2(data: pandas.DataFrame,
     #     ax.scatter(points[:, 0], points[:, 1], s = 0.1)
 
     # b_title = f"Exons and Introns, Time Embedding w/ {gap}-mer Gap between + and -\n{e_count + i_count} Total Regions - Unknown number of genes are represented"
-    e_title = f"Exons, Time Embedding w/ {gap}-mer Gap\n{e_count} Total Regions: weights are forwards and backwards"
-    i_title = f"Introns, Time Embedding w/ {gap}-mer Gap\n{i_count} Total Regions: weights are forwards and backwards"
+    e_title = f"Exons, Time Embedding w/ {gap}-mer Gap\n{e_count} Total Regions"
+    i_title = f"Introns, Time Embedding w/ {gap}-mer Gap\n{i_count} Total Regions"
 
     if backwards:
         weights = ": weights are forwards and backwards"
@@ -552,7 +569,7 @@ def time_embedding_v2(data: pandas.DataFrame,
     fig.set_size_inches(20, 20)
     for points in e_frame.values():
         ax.scatter(points[:, 0], points[:, 1], s = 0.1)
-    exon_file = str(exon_dir / f"exon_gap_{gap}_{k_m}v{k_p}_Back_{backwards}{file_NS}.png")
+    exon_file = str(exon_dir / f"{output_file}_exon_gap_{gap}_{k_m}v{k_p}_Back_{backwards}{file_NS}.png")
     plt.title(e_title)
     plt.xlabel(x_title)
     plt.ylabel(y_title)
@@ -565,7 +582,7 @@ def time_embedding_v2(data: pandas.DataFrame,
     fig.set_size_inches(20, 20)
     for points in i_frame.values():
         ax.scatter(points[:, 0], points[:, 1], s = 0.1)
-    intron_file = str(intron_dir / f"intron_gap_{gap}_{k_m}v{k_p}_Back_{backwards}{file_NS}.png")
+    intron_file = str(intron_dir / f"{output_file}_intron_gap_{gap}_{k_m}v{k_p}_Back_{backwards}{file_NS}.png")
     plt.title(i_title)
     plt.xlabel(x_title)
     plt.ylabel(y_title)
