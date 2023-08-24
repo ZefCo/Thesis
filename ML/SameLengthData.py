@@ -7,6 +7,12 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import itertools
 
+
+def main():
+    '''
+    '''
+    histogram()
+
 def sameLength(threshold: float = 0.15):
     '''
     '''
@@ -73,27 +79,27 @@ def sameLength(threshold: float = 0.15):
     new_data.to_pickle(cwd / "TrainingData_SameSize_11.pkl")
 
 
-def histogram():
+def histogram(data_file: pathlib.Path, min_length: int = 100, max_length: int = 10_000, classification_col: str = "Type"):
     '''
     '''
-    data = cwd / "TrainingGeneData_v5.pkl"
+    # data = cwd / "TrainingGeneData_v5.pkl"
     new_data = pandas.DataFrame()
 
-    data: pandas.DataFrame = pandas.read_pickle(data)
+    data: pandas.DataFrame = pandas.read_pickle(data_file)
 
 
     data["Length"] = data["Seq"].str.len()
     # print(data)
     # data = data[data["Length"] > 100]
 
-    data = data[(data["Length"] >= 100) & (data["Length"] <= 10_000)]
+    data = data[(data["Length"] >= min_length) & (data["Length"] <= max_length)]
 
 
     # data.to_pickle(cwd / "TrainingData_SameSize_His.pkl")
 
-    exon_subset = data[data["Type"] == "Exon"]
+    exon_subset = data[(data[classification_col] == "Exon") | (data[classification_col] == "exon") | (data[classification_col] == "e")]
     exon_subset = exon_subset.reset_index(drop = True)
-    intron_subset = data[data["Type"] == "Intron"]
+    intron_subset = data[(data[classification_col] == "Intron") | (data[classification_col] == "intron") | (data[classification_col] == "i")]
     intron_subset = intron_subset.reset_index(drop = True)
     # print(intron_subset)
 
@@ -126,5 +132,4 @@ def histogram():
 
 
 if __name__ in "__main__":
-    # sameLength()
-    histogram()
+    main()
