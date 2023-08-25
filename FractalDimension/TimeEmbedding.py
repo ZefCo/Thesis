@@ -27,7 +27,40 @@ def main():
     You'll have to also do the exons and introns seperatly, but we want to see how the trajectory can "jump" from exon to intron: maybe there is something of interest there?
     '''
 
-    time_embedding_v2(pathlib.Path("G:\Gene_Data_Sets\Data_Set_1_histogram.pkl"), output_file = "Santiy_biggerPoint", n = 10_000)
+    # time_embedding_v2(pathlib.Path("G:\Gene_Data_Sets\Data_Set_1_histogram.pkl"), output_file = "Santiy_biggerPoint", n = 10_000)
+
+    back_forward_trajectories(cwd / "2mer_occ.csv", cwd / "2mer_occ_wScores.csv")
+
+
+def back_forward_trajectories(occ_data: pandas.DataFrame, output_file: pathlib.Path, kmer: int = 2):
+    '''
+    '''
+    w_p = [(0.25)**n for n in range(1, kmer + 1)]
+    w_m = [(0.25)**n for n in range(1, kmer + 1)]
+    w_m.reverse()
+
+    forwards, backwards = [], []
+
+    x_ave = (0.25**kmer)*100
+
+    if isinstance(occ_data, pathlib.Path) or isinstance(occ_data, str):
+        occ_data = pandas.read_csv(occ_data, header = 0, index_col = "Seq")
+    
+    occ_data["Occ"] = (occ_data["Occ"]*100) + x_ave
+
+    seq_mer = tuple(occ_data.index)
+
+    for seq in seq_mer:
+        digital_seq = [0 if n in "A" else 1 if n in "G" else 2 if n in "T" else 3 for n in seq]
+        forwards.append(np.dot(digital_seq, w_p))
+        backwards.append(np.dot(digital_seq, w_m))
+
+    occ_data["Foward"] = forwards
+    occ_data["Backward"] = backwards
+
+    print(occ_data["Occ"].sum())
+
+    occ_data.to_csv(output_file)
 
 
 def score_keys(k = 9, nucsequence: str = "AGTC"):
