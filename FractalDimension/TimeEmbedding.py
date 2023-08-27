@@ -26,10 +26,19 @@ def main():
     Time embedding v3: make one that goes through a gene (all its different forms) and plots the trajectory of the k windows. Does something happen for the introns and the exons?
     You'll have to also do the exons and introns seperatly, but we want to see how the trajectory can "jump" from exon to intron: maybe there is something of interest there?
     '''
+    x_lim = [0, 0.25]
+    y_lim = [0.25, 0.5]
+    s = 1
+    data_set = 2
 
-    # time_embedding_v2(pathlib.Path("G:\Gene_Data_Sets\Data_Set_1_histogram.pkl"), output_file = "Santiy_biggerPoint", n = 10_000)
+    time_embedding_v2(pathlib.Path(f"G:\Gene_Data_Sets\Data_Set_{data_set}_histogram.pkl"), 
+                      output_file = f"BF_DS{data_set}_zoom", 
+                      n = 10_000, 
+                      backwards = True, 
+                      x_lim = x_lim, y_lim = y_lim, 
+                      dot_size = s)
 
-    back_forward_trajectories(cwd / "2mer_occ.csv", cwd / "2mer_occ_wScores.csv")
+    # back_forward_trajectories(cwd / "2mer_occ.csv", cwd / "2mer_occ_wScores.csv")
 
 
 def back_forward_trajectories(occ_data: pandas.DataFrame, output_file: pathlib.Path, kmer: int = 2):
@@ -476,7 +485,10 @@ def time_embedding_v2(data: pandas.DataFrame,
                       nucsequence: str = "AGTC", PyPu: bool = False,
                       sequence_name: str = "Seq",
                       classification_name: str = "Classificaion",
-                      output_file: str = None):
+                      output_file: str = None,
+                      x_lim: list = None,
+                      y_lim: list = None,
+                      dot_size: float = 0.1):
     '''
     The new way of doing things with the updated data. You can put a pathlib in place of a Dataframe which then opens that file, but that data better be a Dataframe. I'm not going to code
     other ways of handeling that data. It's a Dataframe. Deal with it. WE'RE DEALING WITH THINGS TED!
@@ -601,11 +613,18 @@ def time_embedding_v2(data: pandas.DataFrame,
     fig, ax = plt.subplots()
     fig.set_size_inches(20, 20)
     for points in e_frame.values():
-        ax.scatter(points[:, 0], points[:, 1], s = 0.1)
-    exon_file = str(exon_dir / f"{output_file}_exon_gap_{gap}_{k_m}v{k_p}_Back_{backwards}{file_NS}.png")
+        ax.scatter(points[:, 0], points[:, 1], s = dot_size)
     plt.title(e_title)
     plt.xlabel(x_title)
     plt.ylabel(y_title)
+    e_file_name: str = f"{output_file}_exon_gap_{gap}_{k_m}v{k_p}_Back_{backwards}{file_NS}"
+    if isinstance(x_lim, list):
+        plt.xlim(x_lim[0], x_lim[1])
+        e_file_name = f"{e_file_name}_x_{x_lim[0]}v{x_lim[1]}"
+    if isinstance(y_lim, list):
+        plt.ylim(y_lim[0], y_lim[1])
+        e_file_name = f"{e_file_name}_y_{y_lim[0]}v{y_lim[1]}"
+    exon_file = str(exon_dir / f"{e_file_name}.png")
     plt.savefig(exon_file)
     print(f"Output image to {exon_file}")
     plt.close()
@@ -614,11 +633,18 @@ def time_embedding_v2(data: pandas.DataFrame,
     fig, ax = plt.subplots()
     fig.set_size_inches(20, 20)
     for points in i_frame.values():
-        ax.scatter(points[:, 0], points[:, 1], s = 0.1)
-    intron_file = str(intron_dir / f"{output_file}_intron_gap_{gap}_{k_m}v{k_p}_Back_{backwards}{file_NS}.png")
+        ax.scatter(points[:, 0], points[:, 1], s = dot_size)
     plt.title(i_title)
     plt.xlabel(x_title)
     plt.ylabel(y_title)
+    i_file_name: str = f"{output_file}_intron_gap_{gap}_{k_m}v{k_p}_Back_{backwards}{file_NS}"
+    if isinstance(x_lim, list):
+        plt.xlim(x_lim[0], x_lim[1])
+        i_file_name = f"{i_file_name}_x_{x_lim[0]}v{x_lim[1]}"
+    if isinstance(y_lim, list):
+        plt.ylim(y_lim[0], y_lim[1])
+        i_file_name = f"{i_file_name}_y_{y_lim[0]}v{y_lim[1]}"
+    intron_file = str(intron_dir / f"{i_file_name}.png")
     plt.savefig(intron_file)
     print(f"Output image to {intron_file}")
     plt.close()

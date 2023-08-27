@@ -18,21 +18,34 @@ def main():
     '''
 
     kmer = 6
-    generator(f"/media/ethanspeakman/Elements/Gene_Data_Sets/Data_Set_2_histogram.pkl", kmer, ex_col = "exon", int_col="intron", classification_col = "Classificaion")
+    min_length = 40
+    method = "KTA"
+    data_set = 2
+    ex_col: str = "exon"
+    int_col: str = "intron"
+    classification_col: str = "Classificaion"
+    gene_name_col: str = "NCIBName"
+
+    generator(f"G:/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl", kmer, target_dir = f"G:/Gene_Data_Sets/Data_Set_{data_set}_histogram_{kmer}mer_{method}", ex_col = ex_col, int_col = int_col, classification_col = classification_col, method = method, min_length = min_length, gene_name_col = gene_name_col)
 
 
-def generator(data_file: pathlib.Path, kmer: int, 
+def generator(data_file: pathlib.Path, kmer: int,
+              target_dir: pathlib.Path,
               method: str = "CGR",
               min_length: int = 100, 
-              ex_col: str = "Exon", int_col: str = "Intron", classification_col: str = "Type", gene_name_col: str = "NCIBName",
               *args, **kwargs):
     '''
     This function calls the other functions to generate the Fractals.
 
     data_file should be a pickled dataframe. I could make a csv option, but I wont.
     '''
+    if isinstance(data_file, str):
+        data_file = pathlib.Path(data_file)
+    if isinstance(target_dir, str):
+        target_dir = pathlib.Path(target_dir)
+
     try:
-        train_data: pandas.DataFrame = pandas.read_pickle(cwd / data_file)
+        train_data: pandas.DataFrame = pandas.read_pickle(data_file)
     except Exception as e:
         print(f"Unable to open file {data_file}\nError Type: {type(e)}\nError {e}\nAre you sure it's a file?")
         exit()
@@ -41,26 +54,22 @@ def generator(data_file: pathlib.Path, kmer: int,
     train_data = train_data.iloc[keep, :]
     train_data = train_data.reset_index()
 
-    rows, cols = train_data.shape
-
-    exon = 0
-    intron = 0
-
-    new_folder: pathlib.Path = pathlib.Path( cwd / str(os.path.splitext(data_file)[0] + f"_{kmer}mer"))
-    print(f"Writing training images to {new_folder}")
+    print(f"Writing training images to {target_dir}")
     try:
-        new_folder.mkdir(parents = True, exist_ok = False)
+        target_dir.mkdir(parents = True, exist_ok = False)
     except FileExistsError as e:
         print("Data Already exists: continuing will delete that data and start over.")
         response: str = input("Do you wish to continue? [y/n] ")
 
         if response in "y":
             print("Deleting files")
-            shutil.rmtree(new_folder)
+            shutil.rmtree(target_dir)
             # exit()
-            new_folder.mkdir(parents = True, exist_ok = False)
+            target_dir.mkdir(parents = True, exist_ok = False)
+            print("Files Deleted, resuming script")
         else:
             print("Exiting script")
+            exit()
 
     except Exception as e:
         print(f"New Exception")
@@ -68,54 +77,27 @@ def generator(data_file: pathlib.Path, kmer: int,
         print(f"Error: {e}")
         exit()
 
-    exon_images: pathlib.Path = new_folder / "EXON"
-    intron_images: pathlib.Path = new_folder / "INTRON"
+    exon_images: pathlib.Path = target_dir / "EXON"
+    intron_images: pathlib.Path = target_dir / "INTRON"
     exon_images.mkdir(parents = True, exist_ok = True)
     intron_images.mkdir(parents = True, exist_ok = True)
-    meta_data = new_folder / f"Meta_Data.txt"
-
+    meta_data = target_dir / f"Meta_Data.txt"
+    kwargs["meta_data"] = meta_data
 
     if method in "CGR":
-        fractal_method = chaos_game_representation
         kwargs["k"] = kmer
+        kwargs["target_dir"] = target_dir
+        # print(kwargs)
+        cgr_generator(train_data, *args, **kwargs)
     elif method in "KTA":
-        print("Unable to handle time embedding yet, exiting")
-        exit()
+        # print("Unable to handle time embedding yet, exiting")
+        # exit()
         # It's going to take a bit more work. Time Embedding returns a xy vector that needs to be turned into a picture.
-        fractal_method = time_embedding_v3
         kwargs["k_p"], kwargs["k_m"] = kmer, kmer
+        kwargs["target_dir"] = target_dir
+        # print(kwargs)
+        kta_generator(train_data, *args, **kwargs)
 
-    for row in range(rows):
-        seq = train_data.loc[row, "Seq"]
-        typ = train_data.loc[row, classification_col]
-        gene_name = train_data.loc[row, gene_name_col]
-        length = len(seq)
-
-        cgr = fractal_method(seq, **kwargs)
-
-        if typ in int_col:
-            filepath = intron_images / f"Intron_{intron}.png"
-            try:
-                plt.imsave(filepath, cgr, cmap = "gray")
-                intron += 1
-                with open(meta_data, "at") as mf:
-                    mf.write(f"{filepath.name}\t{gene_name}\tExon {intron}\tLength = {length}\n")
-
-            except Exception as e:
-                print(type(e))
-                print(e)
-
-        elif typ in ex_col:
-            filepath = exon_images / f"Exon_{exon}.png"
-            try:
-                plt.imsave(filepath, cgr, cmap = "gray")
-                exon += 1
-                with open(meta_data, "at") as mf:
-                    mf.write(f"{filepath.name}\t{gene_name}\tExon {intron}\tLength = {length}\n")
-
-            except Exception as e:
-                print(type(e))
-                print(e)
 
 
 
@@ -170,7 +152,109 @@ def nucleotide_counter(sequence: str, window_size: int):
 
     return counter
 
+def kta_generator(train_data: pandas.DataFrame,
+                  target_dir: pathlib.Path = None,
+                  int_col: str = None, ex_col: str = None,
+                  classification_col: str = None, gene_name_col: str = None,
+                  *args, **kwargs):
+    '''
+    for when the method == KTA
+    '''
+    exon, intron = 0, 0
+    exon_images = target_dir / "EXON"
+    intron_images = target_dir / "INTRON"
+
+    meta_data = target_dir / f"Meta_Data.txt"
+
+    rows, cols = train_data.shape
     
+    for row in range(rows):
+        seq = train_data.loc[row, "Seq"]
+        typ = train_data.loc[row, classification_col]
+        gene_name = train_data.loc[row, gene_name_col]
+        length = len(seq)
+
+        xy = time_embedding(seq, gap = 0, *args, **kwargs)
+        fig = plt.figure()
+        ax = fig.add_subplot()
+        ax.set_axis_off()
+        plt.scatter(xy[:, 0], xy[:, 1], color = "black", s = 0.5)
+        
+        if typ in int_col:
+            filepath = intron_images / f"Intron_{intron}.png"
+            intron += 1
+            try:
+                plt.savefig(filepath)
+                plt.close()
+                with open(meta_data, "at") as mf:
+                    mf.write(f"{filepath.name}\t{gene_name}\Intron {intron}\tLength = {length}\n")
+
+            except Exception as e:
+                print(type(e))
+                print(e)
+
+        if typ in ex_col:
+            filepath = exon_images / f"Exon_{exon}.png"
+            exon += 1
+            try:
+                plt.savefig(filepath)
+                plt.close()
+                with open(meta_data, "at") as mf:
+                    mf.write(f"{filepath.name}\t{gene_name}\tExon {intron}\tLength = {length}\n")
+
+            except Exception as e:
+                print(type(e))
+                print(e)
+
+
+    
+def cgr_generator(train_data: pandas.DataFrame, 
+                  classification_col: str = None, gene_name_col: str = None, 
+                  int_col: str = None, ex_col: str = None, 
+                  target_dir: pathlib.Path = None,
+                  meta_data: pathlib.Path = None, 
+                  *args, **kwargs):
+    '''
+    For when the method == CGR
+    '''
+    rows, cols = train_data.shape
+    exon, intron = 0, 0
+    intron_images = target_dir / "INTRON"
+    exon_images = target_dir / "EXON"
+
+    for row in range(rows):
+        seq = train_data.loc[row, "Seq"]
+        typ = train_data.loc[row, classification_col]
+        gene_name = train_data.loc[row, gene_name_col]
+        length = len(seq)
+
+        cgr = chaos_game_representation(seq, **kwargs)
+
+        if typ in int_col:
+            filepath = intron_images / f"Intron_{intron}.png"
+            try:
+                plt.imsave(filepath, cgr, cmap = "gray")
+                intron += 1
+                with open(meta_data, "at") as mf:
+                    mf.write(f"{filepath.name}\t{gene_name}\Intron {intron}\tLength = {length}\n")
+
+            except Exception as e:
+                print(type(e))
+                print(e)
+
+        elif typ in ex_col:
+            filepath = exon_images / f"Exon_{exon}.png"
+            try:
+                plt.imsave(filepath, cgr, cmap = "gray")
+                exon += 1
+                with open(meta_data, "at") as mf:
+                    mf.write(f"{filepath.name}\t{gene_name}\tExon {intron}\tLength = {length}\n")
+
+            except Exception as e:
+                print(type(e))
+                print(e)
+
+    # print(filepath)
 
 
 
@@ -270,7 +354,7 @@ def generate_trajectories(data_file: pathlib.Path, choices: int = 5000, kp: int 
                         if length > max_len:
                             max_len = length
 
-                        xy = time_embedding_v3(exon, kp, km, 0)
+                        xy = time_embedding(exon, kp, km, 0)
                         # print(xy)
                         # exit()
                         filepath = exon_dir / f"Exon_{exon_count}.png"
@@ -295,7 +379,7 @@ def generate_trajectories(data_file: pathlib.Path, choices: int = 5000, kp: int 
 
                     if (max_len >= length) and (length >= min_len):
 
-                        xy = time_embedding_v3(intron, kp, km, 0)
+                        xy = time_embedding(intron, kp, km, 0)
                         filepath = intron_dir / f"Intron_{intron_count}.png"
                         # plt.imshow(xy, cmap = "gray")
                         plt.scatter(xy[:, 0], xy[:, 1], color = "black")
@@ -310,61 +394,50 @@ def generate_trajectories(data_file: pathlib.Path, choices: int = 5000, kp: int 
                             mf.write(f"{filepath.name}\t{choice}\tIntron {local_intron}\tLength = {length}\n")
 
 
-def gene_trajectory(sequence: str, k_p = 9, k_m = 9, *args, **kwargs):
-    '''
-    Does the time embedding image one at a time.
-    '''
 
 
-
-def time_embedding_v3(sequence: str, k_p = 9, k_m = 9, gap = 0, backwards = True, compliment = False, *args, **kwargs):
+def time_embedding(sequence: str, 
+                      k_p: int = 6, k_m: int = 6, gap: int = 0, 
+                      m_backwards: bool = True, p_backwards: bool = False, 
+                      nucsequence: str = "AGTC",
+                      *args, **kwargs):
     '''
     Feeds in a sequence, and it finds the xy coordinates for that sequence.
 
-    This is out of date. Do not use
+    The nucleotide to number order can be altered. By default it is A = 0, G = 1, T = 2, C = 3. To alter it just feed in a new str with your prefered order. The first index is 0, the next
+    index is 1, and so on.
+
+    There is an option for the compliment strand: probably should never be used.
     '''
+    sequence = sequence.upper()
+    nucsequence = nucsequence.upper() # Just in case someone puts in a different order and forgets to capitalize everything
     seq_length = len(sequence)
 
-    if seq_length < (k_m + k_p + gap):
+    if seq_length < (k_m + k_p + abs(gap)):  # I'm making this an |gap| becuase I don't want to think about how it should be done if g < 0. It has to be a certain length, and that length needs to be long.
         print("Cannont find Trajectory for this gene: to small")
         return None
 
     w_p = [(0.25)**n for n in range(1, k_p + 1)]
     w_m = [(0.25)**n for n in range(1, k_m + 1)]
 
-    if backwards:
+    if m_backwards:
         w_m.reverse()
-
-    # b_frame, e_frame, i_frame = [], [], []
-    # e_count, i_count = 0, 0
-
-    sequence = sequence.upper()
-
+    if p_backwards:
+        w_p.reverse()
 
     xy = np.zeros(shape=(seq_length - (k_p + k_m + gap), 2))
 
     k_minus = [sequence[k_prime:k_prime + k_m] for k_prime in range(0, seq_length - (k_p + k_m + gap))]
     k_plus = [sequence[k_prime:k_prime + k_p] for k_prime in range(gap + k_m, seq_length - k_p)]
 
-    if compliment:
-        for i, k_prime in enumerate(k_minus):
-            n = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in k_prime]
-            k_x = np.dot(w_m, n)
+    for i, k_prime in enumerate(k_minus):
+        n = [0 if n in nucsequence[0] else 1 if n in nucsequence[1] else 2 if n in nucsequence[2] else 3 if n in nucsequence[3] else 100 for n in k_prime]
+        k_x = np.dot(w_m, n)
 
-            n = [3 if n in "A" else 2 if n in "C" else 1 if n in "G" else 0 if n in "T" else 100 for n in k_plus[i]]
-            k_y = np.dot(w_p, n)
+        n = [0 if n in nucsequence[0] else 1 if n in nucsequence[1] else 2 if n in nucsequence[2] else 3 if n in nucsequence[3] else 100 for n in k_plus[i]]
+        k_y = np.dot(w_p, n)
 
-            xy[i][0], xy[i][1] = k_x, k_y
-
-    else:
-        for i, k_prime in enumerate(k_minus):
-            n = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in k_prime]
-            k_x = np.dot(w_m, n)
-
-            n = [0 if n in "A" else 1 if n in "C" else 2 if n in "G" else 3 if n in "T" else 100 for n in k_plus[i]]
-            k_y = np.dot(w_p, n)
-
-            xy[i][0], xy[i][1] = k_x, k_y
+        xy[i][0], xy[i][1] = k_x, k_y
 
     return xy
 
