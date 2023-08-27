@@ -28,10 +28,11 @@ def main():
     # History_1D()
     # History_F()
     SelectedHistory(SLSGHis = cwd / "FractalModels" / "IvE" / "version_slurm_47",
-                    mer9_v1 = cwd / "FractalModels" / "IvE" / "version_slurm_50",
-                    mer8_v1 = cwd / "FractalModels" / "IvE" / "version_slurm_51",
-                    mer8_v2 = cwd / "FractalModels" / "IvE" / "version_slurm_52",
-                    mer9_v2 = cwd / "FractalModels" / "IvE" / "version_slurm_55",
+                    DS1 = cwd / "FractalModels" / "IvE" / "version_slurm_22",
+                    # mer9_v1 = cwd / "FractalModels" / "IvE" / "version_slurm_50",
+                    # mer8_v1 = cwd / "FractalModels" / "IvE" / "version_slurm_51",
+                    # mer8_v2 = cwd / "FractalModels" / "IvE" / "version_slurm_52",
+                    # mer9_v2 = cwd / "FractalModels" / "IvE" / "version_slurm_55",
                     line_of_best_epochs = epochs)
 
 
