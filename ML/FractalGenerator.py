@@ -4,6 +4,7 @@ cwd = pathlib.Path.cwd()
 import pandas
 import itertools
 import os
+import matplotlib
 import matplotlib.pyplot as plt
 from PIL import Image
 import pickle
@@ -20,7 +21,7 @@ def main():
     kmer = 6
     min_length = 40
     method = "KTA"
-    data_set = 2
+    data_set = 1
     ex_col: str = "exon"
     int_col: str = "intron"
     classification_col: str = "Classificaion"
@@ -93,6 +94,7 @@ def generator(data_file: pathlib.Path, kmer: int,
         # print("Unable to handle time embedding yet, exiting")
         # exit()
         # It's going to take a bit more work. Time Embedding returns a xy vector that needs to be turned into a picture.
+        matplotlib.rc('figure', figsize=(1, 1), dpi = np.sqrt(4**kmer))
         kwargs["k_p"], kwargs["k_m"] = kmer, kmer
         kwargs["target_dir"] = target_dir
         # print(kwargs)
@@ -160,6 +162,7 @@ def kta_generator(train_data: pandas.DataFrame,
     '''
     for when the method == KTA
     '''
+
     exon, intron = 0, 0
     exon_images = target_dir / "EXON"
     intron_images = target_dir / "INTRON"
@@ -178,7 +181,7 @@ def kta_generator(train_data: pandas.DataFrame,
         fig = plt.figure()
         ax = fig.add_subplot()
         ax.set_axis_off()
-        plt.scatter(xy[:, 0], xy[:, 1], color = "black", s = 0.5)
+        plt.scatter(xy[:, 0], xy[:, 1], color = "black", s = 0.01)
         
         if typ in int_col:
             filepath = intron_images / f"Intron_{intron}.png"
@@ -205,7 +208,6 @@ def kta_generator(train_data: pandas.DataFrame,
             except Exception as e:
                 print(type(e))
                 print(e)
-
 
     
 def cgr_generator(train_data: pandas.DataFrame, 

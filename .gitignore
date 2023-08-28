@@ -40,6 +40,7 @@ Thesis.Rproj
 /FractalDimension/GenePerChrome_KTA
 /FractalDimension/Distance_Dict_KTA
 /DataCollection/*.txt
+/ML/Data_Set_1_histogram_6mer_KTA
 
 !/ML/FractalModels/IvE/version_school_linux_*/*
 !/ML/FractalModels/IvE/version_home_windows_*/*
