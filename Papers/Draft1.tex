@@ -8,7 +8,7 @@
 
 \usepackage[utf8]{inputenc}
 
-\title{Machine Learning with a Fractal Genome: working title}
+\title{Machine Learning with a Fractal Genome: change title}
 
 \author{Ethan Speakman}
 
@@ -19,6 +19,8 @@
 \maketitle
 
 \section{Motivation \& Introduction}
+\paragraph*{}
+New first paragraph telling of DNA -> RNA -> Proteins
 \paragraph*{}
 The Spliceosome has one of the most important functions of the genome: the removal of introns from exons. 
 This critical step takes pre-mRNA and assembles exons for translation into proteins. 
@@ -32,13 +34,24 @@ In fact, any gene that has more then 2 exons can be alternatively expressed.
 This means that the Spliceosome needs not only to properly identify introns for removal, it also must identify which exons are to be skipped if any.
 There are many factors that play into this, such as RNA Secondary Structures and splice site identification, but the precise combination of those factors is not yet fully understood.
 \paragraph*{}
-For this reason a high fidelity of precise intron and exon identification is required for the Spliceosome to properly excise the introns: failure to do so can have pathological consquences.
-
-And yet errors happens rarely: Duchenne muscular dystrophy, a genetic disease caused by the deletion and skipping of exons for example, effects less then 10 in every 100,000 males, and less then 1 per million in females.
-\section{The Role of the Spliceosome}
+For this reason a high fidelity of precise intron and exon identification is required for the Spliceosome to properly excise the introns: failure to do so can have pathological consquences. Aberations in alternative splicing can result in tumerogenesis\cite{zhang2021alternative}, and several genetic diseases have been shown to be the result of erroneous alternative splicing\cite{scotti2016rna}.
+And yet errors happens rarely: Duchenne muscular dystrophy, a genetic disease caused by the deletion and skipping of exons for example, effects less then 10 in every 100,000 males, and less then 1 per million in females\cite{duan2021duchenne}.
+According to the CDC, 403 per 100,000 occure every year, while 144 per 100,000 die of cancer every year.
+This is a large number. However considering that the human body has on the order of magnitude $10^{12}$ cells, with many of these translating genes into proteins, which takes on the order of minutes, the sheer volume of operations and their fidelity is astounding.
 \paragraph*{}
+For this reason we use machine learning techniques to look for possible structural differences of exons and introns.
+The Spliceosome is able to identify them regularly and with high accuracy, but the exact nature of how it does so is still not fully understood: it has to be adaptable to changes in regulation that can quickly happen.\cite{wahl2009spliceosome}\cite{will2011spliceosome}.
+Given the length of genes and their constiuent parts looking for patterns lends itself well to a machine learning approach.
+We use Tensorflow to build a 1 Dimensional and 2 Dimensional Convolution Nueral Network (CNN) to identify and predict exons and introns.
+The results show that a 2D model preformed better then our attempts at a 1D model.
 \section{Background}
+\paragraph*{Statistics of Genes}
+\paragraph*{The Role of the Spliceosome}
+
 \section{Models}
+\paragraph*{Use of Tensorflow}
+\paragraph*{Numerical Representation of RNA}
+
 \paragraph*{1D Time Analysis}
 \paragraph*{Chaos Game Representation}
 
