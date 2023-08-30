@@ -26,17 +26,25 @@ def main():
     Time embedding v3: make one that goes through a gene (all its different forms) and plots the trajectory of the k windows. Does something happen for the introns and the exons?
     You'll have to also do the exons and introns seperatly, but we want to see how the trajectory can "jump" from exon to intron: maybe there is something of interest there?
     '''
-    x_lim = [0, 0.25]
-    y_lim = [0.25, 0.5]
-    s = 1
+    # x_lim = [0, 0.25]
+    # y_lim = [0.25, 0.5]
+    x_lim = None
+    y_lim = None
+
+    # s = 1
+    s = 0.1
     data_set = 2
+    box1 = [[0, 0], 0.25, 0.25, "red"]
+    box2 = [[0.5, 0.5], 0.1, 0.1, "red"]
+    boxes = [box1, box2]
 
     time_embedding_v2(pathlib.Path(f"G:\Gene_Data_Sets\Data_Set_{data_set}_histogram.pkl"), 
                       output_file = f"BF_DS{data_set}_zoom", 
                       n = 10_000, 
                       backwards = True, 
                       x_lim = x_lim, y_lim = y_lim, 
-                      dot_size = s)
+                      dot_size = s,
+                      boxes = boxes)
 
     # back_forward_trajectories(cwd / "2mer_occ.csv", cwd / "2mer_occ_wScores.csv")
 
@@ -488,7 +496,8 @@ def time_embedding_v2(data: pandas.DataFrame,
                       output_file: str = None,
                       x_lim: list = None,
                       y_lim: list = None,
-                      dot_size: float = 0.1):
+                      dot_size: float = 0.1,
+                      boxes: list = None):
     '''
     The new way of doing things with the updated data. You can put a pathlib in place of a Dataframe which then opens that file, but that data better be a Dataframe. I'm not going to code
     other ways of handeling that data. It's a Dataframe. Deal with it. WE'RE DEALING WITH THINGS TED!
@@ -497,6 +506,8 @@ def time_embedding_v2(data: pandas.DataFrame,
 
     The classification & sequence name is because I've done this a few different times with different data standards... and I probably screwed myself for that. But now I get to try to salvage that...
     And yes, that says Classificaion, because I misspelled something.
+
+    Boxes allows you to draw on the plot. Boxes is a list of lists, and every sublist has an anchor point, a height, and a width. The anchor point itself should be a tuple. So it's boxes = [[[x0, y0], h0, w0, color0], [[x1, y1], h1, w1, color1], ..., [[xn, yn], hn, wn, colorn]]
     '''
 
     if isinstance(data, pathlib.Path):
@@ -556,6 +567,13 @@ def time_embedding_v2(data: pandas.DataFrame,
             xy = time_embedding_PyPu(sequence, k_p = k_p, k_m = k_m, gap = gap, m_backwards = backwards)
         else:
             xy = time_embedding(sequence, k_p = k_p, k_m = k_m, gap = gap, m_backwards = backwards, nucsequence = nucsequence)
+
+        if isinstance(x_lim, list):
+            xy = xy[(x_lim[1] >= xy[:, 0]) & (xy[:, 0] >= x_lim[0])]
+            # xy = np.where((x_lim[1] >= xy[:, 0]) & (xy[:, 0] >= x_lim[0]))  # Filter the number of points down to a zoomed in area. Should help speed up the process of making the actual graph
+        if isinstance(y_lim, list):
+            xy = xy[(y_lim[1] >= xy[:, 1]) & (xy[:, 1] >= y_lim[0])]
+            # xy = np.where((y_lim[1] >= xy[:, 1]) & (xy[:, 1] >= y_lim[0]))
         
         if (region in "Exon") or (region in "exon") or (region in "e"):  # because I realized I was doing this like 3 different ways... I probably should have been more precise.
             e_frame[e_count] = xy
@@ -564,8 +582,8 @@ def time_embedding_v2(data: pandas.DataFrame,
             i_frame[i_count] = xy
             i_count += 1
 
-        b_frame[b_count] = xy
-        b_count += 1
+        # b_frame[b_count] = xy
+        # b_count += 1
 
         if ((row % 1000) == 0):
             print(f"Finished row {row} of {rows}")
@@ -645,6 +663,15 @@ def time_embedding_v2(data: pandas.DataFrame,
         plt.ylim(y_lim[0], y_lim[1])
         i_file_name = f"{i_file_name}_y_{y_lim[0]}v{y_lim[1]}"
     intron_file = str(intron_dir / f"{i_file_name}.png")
+
+    if isinstance(boxes, list):
+        for box in boxes:
+            if isinstance(box[3], str):
+                color = box[3]
+            else:
+                color = None
+            plt.Rectangle(box[0], box[1], box[2], set_fill = False, set_edgecolor = color)
+
     plt.savefig(intron_file)
     print(f"Output image to {intron_file}")
     plt.close()
