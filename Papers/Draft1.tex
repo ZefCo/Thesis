@@ -8,7 +8,7 @@
 
 \usepackage[utf8]{inputenc}
 
-\title{Machine Learning with a Fractal Genome: change title}
+\title{Differentiating Exons and Introns Using Machine Learning}
 
 \author{Ethan Speakman}
 
@@ -20,7 +20,12 @@
 
 \section{Motivation \& Introduction}
 \paragraph*{}
-New first paragraph telling of DNA -> RNA -> Proteins
+Gene expression is the result of several phases; the transcription of DNA into RNA by the Ribosome, modification and mythelation of RNA such as adding the 5' cap, the removal of introns by the Spliceosome, and transportation of the mature mRNA out of the nucleous to be translated into proteins\cite{covelo2018rna}.
+The Ribosome transcribes DNA into RNA by opening a small bubble of DNA and copying each nucleotide one by one.
+All nucleotides of a given gene are copied: this includes the introns as well as the exons.
+Introns are portiions of genes that have no known function: exons are the portions of genes that are translated into protiens.
+The presence of introns allows for segmentation of exons, which in turn allows for alternative ways for a single gene to be expressed.
+These introns are, on averge, an order of magnitude longer then exons, making their proper identification a complex interaction of multiple factors.
 \paragraph*{}
 The Spliceosome has one of the most important functions of the genome: the removal of introns from exons. 
 This critical step takes pre-mRNA and assembles exons for translation into proteins. 
