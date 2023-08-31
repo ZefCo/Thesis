@@ -65,7 +65,7 @@ seed = random.randint(1000000, 9000000)
 
 
 batch_size = 200
-epochs = 100
+epochs = 50
 
 pngs = 0
 for folder in os.listdir(image_dir):
