@@ -18,10 +18,10 @@ def main():
 
     # print(data["NM_001351428.2"])
     # print(data["NM_001351428.2"].full_seq)
-    # stitch_dict("G:/GeneData", "G:/Known_Genes_Master.pkl")
+    stitch_frame("/media/ethanspeakman/Elements/Gene_Data_Sets/Combined/", "/media/ethanspeakman/Elements/Gene_Data_Sets/Combined/Combined_Hist.pkl")
     # select_data("G:/Known_Genes_Master.pkl", "G:/Gene_Data_Sets", n = 40_000)
-    test_dict(pathlib.Path("G:\Gene_Data_Sets\Data_set_1_cleaned_dict.pkl"))
-    test_dict(pathlib.Path("G:\Gene_Data_Sets\Data_set_2_cleaned_dict.pkl"))
+    # test_dict(pathlib.Path("G:\Gene_Data_Sets\Data_set_1_cleaned_dict.pkl"))
+    # test_dict(pathlib.Path("G:\Gene_Data_Sets\Data_set_2_cleaned_dict.pkl"))
 
 
 def test_dict(file_path: pathlib.Path, test_key = None):
@@ -280,6 +280,41 @@ def stitch_dict(directory_path: pathlib.Path, output_file: pathlib.Path):
             x = pickle.load(p)
 
         z = z | x
+
+    print(f"Writing master pikle file to {output_file}")
+    with open(output_file, 'wb') as p:
+        pickle.dump(z, p)
+
+
+
+
+def stitch_frame(directory_path: pathlib.Path, output_file: pathlib.Path):
+    '''
+    '''
+    if not isinstance(directory_path, pathlib.Path):
+        directory_path = pathlib.Path(directory_path)
+    if not isinstance(output_file, pathlib.Path):
+        output_file = pathlib.Path(output_file)
+    
+    print(f"Outputing to {output_file}: first checking if {output_file.parent} exists")
+    output_file.parent.mkdir(parents = True, exist_ok = True)  # makes sure the directory is there
+
+    files = []
+    z = pandas.DataFrame()
+
+    print(f"Finding .pkl files in {directory_path}")
+    for file in os.listdir(directory_path):
+        if file.endswith(".pkl"):
+            files.append(directory_path / file)
+    
+    print(f"Found {len(files)} pikle files, now combining them")
+    for file in files:
+        with open(file, "rb") as p:
+            x = pickle.load(p)
+
+        z = pandas.concat([z, x], ignore_index = True)
+
+    z = z.reset_index()
 
     print(f"Writing master pikle file to {output_file}")
     with open(output_file, 'wb') as p:
