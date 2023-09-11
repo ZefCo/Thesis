@@ -26,32 +26,34 @@ def main():
     Time embedding v3: make one that goes through a gene (all its different forms) and plots the trajectory of the k windows. Does something happen for the introns and the exons?
     You'll have to also do the exons and introns seperatly, but we want to see how the trajectory can "jump" from exon to intron: maybe there is something of interest there?
     '''
-    x_lim = [0, 0.25]
-    y_lim = [0.25, 0.5]
-    # x_lim = None
-    # y_lim = None
+    # x_lim = [0.75, 1.0]
+    # y_lim = [0.25, 0.5]
+    x_lim = None
+    y_lim = None
 
     # s = 1
     s = 0.1
-    data_set = f"1&2"
-    # box1 = [[0.75, 0.25], 0.25, 0.25, "red"]  # major box
-    # box2 = [[0.4375, 0.0], 0.5 - 0.4375, 1.0, "red"]  # forward box
-    # box3 = [[0, 0.8125], 1.0, 0.875 - 0.8125, "red"]  # backward box
-    # boxes = [box1, box2, box3]
+    # data_set = f"1&2"
+    data_set = 1
+    box1 = [[0.75, 0.25], 0.25, 0.25, "red"]  # major box
+    box2 = [[0.4375, 0.0], 0.5 - 0.4375, 1.0, "red"]  # forward box
+    box3 = [[0, 0.8125], 1.0, 0.875 - 0.8125, "red"]  # backward box
+    box4 = [[0, 0.25], 0.25, 0.25, "green"] # comparison box
+    boxes = [box1, box2, box3, box4]
     # boxes = None
     # title = "Still working on placement of boxes"
     title = None
 
-    n = 100_000
+    n = 10_000
 
     time_embedding_v2(pathlib.Path(f"/media/ethanspeakman/Elements/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl"), 
-                      output_file = f"BF_DS{data_set}_zoom_n{n}", 
+                      output_file = f"BF_DS{data_set}_boxed_n{n}", 
                       n = n, 
                       backwards = True, 
                       x_lim = x_lim, y_lim = y_lim, 
                       dot_size = s,
-                    #   ioxes = boxes,
-                    #   eoxes = boxes,
+                      ioxes = boxes,
+                      eoxes = boxes,
                       title = title)
 
     # back_forward_trajectories(cwd / "2mer_occ.csv", cwd / "2mer_occ_wScores.csv")
@@ -606,9 +608,11 @@ def time_embedding_v2(data: pandas.DataFrame,
 
     # b_title = f"Exons and Introns, Time Embedding w/ {gap}-mer Gap between + and -\n{e_count + i_count} Total Regions - Unknown number of genes are represented"
     if isinstance(title, str):
-        title = f"{title}\n"
-    e_title = f"{title}Exons, Time Embedding w/ {gap}-mer Gap\n{e_count} Total Regions"
-    i_title = f"{title}Introns, Time Embedding w/ {gap}-mer Gap\n{i_count} Total Regions"
+        e_title = f"{title}\nExons, Time Embedding w/ {gap}-mer Gap\n{e_count} Total Regions"
+        i_title = f"{title}\nIntrons, Time Embedding w/ {gap}-mer Gap\n{i_count} Total Regions"
+    else:
+        e_title = f"Exons, Time Embedding w/ {gap}-mer Gap\n{e_count} Total Regions"
+        i_title = f"Introns, Time Embedding w/ {gap}-mer Gap\n{i_count} Total Regions"
 
     if backwards:
         weights = ": weights are forwards and backwards"
