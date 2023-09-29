@@ -17,8 +17,8 @@ def main():
     # print_data(kmer)
     # perms = nucleotide_permutations("ACGT", 2)
     # print(perms)
-    # window_distribution(kmer, shaded = False)
-    recreate(str(cwd / "Window_Plots" / f"{kmer}mer_Frame.csv"), kmer, labels = True)
+    window_distribution(kmer, shaded = False)
+    # recreate(str(cwd / "Window_Plots" / f"{kmer}mer_Frame.csv"), kmer, labels = True)
 
 
 def nucleotide_counter(sequence: str, window_size: int):

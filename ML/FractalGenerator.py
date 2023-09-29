@@ -21,7 +21,7 @@ def main():
     kmer = 6
     min_length = 40
     method = "KTA"
-    data_set = 1
+    data_set = 2
     ex_col: str = "exon"
     int_col: str = "intron"
     classification_col: str = "Classificaion"
