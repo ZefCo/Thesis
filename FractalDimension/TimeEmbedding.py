@@ -14,6 +14,7 @@ import pickle
 import itertools
 import matplotlib.pyplot as plt
 import GeneClass as Gene
+import random
 
 def main():
     '''
@@ -26,37 +27,59 @@ def main():
     Time embedding v3: make one that goes through a gene (all its different forms) and plots the trajectory of the k windows. Does something happen for the introns and the exons?
     You'll have to also do the exons and introns seperatly, but we want to see how the trajectory can "jump" from exon to intron: maybe there is something of interest there?
     '''
-    # x_lim = [0.75, 1.0]
-    # y_lim = [0.25, 0.5]
-    x_lim = None
-    y_lim = None
+    test_seq = "GGCGGACCGGGCGTCCCTACCAAT"  # this sequence was created in the iterative Map becuase I'm having trouble understanding what the hell Dr G is purposing with his
+                                           # multiple by 4 and add the y and take the fractional etc. I'm just going to study it using this.
+    
+    xy = time_embedding(test_seq)
 
-    # s = 1
-    s = 0.1
-    # data_set = f"1&2"
-    data_set = 1
-    box1 = [[0.75, 0.25], 0.25, 0.25, "red"]  # major box
-    box2 = [[0.4375, 0.0], 0.5 - 0.4375, 1.0, "red"]  # forward box
-    box3 = [[0, 0.8125], 1.0, 0.875 - 0.8125, "red"]  # backward box
-    box4 = [[0, 0.25], 0.25, 0.25, "green"] # comparison box
-    boxes = [box1, box2, box3, box4]
-    # boxes = None
-    # title = "Still working on placement of boxes"
-    title = None
+    print(xy)
+    
+    # # x_lim = [0.75, 1.0]
+    # # y_lim = [0.25, 0.5]
+    # x_lim = None
+    # y_lim = None
 
-    n = 10_000
+    # # s = 1
+    # s = 0.1
+    # # data_set = f"1&2"
+    # data_set = 1
+    # box1 = [[0.75, 0.25], 0.25, 0.25, "red"]  # major box
+    # box2 = [[0.4375, 0.0], 0.5 - 0.4375, 1.0, "red"]  # forward box
+    # box3 = [[0, 0.8125], 1.0, 0.875 - 0.8125, "red"]  # backward box
+    # box4 = [[0, 0.25], 0.25, 0.25, "green"] # comparison box
+    # boxes = [box1, box2, box3, box4]
+    # # boxes = None
+    # # title = "Still working on placement of boxes"
+    # title = None
 
-    time_embedding_v2(pathlib.Path(f"/media/ethanspeakman/Elements/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl"), 
-                      output_file = f"BF_DS{data_set}_boxed_n{n}", 
-                      n = n, 
-                      backwards = True, 
-                      x_lim = x_lim, y_lim = y_lim, 
-                      dot_size = s,
-                      ioxes = boxes,
-                      eoxes = boxes,
-                      title = title)
+    # n = 10_000
 
-    # back_forward_trajectories(cwd / "2mer_occ.csv", cwd / "2mer_occ_wScores.csv")
+    # time_embedding_v2(pathlib.Path(f"/media/ethanspeakman/Elements/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl"), 
+    #                   output_file = f"BF_DS{data_set}_boxed_n{n}", 
+    #                   n = n, 
+    #                   backwards = True, 
+    #                   x_lim = x_lim, y_lim = y_lim, 
+    #                   dot_size = s,
+    #                   ioxes = boxes,
+    #                   eoxes = boxes,
+    #                   title = title)
+
+    # # back_forward_trajectories(cwd / "2mer_occ.csv", cwd / "2mer_occ_wScores.csv")
+
+
+def generate_sequence(k = 12, nucsequence: str = "AGTC"):
+    '''
+    Generates a random sequence.
+    '''
+
+    sequence = ""
+
+    for _ in range(k):
+        rand_n = random.randint(0, 3)
+        sequence = f"{sequence}{nucsequence[rand_n]}"
+
+    return sequence
+
 
 
 def back_forward_trajectories(occ_data: pandas.DataFrame, output_file: pathlib.Path, kmer: int = 2):
