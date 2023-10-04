@@ -13,7 +13,9 @@ from pptx import Presentation
 from pptx.util import Inches, Pt
 import GeneClass as Gene
 import TimeEmbedding as KTA
-import pywt
+# import pywt
+import random
+import TimeEmbedding as TE
 
 
 def main():
@@ -31,34 +33,52 @@ def main():
 
     Trying to find all possible sequences is filling up my memory, and trying to use the equation is yeilding static numbers.
     '''
-    xy = np.array([0.9, 0.3])
-    something = scores(xy, k = 100)
-    print(something)
-    # sequences("CG")
+    # xy = np.array([0.9, 0.3])
+    # something = scores(xy, k = 100)
+    # print(something)
+    # seq = sequences("")
+    # print(seq)
+
+    test_sequence = TE.generate_sequence(k = 100)
+    print(test_sequence)
+    xy = TE.time_embedding(test_sequence)
+    # print(xy)
+    # print(len(xy))
+    # print(type(xy))
+    xy_0 = xy[0]
+    xy_p = scores(xy_0, k = len(xy))
+    e = error(xy, xy_p)
+
+    data = pandas.DataFrame(data = {"X": xy[:, 0], "Y": xy[:, 1], "X'": xy_p[:, 0], "Y'": xy_p[:, 1], "Ex": e[:, 0], "Ey": e[:, 1]})
+    print(data)
+    data.to_csv(f"Iterative_Process_{test_sequence}.csv")
+
+    # print(e)
+
 
 
 
 def scores(score: np.ndarray, k: int = 4):
     '''
-    Does 4 iterations backwards and 4 iterations forwards
+    Does k iterations backwards and 4 iterations forwards
 
     {} -> decimal/fractional portion
     [] -> integer portion
 
-    x' = {4x}
-    y' = 0.25 * ([4x] + y)
+    y_k+1 = {4y_k}
+    x_k+1 = 0.25 * ([4y_k] + x_k)
     '''
     # x = score
-    xy = np.zeros(shape = (k + 1, 2))
+    xy = np.zeros(shape = (k, 2))
 
     xy[0][0] = score[0]
     xy[0][1] = score[1]
 
-    for i in range(1, k + 1):
+    for i in range(1, k):
         x, y = xy[i - 1][0], xy[i - 1][1]
 
-        x_p = (4*x) % 1
-        y_p = 0.25 * (int(4*x) + y)
+        y_p = (4*y) % 1
+        x_p = 0.25 * (int(4*y) + x)
         
         xy[i][0], xy[i][1] = x_p, y_p
 
@@ -72,29 +92,34 @@ def sequences(target: str, nucsequence: str = "AGTC", k: int = 11):
     Ultimatly I want to iterate from n_11 n_10 n_9 n_8 n_7 n_6 | n_5 n_4 n_3 n_2 C G to C G n^2 n^3 n^4 n^5 | n^6 n^7 n^8 n^9 n^10 n^11
 
     This creates a bunch of sequences with the target thing at the middle. That way I can just iterate through them.
+
+    This creates a memory error because it's something like 10^15 possible sequences... yeah we're just going to create one random one instead.
     '''
     perms = tuple(itertools.product([nucsequence[0], nucsequence[1], nucsequence[2], nucsequence[3]], repeat = k))
-    seq = set()
+    # seq = set()
 
     berms = _seqs(perms)
     ferms = _seqs(perms)
     totals: int = len(berms) * len(ferms)
 
-    for berm in berms:
-        for ferm in ferms:
-            sequence = f"{berm}{target}{ferm}"
-            seq.add(sequence)
-            # print(len(seq))
+    random_b = random.randint(0, len(berms))
+    random_f = random.randint(0, len(ferms))
 
-            if (len(seq) % 1000000) == 0:
-                print(f"Finished {len(seq)} of {totals}")
+    seq = f"{berms[random_b]}{target}{ferms[random_f]}"
 
-    print(seq[0])
-    print(seq[len(seq) - 1])
+    # for berm in berms:
+    #     for ferm in ferms:
+    #         sequence = f"{berm}{target}{ferm}"
+    #         seq.add(sequence)
+    #         # print(len(seq))
 
+    #         if (len(seq) % 1000000) == 0:
+    #             print(f"Finished {len(seq)} of {totals}")
 
+    # print(seq[0])
+    # print(seq[len(seq) - 1])
 
-    return 0
+    return seq
 
 def _seqs(permutations: list):
     '''
@@ -108,6 +133,19 @@ def _seqs(permutations: list):
         perms.append(p)
 
     return perms
+
+
+
+def error(xy_t, xy_m):
+    '''
+    finds the error between two arrays:
+
+    e = (m - t)/t
+    '''
+
+    e = (abs(xy_m - xy_t) / xy_t) * 100
+
+    return e
 
 
 
