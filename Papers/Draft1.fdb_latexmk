@@ -1,15 +1,15 @@
 # Fdb version 3
-["bibtex Draft1"] 1693330456 "Draft1.aux" "Draft1.bbl" "Draft1" 1693332293
+["bibtex Draft1"] 1693425276 "Draft1.aux" "Draft1.bbl" "Draft1" 1693503024
   "/usr/share/texlive/texmf-dist/bibtex/bst/base/plain.bst" 1292289607 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "Draft1.aux" 1693332292 1651 6e480dfa30873694fa8ebde01818d9b8 "pdflatex"
-  "References.bib" 1693329191 4916 d77679b56fe831ff3a1ca060d69aa127 ""
+  "Draft1.aux" 1693503023 1703 ddc9361be27b14f845f11aa8aca4abf2 "pdflatex"
+  "References.bib" 1693425275 5225 a9fd725c1e8799c671d42c1072730cc5 ""
   (generated)
   "Draft1.bbl"
   "Draft1.blg"
-["pdflatex"] 1693332292 "/home/ethanspeakman/Coding/Thesis/Papers/Draft1.tex" "Draft1.pdf" "Draft1" 1693332293
+["pdflatex"] 1693503023 "/home/ethanspeakman/Coding/Thesis/Papers/Draft1.tex" "Draft1.pdf" "Draft1" 1693503024
   "/etc/texmf/web2c/texmf.cnf" 1693235252 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/home/ethanspeakman/.texlive2021/texmf-var/web2c/pdftex/pdflatex.fmt" 1693235274 1405754 3a0c35b8b8a99dc645e66742942bed21 ""
-  "/home/ethanspeakman/Coding/Thesis/Papers/Draft1.tex" 1693332292 3942 9dc5d5aee4490d2d67bfa4f9431168b0 ""
+  "/home/ethanspeakman/Coding/Thesis/Papers/Draft1.tex" 1693503022 4823 0d3e0c115fa15efddf21c1d2c192e056 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1246382020 1004 54797486969f23fa377b128694d548df ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex8.tfm" 1246382020 988 bdf658c3bfc2d96d3c8b02cfc1c94c20 ""
@@ -83,10 +83,10 @@
   "/usr/share/texlive/texmf-dist/web2c/texmf.cnf" 1644012257 39432 7155514e09a3d69036fac785183a21c2 ""
   "/usr/share/texmf/web2c/texmf.cnf" 1644012257 39432 7155514e09a3d69036fac785183a21c2 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1693235299 4379155 98693266ff65f58d9f98aff394de12d2 ""
-  "Draft1.aux" 1693332292 1651 6e480dfa30873694fa8ebde01818d9b8 "pdflatex"
-  "Draft1.bbl" 1693330456 1251 42741e88cbe2d0714dac32db3e8abe16 "bibtex Draft1"
-  "Draft1.out" 1693332292 494 e89c52482bb0e200e9b48adadbe2e137 "pdflatex"
-  "Draft1.tex" 1693332292 3942 9dc5d5aee4490d2d67bfa4f9431168b0 ""
+  "Draft1.aux" 1693503023 1703 ddc9361be27b14f845f11aa8aca4abf2 "pdflatex"
+  "Draft1.bbl" 1693494403 1470 94f96936a76deb2ae704e1a2840d0624 "bibtex Draft1"
+  "Draft1.out" 1693503023 494 e89c52482bb0e200e9b48adadbe2e137 "pdflatex"
+  "Draft1.tex" 1693503022 4823 0d3e0c115fa15efddf21c1d2c192e056 ""
   (generated)
   "Draft1.aux"
   "Draft1.log"

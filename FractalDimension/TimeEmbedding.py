@@ -14,6 +14,7 @@ import pickle
 import itertools
 import matplotlib.pyplot as plt
 import GeneClass as Gene
+import random
 
 def main():
     '''
@@ -26,11 +27,45 @@ def main():
     Time embedding v3: make one that goes through a gene (all its different forms) and plots the trajectory of the k windows. Does something happen for the introns and the exons?
     You'll have to also do the exons and introns seperatly, but we want to see how the trajectory can "jump" from exon to intron: maybe there is something of interest there?
     '''
-    x_lim = [0, 0.25]
-    y_lim = [0.25, 0.5]
-    s = 1
-    data_set = 2
+    test_seq = "GGCGGACCGGGCGTCCCTACCAAT"  # this sequence was created in the iterative Map becuase I'm having trouble understanding what the hell Dr G is purposing with his
+                                           # multiple by 4 and add the y and take the fractional etc. I'm just going to study it using this.
+    
+    xy = time_embedding(test_seq)
 
+    print(xy)
+    
+    # # x_lim = [0.75, 1.0]
+    # # y_lim = [0.25, 0.5]
+    # x_lim = None
+    # y_lim = None
+
+    # # s = 1
+    # s = 0.1
+    # # data_set = f"1&2"
+    # data_set = 1
+    # box1 = [[0.75, 0.25], 0.25, 0.25, "red"]  # major box
+    # box2 = [[0.4375, 0.0], 0.5 - 0.4375, 1.0, "red"]  # forward box
+    # box3 = [[0, 0.8125], 1.0, 0.875 - 0.8125, "red"]  # backward box
+    # box4 = [[0, 0.25], 0.25, 0.25, "green"] # comparison box
+    # boxes = [box1, box2, box3, box4]
+    # # boxes = None
+    # # title = "Still working on placement of boxes"
+    # title = None
+
+    # n = 10_000
+
+    # time_embedding_v2(pathlib.Path(f"/media/ethanspeakman/Elements/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl"), 
+    #                   output_file = f"BF_DS{data_set}_boxed_n{n}", 
+    #                   n = n, 
+    #                   backwards = True, 
+    #                   x_lim = x_lim, y_lim = y_lim, 
+    #                   dot_size = s,
+    #                   ioxes = boxes,
+    #                   eoxes = boxes,
+    #                   title = title)
+
+    # # back_forward_trajectories(cwd / "2mer_occ.csv", cwd / "2mer_occ_wScores.csv")
+    
     # time_embedding_v2(pathlib.Path(f"G:\Gene_Data_Sets\Data_Set_{data_set}_histogram.pkl"), 
     #                   output_file = f"BF_DS{data_set}_zoom", 
     #                   n = 10_000, 
@@ -39,16 +74,28 @@ def main():
     #                   dot_size = s)
 
     # back_forward_trajectories(cwd / "2mer_occ.csv", cwd / "2mer_occ_wScores.csv")
-    time_embedding_v3(pathlib.Path(f"F:\Gene_Data_Sets\Data_Set_{data_set}_histogram.pkl"), 
-                      output_file = f"BF_DS{data_set}_zoom", 
-                      n = 1000,
-                      N = 10)
+    # time_embedding_v3(pathlib.Path(f"F:\Gene_Data_Sets\Data_Set_{data_set}_histogram.pkl"), 
+    #                  output_file = f"BF_DS{data_set}_zoom", 
+    #                  n = 1000,
+    #                  N = 10)
 
     # thing = np.array([[1, 1], [1, 2], [3, 4], [5, 1], [1, 1]])
     # print(thing[1, 1])
     # something = np.where(thing[:, 0] == 1)
     # print(something)
 
+
+def generate_sequence(k = 12, nucsequence: str = "AGTC"):
+    '''
+    Generates a random sequence.
+    '''
+
+    sequence = ""
+    for _ in range(k):
+        rand_n = random.randint(0, 3)
+        sequence = f"{sequence}{nucsequence[rand_n]}"
+
+    return sequence
 
 
 def back_forward_trajectories(occ_data: pandas.DataFrame, output_file: pathlib.Path, kmer: int = 2):
@@ -495,10 +542,12 @@ def time_embedding_v2(data: pandas.DataFrame,
                       nucsequence: str = "AGTC", PyPu: bool = False,
                       sequence_name: str = "Seq",
                       classification_name: str = "Classificaion",
+                      title: str = None,
                       output_file: str = None,
                       x_lim: list = None,
                       y_lim: list = None,
-                      dot_size: float = 0.1):
+                      dot_size: float = 0.1,
+                      eoxes: list = None, ioxes: list = None):
     '''
     The new way of doing things with the updated data. You can put a pathlib in place of a Dataframe which then opens that file, but that data better be a Dataframe. I'm not going to code
     other ways of handeling that data. It's a Dataframe. Deal with it. WE'RE DEALING WITH THINGS TED!
@@ -507,6 +556,8 @@ def time_embedding_v2(data: pandas.DataFrame,
 
     The classification & sequence name is because I've done this a few different times with different data standards... and I probably screwed myself for that. But now I get to try to salvage that...
     And yes, that says Classificaion, because I misspelled something.
+
+    Boxes allows you to draw on the plot. Boxes is a list of lists, and every sublist has an anchor point, a height, and a width. The anchor point itself should be a tuple. So it's boxes = [[[x0, y0], h0, w0, color0], [[x1, y1], h1, w1, color1], ..., [[xn, yn], hn, wn, colorn]]
     '''
 
     if isinstance(data, pathlib.Path):
@@ -566,6 +617,13 @@ def time_embedding_v2(data: pandas.DataFrame,
             xy = time_embedding_PyPu(sequence, k_p = k_p, k_m = k_m, gap = gap, m_backwards = backwards)
         else:
             xy = time_embedding(sequence, k_p = k_p, k_m = k_m, gap = gap, m_backwards = backwards, nucsequence = nucsequence)
+
+        if isinstance(x_lim, list):
+            xy = xy[(x_lim[1] >= xy[:, 0]) & (xy[:, 0] >= x_lim[0])]
+            # xy = np.where((x_lim[1] >= xy[:, 0]) & (xy[:, 0] >= x_lim[0]))  # Filter the number of points down to a zoomed in area. Should help speed up the process of making the actual graph
+        if isinstance(y_lim, list):
+            xy = xy[(y_lim[1] >= xy[:, 1]) & (xy[:, 1] >= y_lim[0])]
+            # xy = np.where((y_lim[1] >= xy[:, 1]) & (xy[:, 1] >= y_lim[0]))
         
         if (region in "Exon") or (region in "exon") or (region in "e"):  # because I realized I was doing this like 3 different ways... I probably should have been more precise.
             e_frame[e_count] = xy
@@ -574,8 +632,8 @@ def time_embedding_v2(data: pandas.DataFrame,
             i_frame[i_count] = xy
             i_count += 1
 
-        b_frame[b_count] = xy
-        b_count += 1
+        # b_frame[b_count] = xy
+        # b_count += 1
 
         if ((row % 1000) == 0):
             print(f"Finished row {row} of {rows}")
@@ -588,8 +646,12 @@ def time_embedding_v2(data: pandas.DataFrame,
     #     ax.scatter(points[:, 0], points[:, 1], s = 0.1)
 
     # b_title = f"Exons and Introns, Time Embedding w/ {gap}-mer Gap between + and -\n{e_count + i_count} Total Regions - Unknown number of genes are represented"
-    e_title = f"Exons, Time Embedding w/ {gap}-mer Gap\n{e_count} Total Regions"
-    i_title = f"Introns, Time Embedding w/ {gap}-mer Gap\n{i_count} Total Regions"
+    if isinstance(title, str):
+        e_title = f"{title}\nExons, Time Embedding w/ {gap}-mer Gap\n{e_count} Total Regions"
+        i_title = f"{title}\nIntrons, Time Embedding w/ {gap}-mer Gap\n{i_count} Total Regions"
+    else:
+        e_title = f"Exons, Time Embedding w/ {gap}-mer Gap\n{e_count} Total Regions"
+        i_title = f"Introns, Time Embedding w/ {gap}-mer Gap\n{i_count} Total Regions"
 
     if backwards:
         weights = ": weights are forwards and backwards"
@@ -635,6 +697,17 @@ def time_embedding_v2(data: pandas.DataFrame,
         plt.ylim(y_lim[0], y_lim[1])
         e_file_name = f"{e_file_name}_y_{y_lim[0]}v{y_lim[1]}"
     exon_file = str(exon_dir / f"{e_file_name}.png")
+
+    if isinstance(eoxes, list):
+        for box in eoxes:
+            if isinstance(box[3], str):
+                color = box[3]
+            else:
+                color = None
+            p = plt.Rectangle(box[0], box[1], box[2], edgecolor = color, linewidth = 2, fill = False)  #set_fill = False, 
+
+            ax.add_patch(p)
+
     plt.savefig(exon_file)
     print(f"Output image to {exon_file}")
     plt.close()
@@ -655,6 +728,17 @@ def time_embedding_v2(data: pandas.DataFrame,
         plt.ylim(y_lim[0], y_lim[1])
         i_file_name = f"{i_file_name}_y_{y_lim[0]}v{y_lim[1]}"
     intron_file = str(intron_dir / f"{i_file_name}.png")
+
+    if isinstance(ioxes, list):
+        for box in ioxes:
+            if isinstance(box[3], str):
+                color = box[3]
+            else:
+                color = None
+            p = plt.Rectangle(box[0], box[1], box[2], edgecolor = color, linewidth = 2, fill = False)  #set_fill = False, 
+
+            ax.add_patch(p)
+
     plt.savefig(intron_file)
     print(f"Output image to {intron_file}")
     plt.close()

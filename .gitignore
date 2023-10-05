@@ -46,4 +46,7 @@ Thesis.Rproj
 !/ML/FractalModels/IvE/version_home_windows_*/*
 !/ML/FractalModels/IvE/version_slurm_*/*
 !/ML/FractalModels/IvE/version_home_fedora_*/*
+!/FractalDimension/TE_Images_ForPaper/*/*
+!/FractalDimension/TE_Images_ForPaper/*
 !GenePerChrom.pkl
+!Iterative_Process_TGGCAGGTGTTTAGTTTAGGTCCCTACAGAATAGGCTGGTTATTCTGGGTCAGATCCGAGTTCATTTCAATACGGTGGCTATCCTTAAGGTCTTGGATCG.csv
