@@ -65,6 +65,24 @@ def main():
     #                   title = title)
 
     # # back_forward_trajectories(cwd / "2mer_occ.csv", cwd / "2mer_occ_wScores.csv")
+    
+    # time_embedding_v2(pathlib.Path(f"G:\Gene_Data_Sets\Data_Set_{data_set}_histogram.pkl"), 
+    #                   output_file = f"BF_DS{data_set}_zoom", 
+    #                   n = 10_000, 
+    #                   backwards = True, 
+    #                   x_lim = x_lim, y_lim = y_lim, 
+    #                   dot_size = s)
+
+    # back_forward_trajectories(cwd / "2mer_occ.csv", cwd / "2mer_occ_wScores.csv")
+    # time_embedding_v3(pathlib.Path(f"F:\Gene_Data_Sets\Data_Set_{data_set}_histogram.pkl"), 
+    #                  output_file = f"BF_DS{data_set}_zoom", 
+    #                  n = 1000,
+    #                  N = 10)
+
+    # thing = np.array([[1, 1], [1, 2], [3, 4], [5, 1], [1, 1]])
+    # print(thing[1, 1])
+    # something = np.where(thing[:, 0] == 1)
+    # print(something)
 
 
 def generate_sequence(k = 12, nucsequence: str = "AGTC"):
@@ -73,13 +91,11 @@ def generate_sequence(k = 12, nucsequence: str = "AGTC"):
     '''
 
     sequence = ""
-
     for _ in range(k):
         rand_n = random.randint(0, 3)
         sequence = f"{sequence}{nucsequence[rand_n]}"
 
     return sequence
-
 
 
 def back_forward_trajectories(occ_data: pandas.DataFrame, output_file: pathlib.Path, kmer: int = 2):
@@ -727,6 +743,144 @@ def time_embedding_v2(data: pandas.DataFrame,
     print(f"Output image to {intron_file}")
     plt.close()
 
+
+def time_embedding_v3(data: pandas.DataFrame,
+                      n: int = 10_000,
+                      k_m: int = 6, k_p: int = 6, gap: int = 0,
+                      nucsequence: str = "AGTC", sequence_name: str = "Seq", classification_name: str = "Classificaion",
+                      N: int = 10,
+                      *args, **kwargs):
+    '''
+    Maybe I should rename this to "Danish Pastry" method.
+
+    
+    I have this idea that I want to write down before I forget it: create a numpy vector that is n**2 x 3 for the points in the time embedding map (danish pastrey?). it would be [[x y z]] where x and y are the points and z is the count.
+    That way if I want a specific area I can just filter by either x vs y or by z.
+    '''
+    # master_xy = np.zeros(shape = (1, 3))
+    backwards: bool = True
+    if isinstance(data, pathlib.Path):
+        with open(data, "rb") as p:
+            data = pickle.load(p)
+
+    # print(data.iloc[0, :])
+    # exit()
+
+    try:
+        data = data.sample(n = n).reset_index()
+    except ValueError as e:
+        data = data.reset_index()
+    except Exception as e:
+        print(type(e))
+        print(e)
+        print(data.shape)
+        print(n)
+        exit()
+
+    # data = data.iloc[0:2, :]
+    # data.loc[0, "Seq"] = "AGTCGGAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTC"
+
+    # print(data.columns)
+
+    image_dir = cwd / "TE_Images_ForPaper"
+    image_dir.mkdir(parents = True, exist_ok = True)
+    exon_dir = image_dir / "Exon"
+    exon_dir.mkdir(parents = True, exist_ok = True)
+    intron_dir = image_dir / "Intron"
+    intron_dir.mkdir(parents = True, exist_ok = True)
+    both_dir = image_dir / "Both"
+    both_dir.mkdir(parents = True, exist_ok = True)
+
+    # gene: Gene.Gene
+    # ncib: str
+
+    rows, cols = data.shape
+    # rows = 1
+
+    if "Length" in data.columns:
+        data = data[data["Length"] > (k_m + k_p + gap)]
+    else:
+        data["Length"] = data.Seq.str.len()
+        data = data[data["Length"] > (k_m + k_p + gap)]
+
+    b_frame, e_frame, i_frame = {}, {}, {}  # OK this may seem weird, but hear me out: lists are slow, especially when you have a very large N in a list. But a dictionary is hashable, so I can store the lists in the dictionary, who cares about the key, and it should be faster for large N
+    b_count, e_count, i_count = 0, 0, 0
+
+    for row in range(rows):
+        try:
+            sequence = data.loc[row, sequence_name].upper()
+        except Exception as e:
+            print(type(e))
+            print(e)
+            print(row)
+            continue
+            exit()
+
+        region = data.loc[row, classification_name]
+
+        xy = time_embedding(sequence, k_p = k_p, k_m = k_m, gap = gap, m_backwards = backwards, nucsequence = nucsequence)
+        # print(xy)
+        # exit()
+
+        # Need to figure out a faster way instead of iterating and adding it one at a time.
+
+        # This is where things are going to get crazy. I have to find the xy points, check if they're in the master thing, add them if they are not, and add to the z position if they are.
+        for j, r in enumerate(xy):
+            index = f"{r[0]}_{r[1]}"
+            if index not in b_frame.keys():
+                b_frame[index] = {"x": r[0], "y": r[1], "z": 1}
+            else:
+                b_frame[index]["z"] += 1
+
+            if (region in "Exon") or (region in "exon") or (region in "e"):  # because I realized I was doing this like 3 different ways... I probably should have been more precise.
+                if index not in e_frame.keys():
+                    e_frame[index] = {"x": r[0], "y": r[1], "z": 1}
+                else:
+                    e_frame[index]["z"] += 1
+            elif (region in "Intron") or (region in "intron") or (region in "i"):
+                if index not in i_frame.keys():
+                    i_frame[index] = {"x": r[0], "y": r[1], "z": 1}
+                else:
+                    i_frame[index]["z"] += 1
+
+            # # r = np.array([r[0], r[1], 1])
+            # if (r[0] in master_xy[:, 0]):
+            #     index = np.where(master_xy[:, 0] == r[0])[0] # matching to the x cord
+            #     # print(index, type(index))
+            #     for i in index:
+            #         # print(i, type(i))
+            #         if (r[1] == master_xy[i, 1]): # matching to the y cord
+            #             master_xy[i, 2] += 1
+            #             break
+            #     else: # failed to match to the y cord, need to add it to the master matrix
+            #         r = np.array([r[0], r[1], 1])
+            #         master_xy = np.insert(master_xy, master_xy.shape[0], r, axis = 0)
+            # else:
+            #     r = np.array([r[0], r[1], 1])
+            #     master_xy = np.insert(master_xy, master_xy.shape[0], r, axis = 0)
+        
+
+        # b_frame[b_count] = xy
+        # b_count += 1
+
+        if ((row % 1000) == 0):
+            print(f"Finished row {row} of {rows}")
+    # print(b_frame)
+    # print(e_frame)
+    # print(i_frame)
+        
+    # print(master_xy)
+
+    # sorted_e = dict(sorted(e_frame.items(), key = lambda x:x[1], reverse = True)[:N])
+    # print(sorted_e)
+    master_xy = np.zeros(shape = (len(e_frame), 3))
+    for i, (_, value) in enumerate(e_frame.items()):
+        master_xy[i, 0] = value["x"]
+        master_xy[i, 1] = value["y"]
+        master_xy[i, 2] = value["z"]
+
+    print(np.unique(master_xy[:, 2]))
+        
 
 if __name__ in "__main__":
     main()
