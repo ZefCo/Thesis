@@ -21,18 +21,22 @@ def main():
 
     This script is meant to scan through all the different regions and take note of what they are composed of.
     '''
-    kmer = 3
+    kmer = 6
+    linux_path = f"/media/ethanspeakman/Elements/"
+    windows_path = f"F:/"
 
-    data_1 = pathlib.Path("/media/ethanspeakman/Elements/Gene_Data_Sets/Data_Set_1_frame.pkl")  # I know the method says it was a dataframe, but I also coded it where it can just take a pathlib and load the data. I got lazy
-    output_file_1 = cwd / "GeneSurvey_1_3mer.pkl"
-    data_2 = pathlib.Path("/media/ethanspeakman/Elements/Gene_Data_Sets/Data_Set_2_frame.pkl")  # I know the method says it was a dataframe, but I also coded it where it can just take a pathlib and load the data. I got lazy
-    output_file_2 = cwd / "GeneSurvey_2_3mer.pkl"
+    data_path = windows_path
+
+    data_1 = pathlib.Path(f"{data_path}/Gene_Data_Sets/Data_Set_1_frame.pkl")  # I know the method says it was a dataframe, but I also coded it where it can just take a pathlib and load the data. I got lazy
+    output_file_1 = cwd / f"GeneSurvey_1_{kmer}mer.pkl"
+    data_2 = pathlib.Path(f"{data_path}/Gene_Data_Sets/Data_Set_2_frame.pkl")  # I know the method says it was a dataframe, but I also coded it where it can just take a pathlib and load the data. I got lazy
+    output_file_2 = cwd / f"GeneSurvey_2_{kmer}mer.pkl"
 
     # print(data_1)
     survey(data_1, output_file_1, kmer)
     survey(data_2, output_file_2, kmer)
-    recreate(output_file_1, kmer, title = "Dataset 1 Histogram Method", labels = True, output_file = pathlib.Path(cwd / "GeneSurvey_Dataset1_3mer.html"))
-    recreate(output_file_2, kmer, title = "Dataset 2 Histogram Method", labels = True, output_file = pathlib.Path(cwd / "GeneSurvey_Dataset2_3mer.html"))
+    recreate(output_file_1, kmer, title = "Dataset 1 Histogram Method", labels = True, output_file = pathlib.Path(cwd / f"GeneSurvey_Dataset1_{kmer}mer.html"))
+    recreate(output_file_2, kmer, title = "Dataset 2 Histogram Method", labels = True, output_file = pathlib.Path(cwd / f"GeneSurvey_Dataset2_{kmer}mer.html"))
 
 
 def count_occurences(sequence: str, permutations: list):
