@@ -27,42 +27,51 @@ def main():
     Time embedding v3: make one that goes through a gene (all its different forms) and plots the trajectory of the k windows. Does something happen for the introns and the exons?
     You'll have to also do the exons and introns seperatly, but we want to see how the trajectory can "jump" from exon to intron: maybe there is something of interest there?
     '''
-    test_seq = "GGCGGACCGGGCGTCCCTACCAAT"  # this sequence was created in the iterative Map becuase I'm having trouble understanding what the hell Dr G is purposing with his
-                                           # multiple by 4 and add the y and take the fractional etc. I'm just going to study it using this.
+    # test_seq = "GGCGGACCGGGCGTCCCTACCAAT"  # this sequence was created in the iterative Map becuase I'm having trouble understanding what the hell Dr G is purposing with his
+    #                                        # multiple by 4 and add the y and take the fractional etc. I'm just going to study it using this.
     
-    xy = time_embedding(test_seq)
+    # xy = time_embedding(test_seq)
 
-    print(xy)
+    # print(xy)
+
+    linux_path = f"/media/ethanspeakman/Elements/"
+    windows_path = f"F:/"
+
+    data_path = windows_path
     
-    # # x_lim = [0.75, 1.0]
-    # # y_lim = [0.25, 0.5]
+    x_lim = [0.75, 1.0]
+    y_lim = [0.25, 0.5]
+    x_ticks = {x/100:x/100 for x in range(75, 100 + 1, 1)}
+    y_ticks = {y/100:y/100 for y in range(25, 50 + 1, 1)}
     # x_lim = None
     # y_lim = None
 
-    # # s = 1
+    # s = 1
+    s = 0.75
     # s = 0.1
-    # # data_set = f"1&2"
-    # data_set = 1
+    # data_set = f"1&2"
+    data_set = 1
     # box1 = [[0.75, 0.25], 0.25, 0.25, "red"]  # major box
     # box2 = [[0.4375, 0.0], 0.5 - 0.4375, 1.0, "red"]  # forward box
     # box3 = [[0, 0.8125], 1.0, 0.875 - 0.8125, "red"]  # backward box
     # box4 = [[0, 0.25], 0.25, 0.25, "green"] # comparison box
     # boxes = [box1, box2, box3, box4]
-    # # boxes = None
-    # # title = "Still working on placement of boxes"
-    # title = None
+    boxes = None
+    # title = "Still working on placement of boxes"
+    title = None
 
-    # n = 10_000
+    n = 10_000
 
-    # time_embedding_v2(pathlib.Path(f"/media/ethanspeakman/Elements/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl"), 
-    #                   output_file = f"BF_DS{data_set}_boxed_n{n}", 
-    #                   n = n, 
-    #                   backwards = True, 
-    #                   x_lim = x_lim, y_lim = y_lim, 
-    #                   dot_size = s,
-    #                   ioxes = boxes,
-    #                   eoxes = boxes,
-    #                   title = title)
+    time_embedding_v2(pathlib.Path(f"{data_path}/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl"), 
+                      output_file = f"BF_DS{data_set}_boxed_n{n}_test_s{s}", 
+                      n = n, 
+                      backwards = True, 
+                      x_lim = x_lim, y_lim = y_lim, 
+                      dot_size = s,
+                      ioxes = boxes,
+                      eoxes = boxes,
+                      title = title,
+                      x_tick_marks = x_ticks, y_tick_marks = y_ticks)
 
     # # back_forward_trajectories(cwd / "2mer_occ.csv", cwd / "2mer_occ_wScores.csv")
     
@@ -546,6 +555,8 @@ def time_embedding_v2(data: pandas.DataFrame,
                       output_file: str = None,
                       x_lim: list = None,
                       y_lim: list = None,
+                      x_tick_marks: dict = None,
+                      y_tick_marks: dict = None,
                       dot_size: float = 0.1,
                       eoxes: list = None, ioxes: list = None):
     '''
@@ -685,7 +696,7 @@ def time_embedding_v2(data: pandas.DataFrame,
     fig, ax = plt.subplots()
     fig.set_size_inches(20, 20)
     for points in e_frame.values():
-        ax.scatter(points[:, 0], points[:, 1], s = dot_size)
+        ax.scatter(points[:, 0], points[:, 1], s = dot_size, marker = "s", color = "k")
     plt.title(e_title)
     plt.xlabel(x_title)
     plt.ylabel(y_title)
@@ -707,6 +718,13 @@ def time_embedding_v2(data: pandas.DataFrame,
             p = plt.Rectangle(box[0], box[1], box[2], edgecolor = color, linewidth = 2, fill = False)  #set_fill = False, 
 
             ax.add_patch(p)
+    
+    if isinstance(x_tick_marks, dict):
+        ax.set_xticks(list(x_tick_marks.keys()))
+        ax.set_xticklabels(list(x_tick_marks.values()))
+    if isinstance(y_tick_marks, dict):
+        ax.set_yticks(list(y_tick_marks.keys()))
+        ax.set_yticklabels(list(x_tick_marks.values()))
 
     plt.savefig(exon_file)
     print(f"Output image to {exon_file}")
@@ -716,7 +734,7 @@ def time_embedding_v2(data: pandas.DataFrame,
     fig, ax = plt.subplots()
     fig.set_size_inches(20, 20)
     for points in i_frame.values():
-        ax.scatter(points[:, 0], points[:, 1], s = dot_size)
+        ax.scatter(points[:, 0], points[:, 1], s = dot_size, marker = "s", color = "k")
     plt.title(i_title)
     plt.xlabel(x_title)
     plt.ylabel(y_title)
@@ -738,6 +756,13 @@ def time_embedding_v2(data: pandas.DataFrame,
             p = plt.Rectangle(box[0], box[1], box[2], edgecolor = color, linewidth = 2, fill = False)  #set_fill = False, 
 
             ax.add_patch(p)
+    
+    if isinstance(x_tick_marks, dict):
+        ax.set_xticks(list(x_tick_marks.keys()))
+        ax.set_xticklabels(list(x_tick_marks.values()))
+    if isinstance(y_tick_marks, dict):
+        ax.set_yticks(list(y_tick_marks.keys()))
+        ax.set_yticklabels(list(x_tick_marks.values()))
 
     plt.savefig(intron_file)
     print(f"Output image to {intron_file}")

@@ -20,6 +20,10 @@ import TimeEmbedding as TE
 
 def main():
     '''
+    I'll keep the below notes, but the idea behind it is that you are tracking the lines, not the points. Really your x,y points are defined from a sum function going from i = 1 to infinity, so we really
+    only care about the lines. 
+
+
     Start with x = C and y = G. Then we want to see where it came from and where it's going to. Find this for all possible combinations of n. The formula for the x and y coordinates is:
 
     n_6 n_5 n_4 n_3 n_2 n_1 | n^1 n^2 n^3 n^4 n^5 n^6
@@ -39,21 +43,34 @@ def main():
     # seq = sequences("")
     # print(seq)
 
-    test_sequence = TE.generate_sequence(k = 100)
-    print(test_sequence)
-    xy = TE.time_embedding(test_sequence)
-    # print(xy)
-    # print(len(xy))
-    # print(type(xy))
-    xy_0 = xy[0]
-    xy_p = scores(xy_0, k = len(xy))
-    e = error(xy, xy_p)
+    # test_sequence = TE.generate_sequence(k = 100)
+    # print(test_sequence)
+    # xy = TE.time_embedding(test_sequence)
+    # # print(xy)
+    # # print(len(xy))
+    # # print(type(xy))
+    # xy_0 = xy[0]
+    # xy_p = scores(xy_0, k = len(xy))
+    # e = error(xy, xy_p)
 
-    data = pandas.DataFrame(data = {"X": xy[:, 0], "Y": xy[:, 1], "X'": xy_p[:, 0], "Y'": xy_p[:, 1], "Ex": e[:, 0], "Ey": e[:, 1]})
-    print(data)
-    data.to_csv(f"Iterative_Process_{test_sequence}.csv")
+    # data = pandas.DataFrame(data = {"X": xy[:, 0], "Y": xy[:, 1], "X'": xy_p[:, 0], "Y'": xy_p[:, 1], "Ex": e[:, 0], "Ey": e[:, 1]})
+    # print(data)
+    # data.to_csv(f"Iterative_Process_{test_sequence}.csv")
 
     # print(e)
+    xy = np.array([[0.75, 1.0], [0.25, 0.5]])
+    scores(xy)
+
+
+def score_propogation(x1: float, x2: float):
+    '''
+    '''
+    x1p = (4*x1) % 1
+
+    x2p = 0.25 * (int(4*x1) + x2)
+
+    return x1p, x2p
+
 
 
 
@@ -65,22 +82,31 @@ def scores(score: np.ndarray, k: int = 4):
     {} -> decimal/fractional portion
     [] -> integer portion
 
-    y_k+1 = {4y_k}
-    x_k+1 = 0.25 * ([4y_k] + x_k)
+    x_k+1 = {4x_k}
+    y_k+1 = 0.25 * ([4x_k] + y_k)
+
+    y_k-1 = {4y_k}
+    x_k-1 = 0.25 * ([4y_k] + x_k)
     '''
+    # print(score)
+    # print(score.shape)
     # x = score
-    xy = np.zeros(shape = (k, 2))
+    xy = np.zeros(shape = (2*k + 1, 2, 2))
 
-    xy[0][0] = score[0]
-    xy[0][1] = score[1]
+    xy[k][0] = score[0]
+    xy[k][1] = score[1]
 
-    for i in range(1, k):
-        x, y = xy[i - 1][0], xy[i - 1][1]
+    # print(xy)
+    # backwards propogation
+    print("backwards propogation")
+    for i in range(k - 1, -1, -1):
+        print(i)
 
-        y_p = (4*y) % 1
-        x_p = 0.25 * (int(4*y) + x)
-        
-        xy[i][0], xy[i][1] = x_p, y_p
+    # forwards propogation
+    print("forwards propogation")
+    for i in range(k + 1, 2*k + 1, 1):
+        print(i)
+
 
     return xy
 
