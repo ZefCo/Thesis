@@ -21,7 +21,7 @@ def main():
 
     This script is meant to scan through all the different regions and take note of what they are composed of.
     '''
-    kmer = 6
+    kmer = 4
     linux_path = f"/media/ethanspeakman/Elements/"
     windows_path = f"F:/"
 
