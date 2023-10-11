@@ -58,8 +58,24 @@ def main():
     # data.to_csv(f"Iterative_Process_{test_sequence}.csv")
 
     # print(e)
-    xy = np.array([[0.75, 1.0], [0.25, 0.5]])
-    scores(xy)
+
+    x1 = float(input("Input a value for x1: "))
+    x2 = float(input("Input a value for x2: "))
+    y1 = float(input("Input a value for y1: "))
+    y2 = float(input("Input a value for y2: "))
+    X, Y = 0, 1
+
+    # print("Testing with [0.75, 1.0], [0.25. 0.5]")
+    # x1 = 0.75
+    # x2 = 1.0
+    # y1 = 0.25
+    # y2 = 0.5
+
+    xy = np.array([[x1, x2], [y1, y2]])
+    xy = scores(xy)
+    print(f"Backwards propogation:\n\tx1 = {xy[0][X][0]}\tx2 = {xy[0][X][1]}\n\ty1 = {xy[0][Y][0]}\ty2 = {xy[0][Y][1]}")
+    print(f"Original position:\n\tx1 = {xy[1][X][0]}\tx2 = {xy[1][X][1]}\n\ty1 = {xy[1][Y][0]}\ty2 = {xy[1][Y][1]}")
+    print(f"Forwards propogation:\n\tx1 = {xy[2][X][0]}\tx2 = {xy[2][X][1]}\n\ty1 = {xy[2][Y][0]}\ty2 = {xy[2][Y][1]}")
 
 
 def score_propogation(x1: float, x2: float):
@@ -75,9 +91,9 @@ def score_propogation(x1: float, x2: float):
 
 
 
-def scores(score: np.ndarray, k: int = 4):
+def scores(score: np.ndarray) -> np.ndarray:
     '''
-    Does k iterations backwards and 4 iterations forwards
+    Finds the forward and backward propogation of a given input. Expects the input to be a 2x2 array where the first row is the x and the second row is the y. Will output a 3x2x2 matrix representing the -1, 0, +1 iterations. 0 is the input.
 
     {} -> decimal/fractional portion
     [] -> integer portion
@@ -88,27 +104,45 @@ def scores(score: np.ndarray, k: int = 4):
     y_k-1 = {4y_k}
     x_k-1 = 0.25 * ([4y_k] + x_k)
     '''
-    # print(score)
-    # print(score.shape)
-    # x = score
-    xy = np.zeros(shape = (2*k + 1, 2, 2))
+    X, Y  = 0, 1
+    xy = np.zeros(shape = (3, 2, 2))
 
-    xy[k][0] = score[0]
-    xy[k][1] = score[1]
+    xy[1][X] = score[X]
+    xy[1][Y] = score[Y]
 
-    # print(xy)
-    # backwards propogation
-    print("backwards propogation")
-    for i in range(k - 1, -1, -1):
-        print(i)
+
+    # # backwards propogation
+    y, x = _propogation(xy[1][Y], xy[1][X])
+    xy[0][X][0], xy[0][X][1] = x[0], x[1]
+    xy[0][Y][0], xy[0][Y][1] = y[0], y[1]
 
     # forwards propogation
-    print("forwards propogation")
-    for i in range(k + 1, 2*k + 1, 1):
-        print(i)
-
+    x, y = _propogation(xy[1][X], xy[1][Y])
+    xy[2][X][0], xy[2][X][1] = x[0], x[1]
+    xy[2][Y][0], xy[2][Y][1] = y[0], y[1]
 
     return xy
+
+
+def _propogation(x: np.ndarray, y: np.ndarray) -> tuple:
+    '''
+    The actual calculation. I felt it was better as a function and a bit more complicated then a lambda function. To do the backwards propogation, simply switch the x and y inputs.
+    Each x and y are a 1x2 array.
+    '''
+    x_k = np.zeros(shape = (2, 1))
+    y_k = np.zeros(shape = (2, 1))
+
+    x_k[0] = 4*x[0] % 1
+    x_k[1] = 4*x[1] % 1
+
+    y_k[0] = 0.25 * (int(4*x[0]) + y[0])
+    y_k[1] = 0.25 * (int(4*x[0]) + y[1])
+    # y_k[1] = 0.25 * (int(4*x[1]) + y[1]) if (x_k[1] > 0) else 0.25 * (int(4*x[0]) + y[1])
+
+    if (x_k[0] == 0) and (x_k[1] == 0):
+        x_k[1] = 1.0
+
+    return x_k, y_k
 
 
 def sequences(target: str, nucsequence: str = "AGTC", k: int = 11):

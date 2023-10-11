@@ -27,6 +27,8 @@ def main():
     Time embedding v3: make one that goes through a gene (all its different forms) and plots the trajectory of the k windows. Does something happen for the introns and the exons?
     You'll have to also do the exons and introns seperatly, but we want to see how the trajectory can "jump" from exon to intron: maybe there is something of interest there?
     '''
+    # score_keys(k = 6)
+    # exit()
     # test_seq = "GGCGGACCGGGCGTCCCTACCAAT"  # this sequence was created in the iterative Map becuase I'm having trouble understanding what the hell Dr G is purposing with his
     #                                        # multiple by 4 and add the y and take the fractional etc. I'm just going to study it using this.
     
@@ -60,7 +62,7 @@ def main():
     # title = "Still working on placement of boxes"
     title = None
 
-    n = 10_000
+    n = 50_0
 
     time_embedding_v2(pathlib.Path(f"{data_path}/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl"), 
                       output_file = f"BF_DS{data_set}_boxed_n{n}_test_s{s}", 
@@ -169,6 +171,84 @@ def score_keys(k = 9, nucsequence: str = "AGTC"):
 
     scores.to_csv(cwd / f"ScoreKey_kmer_{k}_{nucsequence}.csv")
 
+
+
+def matplotfigure(frame: dict,
+                  dir: str = None,
+                  count: int = 0,
+                  k_p: int = 6, k_m: int = 6, gap: int = 0, 
+                  backwards: bool = True, 
+                  nucsequence: str = "AGTC",
+                  title: str = None,
+                  file_name: str = None,
+                  x_lim: list = None,
+                  y_lim: list = None,
+                  x_tick_marks: dict = None,
+                  y_tick_marks: dict = None,
+                  dot_size: float = 0.1,
+                  boxes: list = None,
+                  file_extension: str = ".png",
+                  *args, **kwargs):
+    '''
+    The figure thing is redundent, so I'm going to try a single function to do everything.
+    '''
+
+    if isinstance(title, str):
+        title = f"{title}\nTime Embedding w/ {gap}-mer Gap\n{count} Total Regions"
+    else:
+        title = f"Time Embedding w/ {gap}-mer Gap\n{count} Total Regions"
+
+    if backwards:
+        weights = ": weights are forwards and backwards"
+    else:
+        weights = ": weights are forwards"
+
+
+    # b_title = f"{b_title}{weights}{NS}"
+    title = f"{title}{weights}{nucsequence}"
+
+    x_title = f"History: {k_m}-Mer"
+    y_title = f"Future: {k_p}-Mer"
+
+    # Plot
+    fig, ax = plt.subplots(111)
+    fig.set_size_inches(20, 20)
+    for points in frame.values():
+        ax.scatter(points[:, 0], points[:, 1], s = dot_size, marker = "s", color = "k")
+    plt.title(title)
+    plt.xlabel(x_title)
+    plt.ylabel(y_title)
+    if isinstance(x_lim, list):
+        plt.xlim(x_lim[0], x_lim[1])
+        file_name = f"{file_name}_x_{x_lim[0]}v{x_lim[1]}"
+    if isinstance(y_lim, list):
+        plt.ylim(y_lim[0], y_lim[1])
+        file_name = f"{file_name}_y_{y_lim[0]}v{y_lim[1]}"
+    file = str(dir / f"{file_name}")
+
+    if isinstance(boxes, list):
+        for box in boxes:
+            if isinstance(box[3], str):
+                color = box[3]
+            else:
+                color = None
+            p = plt.Rectangle(box[0], box[1], box[2], edgecolor = color, linewidth = 2, fill = False)  #set_fill = False, 
+
+            ax.add_patch(p)
+    
+    if isinstance(x_tick_marks, dict):
+        ax.set_xticks(list(x_tick_marks.keys()))
+        ax.set_xticklabels(list(x_tick_marks.values()))
+    if isinstance(y_tick_marks, dict):
+        ax.set_yticks(list(y_tick_marks.keys()))
+        ax.set_yticklabels(list(y_tick_marks.values()))
+
+    if (file_extension in ".png") or (file_extension in ".pdf"):
+        plt.savefig(f"{file}{file_extension}")
+        print(f"Output image to {file}{file_extension}")
+        plt.close()
+    elif file_extension in ".pkl":
+        pickle.dump(ax, open(f"{file}", "w"))
 
 
 def old_time_embedding_plotly(k_p = 9, k_m = 9, gap = 0, max_rows = 200):
@@ -544,7 +624,7 @@ def scoring(N: list):
     return np.dot(np.array(w), np.array(n))
 
 
-def time_embedding_v2(data: pandas.DataFrame, 
+def time_embedding_v2a(data: pandas.DataFrame, 
                       n: int,
                       k_p: int = 6, k_m: int = 6, gap: int = 0, 
                       backwards: bool = True, 
@@ -558,7 +638,9 @@ def time_embedding_v2(data: pandas.DataFrame,
                       x_tick_marks: dict = None,
                       y_tick_marks: dict = None,
                       dot_size: float = 0.1,
-                      eoxes: list = None, ioxes: list = None):
+                      eoxes: list = None, ioxes: list = None,
+                      file_extension: str = ".png",
+                      *args, **kwargs):
     '''
     The new way of doing things with the updated data. You can put a pathlib in place of a Dataframe which then opens that file, but that data better be a Dataframe. I'm not going to code
     other ways of handeling that data. It's a Dataframe. Deal with it. WE'RE DEALING WITH THINGS TED!
@@ -707,7 +789,7 @@ def time_embedding_v2(data: pandas.DataFrame,
     if isinstance(y_lim, list):
         plt.ylim(y_lim[0], y_lim[1])
         e_file_name = f"{e_file_name}_y_{y_lim[0]}v{y_lim[1]}"
-    exon_file = str(exon_dir / f"{e_file_name}.png")
+    exon_file = str(exon_dir / f"{e_file_name}")
 
     if isinstance(eoxes, list):
         for box in eoxes:
@@ -724,7 +806,7 @@ def time_embedding_v2(data: pandas.DataFrame,
         ax.set_xticklabels(list(x_tick_marks.values()))
     if isinstance(y_tick_marks, dict):
         ax.set_yticks(list(y_tick_marks.keys()))
-        ax.set_yticklabels(list(x_tick_marks.values()))
+        ax.set_yticklabels(list(y_tick_marks.values()))
 
     plt.savefig(exon_file)
     print(f"Output image to {exon_file}")
@@ -745,7 +827,7 @@ def time_embedding_v2(data: pandas.DataFrame,
     if isinstance(y_lim, list):
         plt.ylim(y_lim[0], y_lim[1])
         i_file_name = f"{i_file_name}_y_{y_lim[0]}v{y_lim[1]}"
-    intron_file = str(intron_dir / f"{i_file_name}.png")
+    intron_file = str(intron_dir / f"{i_file_name}")
 
     if isinstance(ioxes, list):
         for box in ioxes:
@@ -762,11 +844,145 @@ def time_embedding_v2(data: pandas.DataFrame,
         ax.set_xticklabels(list(x_tick_marks.values()))
     if isinstance(y_tick_marks, dict):
         ax.set_yticks(list(y_tick_marks.keys()))
-        ax.set_yticklabels(list(x_tick_marks.values()))
+        ax.set_yticklabels(list(y_tick_marks.values()))
 
     plt.savefig(intron_file)
     print(f"Output image to {intron_file}")
     plt.close()
+
+
+
+def time_embedding_v2(data: pandas.DataFrame, 
+                      n: int,
+                      k_p: int = 6, k_m: int = 6, gap: int = 0, 
+                      backwards: bool = True, 
+                      nucsequence: str = "AGTC", PyPu: bool = False,
+                      sequence_name: str = "Seq",
+                      classification_name: str = "Classificaion",
+                      title: str = None,
+                      output_file: str = None,
+                      x_lim: list = None,
+                      y_lim: list = None,
+                      x_tick_marks: dict = None,
+                      y_tick_marks: dict = None,
+                      dot_size: float = 0.1,
+                      eoxes: list = None, ioxes: list = None,
+                      file_extension: str = ".png",
+                      *args, **kwargs):
+    '''
+    The new way of doing things with the updated data. You can put a pathlib in place of a Dataframe which then opens that file, but that data better be a Dataframe. I'm not going to code
+    other ways of handeling that data. It's a Dataframe. Deal with it. WE'RE DEALING WITH THINGS TED!
+
+    n represents the number of samples to be taken. I can't use all of them because some datasets have as much as 150,000, which basically freezes matplotlib.
+
+    The classification & sequence name is because I've done this a few different times with different data standards... and I probably screwed myself for that. But now I get to try to salvage that...
+    And yes, that says Classificaion, because I misspelled something.
+
+    Boxes allows you to draw on the plot. Boxes is a list of lists, and every sublist has an anchor point, a height, and a width. The anchor point itself should be a tuple. So it's boxes = [[[x0, y0], h0, w0, color0], [[x1, y1], h1, w1, color1], ..., [[xn, yn], hn, wn, colorn]]
+    '''
+    if PyPu:
+        NS = f"\nPy = 0, Pu = 1"
+        file_NS = f"_PyPu_{PyPu}"
+    else:
+        NS = f"\n{nucsequence}"
+        file_NS = f"_NucSeq_{nucsequence}"
+
+    if isinstance(data, pathlib.Path):
+        with open(data, "rb") as p:
+            data = pickle.load(p)
+
+    try:
+        data = data.sample(n = n).reset_index()
+    except ValueError as e:
+        data = data.reset_index()
+    except Exception as e:
+        print(type(e))
+        print(e)
+        print(data.shape)
+        print(n)
+        exit()
+
+
+    print(data.columns)
+
+    image_dir = cwd / "TE_Images_ForPaper"
+    image_dir.mkdir(parents = True, exist_ok = True)
+    exon_dir = image_dir / "Exon"
+    exon_dir.mkdir(parents = True, exist_ok = True)
+    intron_dir = image_dir / "Intron"
+    intron_dir.mkdir(parents = True, exist_ok = True)
+    both_dir = image_dir / "Both"
+    both_dir.mkdir(parents = True, exist_ok = True)
+
+    # gene: Gene.Gene
+    # ncib: str
+
+    rows, cols = data.shape
+
+    if "Length" in data.columns:
+        data = data[data["Length"] > (k_m + k_p + gap)]
+    else:
+        data["Length"] = data.Seq.str.len()
+        data = data[data["Length"] > (k_m + k_p + gap)]
+
+    b_frame, e_frame, i_frame = {}, {}, {}  # OK this may seem weird, but hear me out: lists are slow, especially when you have a very large N in a list. But a dictionary is hashable, so I can store the lists in the dictionary, who cares about the key, and it should be faster for large N
+    b_count, e_count, i_count = 0, 0, 0
+
+    for row in range(rows):
+        try:
+            sequence = data.loc[row, sequence_name].upper()
+        except Exception as e:
+            print(type(e))
+            print(e)
+            print(row)
+            continue
+            exit()
+
+        region = data.loc[row, classification_name]
+
+        if PyPu:
+            xy = time_embedding_PyPu(sequence, k_p = k_p, k_m = k_m, gap = gap, m_backwards = backwards)
+        else:
+            xy = time_embedding(sequence, k_p = k_p, k_m = k_m, gap = gap, m_backwards = backwards, nucsequence = nucsequence)
+
+        if isinstance(x_lim, list):
+            xy = xy[(x_lim[1] >= xy[:, 0]) & (xy[:, 0] >= x_lim[0])]
+            # xy = np.where((x_lim[1] >= xy[:, 0]) & (xy[:, 0] >= x_lim[0]))  # Filter the number of points down to a zoomed in area. Should help speed up the process of making the actual graph
+        if isinstance(y_lim, list):
+            xy = xy[(y_lim[1] >= xy[:, 1]) & (xy[:, 1] >= y_lim[0])]
+            # xy = np.where((y_lim[1] >= xy[:, 1]) & (xy[:, 1] >= y_lim[0]))
+        
+        if (region in "Exon") or (region in "exon") or (region in "e"):  # because I realized I was doing this like 3 different ways... I probably should have been more precise.
+            e_frame[e_count] = xy
+            e_count += 1
+        elif (region in "Intron") or (region in "intron") or (region in "i"):
+            i_frame[i_count] = xy
+            i_count += 1
+
+        # b_frame[b_count] = xy
+        # b_count += 1
+
+        if ((row % 1000) == 0):
+            print(f"Finished row {row} of {rows}")
+
+    e_file_name: str = f"{output_file}_exon_gap_{gap}_{k_m}v{k_p}_Back_{backwards}{file_NS}"
+    matplotfigure(e_frame, exon_dir, e_count, 
+                  k_p = k_p, k_m = k_m, gap = gap, backwards = backwards, nucsequence = nucsequence, PyPu = PyPu, 
+                  title = title, file_name = e_file_name,
+                  x_lim = x_lim, y_lim = y_lim,
+                  x_tick_marks = x_tick_marks, y_tick_marks = y_tick_marks,
+                  dot_size = dot_size, boxes = eoxes, file_extension = file_extension)
+
+    i_file_name: str = f"{output_file}_intron_gap_{gap}_{k_m}v{k_p}_Back_{backwards}{file_NS}"
+    matplotfigure(e_frame, exon_dir, e_count, 
+                  k_p = k_p, k_m = k_m, gap = gap, backwards = backwards, nucsequence = nucsequence, PyPu = PyPu, 
+                  title = title, file_name = i_file_name,
+                  x_lim = x_lim, y_lim = y_lim,
+                  x_tick_marks = x_tick_marks, y_tick_marks = y_tick_marks,
+                  dot_size = dot_size, boxes = eoxes, file_extension = file_extension)
+
+
+
 
 
 def time_embedding_v3(data: pandas.DataFrame,
@@ -867,26 +1083,6 @@ def time_embedding_v3(data: pandas.DataFrame,
                     i_frame[index] = {"x": r[0], "y": r[1], "z": 1}
                 else:
                     i_frame[index]["z"] += 1
-
-            # # r = np.array([r[0], r[1], 1])
-            # if (r[0] in master_xy[:, 0]):
-            #     index = np.where(master_xy[:, 0] == r[0])[0] # matching to the x cord
-            #     # print(index, type(index))
-            #     for i in index:
-            #         # print(i, type(i))
-            #         if (r[1] == master_xy[i, 1]): # matching to the y cord
-            #             master_xy[i, 2] += 1
-            #             break
-            #     else: # failed to match to the y cord, need to add it to the master matrix
-            #         r = np.array([r[0], r[1], 1])
-            #         master_xy = np.insert(master_xy, master_xy.shape[0], r, axis = 0)
-            # else:
-            #     r = np.array([r[0], r[1], 1])
-            #     master_xy = np.insert(master_xy, master_xy.shape[0], r, axis = 0)
-        
-
-        # b_frame[b_count] = xy
-        # b_count += 1
 
         if ((row % 1000) == 0):
             print(f"Finished row {row} of {rows}")
