@@ -21,16 +21,17 @@ def main():
 
     This script is meant to scan through all the different regions and take note of what they are composed of.
     '''
-    kmer = 4
+    kmer = 2
     linux_path = f"/media/ethanspeakman/Elements/"
-    windows_path = f"F:/"
+    windows_path = f"G:/"
 
     data_path = windows_path
 
-    data_1 = pathlib.Path(f"{data_path}/Gene_Data_Sets/Data_Set_1_frame.pkl")  # I know the method says it was a dataframe, but I also coded it where it can just take a pathlib and load the data. I got lazy
-    output_file_1 = cwd / f"GeneSurvey_1_{kmer}mer.pkl"
-    data_2 = pathlib.Path(f"{data_path}/Gene_Data_Sets/Data_Set_2_frame.pkl")  # I know the method says it was a dataframe, but I also coded it where it can just take a pathlib and load the data. I got lazy
-    output_file_2 = cwd / f"GeneSurvey_2_{kmer}mer.pkl"
+    # This needs to use the same data for the histogram
+    data_1 = pathlib.Path(f"{data_path}/Gene_Data_Sets/Data_Set_1_histogram.pkl")  # I know the method says it was a dataframe, but I also coded it where it can just take a pathlib and load the data. I got lazy
+    output_file_1 = cwd / f"GeneSurvey_1_{kmer}mer_hist.pkl"
+    data_2 = pathlib.Path(f"{data_path}/Gene_Data_Sets/Data_Set_2_histogram.pkl")  # I know the method says it was a dataframe, but I also coded it where it can just take a pathlib and load the data. I got lazy
+    output_file_2 = cwd / f"GeneSurvey_2_{kmer}mer_hist.pkl"
 
     # print(data_1)
     survey(data_1, output_file_1, kmer)

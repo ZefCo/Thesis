@@ -89,13 +89,14 @@ def main():
     
     matplotfigure(cwd / "TE_Images_ForPaper" / "Dict" / f"{exon_dict_file}.pkl",
                   cwd / "TE_Images_ForPaper" / "Exon",
-                  f"{exon_dict_file}.png",
+                  f"{exon_dict_file}_ptest.png",
                   x_lim=x_lim, y_lim=y_lim,
                   x_tick_marks=x_ticks, y_tick_marks=y_ticks,
                   dot_size=s)
+
     matplotfigure(cwd / "TE_Images_ForPaper" / "Dict" / f"{intron_dict_file}.pkl",
                   cwd / "TE_Images_ForPaper" / "Intron",
-                  f"{intron_dict_file}.png",
+                  f"{intron_dict_file}_ptest.png",
                   x_lim=x_lim, y_lim=y_lim,
                   x_tick_marks=x_ticks, y_tick_marks=y_ticks,
                   dot_size=s)
@@ -142,8 +143,6 @@ def matplotfigure(frame: dict or pathlib.Path or str,
                   backwards: bool = True, 
                   nucsequence: str = "AGTC",
                   title: str = None,
-                  x_lim: list = None,
-                  y_lim: list = None,
                   x_tick_marks: dict = None,
                   y_tick_marks: dict = None,
                   dot_size: float = 0.1,
@@ -161,8 +160,10 @@ def matplotfigure(frame: dict or pathlib.Path or str,
     file_name = file_name.with_suffix("")
     file_name = pathlib.Path(str(file_name).replace(".", ""))
     file_name = file_name.with_suffix(file_extension)
+    file = dir / f"{file_name}"
+
     # print(file_name)
-    # print(file_extension)
+    # # print(file_extension)
     # exit()
 
     if isinstance(frame, pathlib.Path) or isinstance(frame, str):
@@ -197,13 +198,6 @@ def matplotfigure(frame: dict or pathlib.Path or str,
     plt.title(title)
     plt.xlabel(x_title)
     plt.ylabel(y_title)
-    if isinstance(x_lim, list):
-        plt.xlim(x_lim[0], x_lim[1])
-        file_name = f"{file_name}_x_{x_lim[0]}v{x_lim[1]}"
-    if isinstance(y_lim, list):
-        plt.ylim(y_lim[0], y_lim[1])
-        file_name = f"{file_name}_y_{y_lim[0]}v{y_lim[1]}"
-    file = dir / f"{file_name}"
 
     if isinstance(boxes, list):
         for box in boxes:
