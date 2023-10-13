@@ -72,10 +72,19 @@ def main():
     # y2 = 0.5
 
     xy = np.array([[x1, x2], [y1, y2]])
-    xy = scores(xy)
-    print(f"Backwards propogation:\n\tx1 = {xy[0][X][0]}\tx2 = {xy[0][X][1]}\n\ty1 = {xy[0][Y][0]}\ty2 = {xy[0][Y][1]}")
-    print(f"Original position:\n\tx1 = {xy[1][X][0]}\tx2 = {xy[1][X][1]}\n\ty1 = {xy[1][Y][0]}\ty2 = {xy[1][Y][1]}")
-    print(f"Forwards propogation:\n\tx1 = {xy[2][X][0]}\tx2 = {xy[2][X][1]}\n\ty1 = {xy[2][Y][0]}\ty2 = {xy[2][Y][1]}")
+    score_file = f"Scores_x_{x1}_{x2}_y_{y1}_{y2}"
+    score_file = score_file.replace(".", "")
+    score_file = cwd / "TE_Images_ForPaper" / "Scores" / f"{score_file}.csv"
+
+    # xy = scores(xy)
+    # print(f"Backwards propogation:\n\tx1 = {xy[0][X][0]}\tx2 = {xy[0][X][1]}\n\ty1 = {xy[0][Y][0]}\ty2 = {xy[0][Y][1]}")
+    # print(f"Original position:\n\tx1 = {xy[1][X][0]}\tx2 = {xy[1][X][1]}\n\ty1 = {xy[1][Y][0]}\ty2 = {xy[1][Y][1]}")
+    # print(f"Forwards propogation:\n\tx1 = {xy[2][X][0]}\tx2 = {xy[2][X][1]}\n\ty1 = {xy[2][Y][0]}\ty2 = {xy[2][Y][1]}")
+
+    xy = kscores(xy, 4)
+    xy = convert2frame(xy)
+    xy.to_csv(score_file)
+    print(f"Printed to {score_file}")
 
 
 def score_propogation(x1: float, x2: float):
@@ -86,9 +95,6 @@ def score_propogation(x1: float, x2: float):
     x2p = 0.25 * (int(4*x1) + x2)
 
     return x1p, x2p
-
-
-
 
 
 def scores(score: np.ndarray) -> np.ndarray:
@@ -122,6 +128,52 @@ def scores(score: np.ndarray) -> np.ndarray:
     xy[2][Y][0], xy[2][Y][1] = y[0], y[1]
 
     return xy
+
+def kscores(score: np.ndarray, k: int) -> np.ndarray:
+    '''
+    Finds 2*k scores from an inital score, returning 2*k+1 scores.
+    '''
+    # print(f"Starting at {k}")
+
+    X, Y  = 0, 1
+    xy = np.zeros(shape = (2*k + 1, 2, 2))
+
+    xy[k][X] = score[X]
+    xy[k][Y] = score[Y]
+
+    # print(f"Back propogation")
+    for i in range(k - 1, -1, -1):
+        y, x = _propogation(xy[i + k][Y], xy[i + 1][X])
+        xy[i][X][0], xy[i][X][1] = x[0], x[1]
+        xy[i][Y][0], xy[i][Y][1] = y[0], y[1]
+
+
+    # print(f"Froward propogation")
+    for j in range(k + 1, 2*k + 1, 1):
+        x, y = _propogation(xy[j - 1][X], xy[j - 1][Y])
+        xy[j][X][0], xy[j][X][1] = x[0], x[1]
+        xy[j][Y][0], xy[j][Y][1] = y[0], y[1]
+
+    return xy
+
+
+def convert2frame(array: np.ndarray) -> pandas.DataFrame:
+    '''
+    Input an array that is kx2x2 and output a kx4 dataframe
+    '''
+    X, Y = 0, 1
+    i, _, _ = array.shape
+    
+    zeros: np.ndarray = np.zeros(shape = (i, 4))
+    index = [j - int(i/2) for j in range(i)]
+    frame: pandas.DataFrame = pandas.DataFrame(zeros, columns=["X1", "X2", "Y1", "Y2"], index=index)
+
+    for j in range(i):
+        xy = array[j]
+        frame.iloc[j, 0], frame.iloc[j, 1] = xy[X][0], xy[X][1]
+        frame.iloc[j, 2], frame.iloc[j, 3] = xy[Y][0], xy[Y][1]
+
+    return frame
 
 
 def _propogation(x: np.ndarray, y: np.ndarray) -> tuple:
