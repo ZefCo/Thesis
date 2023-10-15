@@ -29,15 +29,15 @@ def main():
 
     # This needs to use the same data for the histogram
     data_1 = pathlib.Path(f"{data_path}/Gene_Data_Sets/Data_Set_1_histogram.pkl")  # I know the method says it was a dataframe, but I also coded it where it can just take a pathlib and load the data. I got lazy
-    output_file_1 = cwd / f"GeneSurvey_1_{kmer}mer_hist.pkl"
+    output_file_1 = cwd / f"GeneSurvey_1_{kmer}mer_hist_reversed.pkl"
     data_2 = pathlib.Path(f"{data_path}/Gene_Data_Sets/Data_Set_2_histogram.pkl")  # I know the method says it was a dataframe, but I also coded it where it can just take a pathlib and load the data. I got lazy
-    output_file_2 = cwd / f"GeneSurvey_2_{kmer}mer_hist.pkl"
+    output_file_2 = cwd / f"GeneSurvey_2_{kmer}mer_hist_reversed.pkl"
 
     # print(data_1)
-    survey(data_1, output_file_1, kmer)
-    survey(data_2, output_file_2, kmer)
-    recreate(output_file_1, kmer, title = "Dataset 1 Histogram Method", labels = True, output_file = pathlib.Path(cwd / f"GeneSurvey_Dataset1_{kmer}mer.html"))
-    recreate(output_file_2, kmer, title = "Dataset 2 Histogram Method", labels = True, output_file = pathlib.Path(cwd / f"GeneSurvey_Dataset2_{kmer}mer.html"))
+    survey(data_1, output_file_1, kmer, reverse = True)
+    survey(data_2, output_file_2, kmer, reverse = True)
+    recreate(output_file_1, kmer, title = "Dataset 1 Histogram Method Reversed Seqeunces", labels = True, output_file = pathlib.Path(cwd / f"GeneSurvey_Dataset1_{kmer}mer_reversed.html"))
+    recreate(output_file_2, kmer, title = "Dataset 2 Histogram Method Reversed Seqeunces", labels = True, output_file = pathlib.Path(cwd / f"GeneSurvey_Dataset2_{kmer}mer_reversed.html"))
 
 
 def count_occurences(sequence: str, permutations: list):
@@ -54,7 +54,7 @@ def count_occurences(sequence: str, permutations: list):
     return occurences
 
 
-def nucleotide_counter(sequence: str, window_size: int) -> dict:
+def nucleotide_counter(sequence: str, window_size: int, reverse: bool = False) -> dict:
     '''
     '''
     keys: set = set()
@@ -64,6 +64,8 @@ def nucleotide_counter(sequence: str, window_size: int) -> dict:
 
     for i in range(len(sequence) - window_size):
         seq = sequence[i: i + window_size].upper()
+        if reverse:
+            seq = seq[::-1]
 
         if seq not in keys:
             keys.add(seq)
@@ -80,7 +82,7 @@ def nucleotide_counter(sequence: str, window_size: int) -> dict:
     return counter
 
 
-def regional_survey(data: pandas.DataFrame, kmer: int, sequence_name: str = "Seq") -> dict:
+def regional_survey(data: pandas.DataFrame, kmer: int, sequence_name: str = "Seq", *args, **kwargs) -> dict:
     '''
     '''
     rows, cols = data.shape
@@ -89,7 +91,7 @@ def regional_survey(data: pandas.DataFrame, kmer: int, sequence_name: str = "Seq
     for row in range(rows):
         seq_of_interest = data.loc[row, sequence_name]
 
-        nuc_count = nucleotide_counter(seq_of_interest, kmer)
+        nuc_count = nucleotide_counter(seq_of_interest, kmer, **kwargs)
 
         for key, value in nuc_count.items():
             if key in regional_mer.keys():
@@ -129,7 +131,8 @@ def statistics(global_mer, exon_mer, intron_mer, kmer: int) -> pandas.DataFrame:
 
 
 def survey(data: pandas.DataFrame or pathlib.Path, output_file: pathlib.Path, kmer: int, min_length: int = 10, 
-           sequence_column: str = "Seq", classification_name: str = "Classificaion", exon_name: str = "exon", intron_name: str = "intron"):
+           sequence_column: str = "Seq", classification_name: str = "Classificaion", exon_name: str = "exon", intron_name: str = "intron",
+           *args, **kwargs):
     '''
     '''
     if isinstance(data, pathlib.Path):
