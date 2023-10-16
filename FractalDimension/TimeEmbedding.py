@@ -35,32 +35,53 @@ def main():
 
     data_path = windows_path
 
-    # Zoomed in Picture    
-    x_lim = [0.75, 1.0]
-    y_lim = [0.25, 0.5]
-    x_ticks = {x/100:x/100 for x in range(75, 100 + 1, 1)}
-    y_ticks = {y/100:y/100 for y in range(25, 50 + 1, 1)}
-    s = 0.5
+    # # Zoomed in Picture    
+    # x_lim = [0.75, 1.0]
+    # y_lim = [0.25, 0.5]
+    # x_ticks = {x/100:x/100 for x in range(75, 100 + 1, 1)}
+    # y_ticks = {y/100:y/100 for y in range(25, 50 + 1, 1)}
+    # s = 0.5
 
     # Non Zoomed Picture
-    # x_lim = None
-    # y_lim = None
-    # x_ticks = None
-    # y_ticks = None
-    # s = 0.01
+    x_lim = None
+    y_lim = None
+    x_ticks = None
+    y_ticks = None
+    s = 0.01
 
     # s = 1
     # data_set = f"1&2"
     data_set = 1
 
-    # box1 = [[0.75, 0.25], 0.25, 0.25, "red"]  # major box
-    # box2 = [[0.4375, 0.0], 0.5 - 0.4375, 1.0, "red"]  # forward box
-    # box3 = [[0, 0.8125], 1.0, 0.875 - 0.8125, "red"]  # backward box
+    box1 = [[0, 0.8125], 1.0, 0.875 - 0.8125, ["blue", 4]]  # backward box
+    
+    box2 = [[0.75, 0.25], 0.25, 0.25, ["red", 4]]  # major box
+    arrow = arrows([[0, 0.8125], [1.0, 0.875 - 0.8125]], [[0.75, 0.25], [0.25, 0.25]])
+    # print(arrow)
+    box2.append([arrow[0][0], arrow[0][1], arrow[1][0], arrow[1][1], 0.008, "blue"])
+    
+    box3 = [[0.4375, 0.0], 0.5 - 0.4375, 1.0, ["green", 4]]  # forward box
+    arrow = arrows([[0.75, 0.25], [0.25, 0.25]], [[0.4375, 0.0], [0.5 - 0.4375, 1.0]])
+    box3.append([arrow[0][0], arrow[0][1], arrow[1][0], arrow[1][1], 0.008, "red"])
+
+    # print(box1)
+    # print(box2)
+    # print(box3)
+    # exit()
+    
     # box4 = [[0, 0.25], 0.25, 0.25, "green"] # comparison box
-    # boxes = [box1, box2, box3, box4]
-    boxes = None
+    
+    boxes = [box1, box2, box3]
+    # boxes = None
     # title = "Still working on placement of boxes"
     title = None
+
+    # arrow_box_expl = [0 + 1.0/2, 0.8125 + (0.875 - 0.8125)/2, (0.75 + (0.25/2)) - (0 + 1.0/2), (0.25 + (0.25/2)) - (0.8125 + ((0.875 - 0.8125) / 2)) , 0.008, "blue"]
+    # arrow_box_func = arrows([[0, 0.8125], [1.0, 0.875 - 0.8125], "blue"], [[0.75, 0.25], [0.25, 0.25], "red"])
+
+    # print(arrow_box_expl)
+    # print(arrow_box_func)
+    # exit()
 
     n = 100_000
     if isinstance(x_lim, list):
@@ -71,12 +92,6 @@ def main():
         intron_dict_file = f"IntronData_n{n}_DS{data_set}_kp6_km6_zoomed_x{x_lim[0]}by{x_lim[1]}_y{y_lim[0]}by{y_lim[1]}"
     else:
         intron_dict_file = f"IntronData_n{n}_DS{data_set}_kp6_km6"
-
-    # reload_matplotlib(cwd / "TE_Images_ForPaper" / "Intron" / "BF_DS1_boxed_n100000_intron_gap_0_6v6_Back_True_NucSeq_AGTC.pkl",
-    #                   cwd / "TE_Images_ForPaper" / "Intron" / "Test_zoom.png",
-    #                   x_lim = x_lim, y_lim = y_lim,
-    #                   x_tick_marks = x_ticks, y_tick_marks = y_ticks)
-    # exit()
 
     # time_embedding_v2(pathlib.Path(f"{data_path}/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl"), 
     #                   n = n, 
@@ -89,17 +104,23 @@ def main():
     
     matplotfigure(cwd / "TE_Images_ForPaper" / "Dict" / f"{exon_dict_file}.pkl",
                   cwd / "TE_Images_ForPaper" / "Exon",
-                  f"{exon_dict_file}_ptest.png",
+                  f"{exon_dict_file}.png",
                   x_lim=x_lim, y_lim=y_lim,
                   x_tick_marks=x_ticks, y_tick_marks=y_ticks,
+                  boxes = boxes,
                   dot_size=s)
-
+    
     matplotfigure(cwd / "TE_Images_ForPaper" / "Dict" / f"{intron_dict_file}.pkl",
                   cwd / "TE_Images_ForPaper" / "Intron",
-                  f"{intron_dict_file}_ptest.png",
+                  f"{intron_dict_file}.png",
                   x_lim=x_lim, y_lim=y_lim,
                   x_tick_marks=x_ticks, y_tick_marks=y_ticks,
+                  boxes = boxes,
                   dot_size=s)
+
+    # reload_matplotlib(cwd / "TE_Images_ForPaper" / "Exon" / f"{exon_dict_file}_pkltest.pkl", cwd / "TE_Images_ForPaper" / "Exon" / f"{exon_dict_file}_pkltest.png", boxes = boxes)
+    # reload_matplotlib(cwd / "TE_Images_ForPaper" / "Intron" / f"{intron_dict_file}_pkltest.pkl", cwd / "TE_Images_ForPaper" / "Intron" / f"{intron_dict_file}_pkltest.png", boxes = boxes)
+
 
 
 
@@ -136,6 +157,38 @@ def score_keys(k = 9, nucsequence: str = "AGTC"):
 
 
 
+def _clean_filepath(filepath: pathlib.Path) -> tuple:
+    '''
+    Just cleans the filepath and removes unnecessary .
+    '''
+    file_extension = filepath.suffix
+    filepath = filepath.with_suffix("")
+    filepath = pathlib.Path(str(filepath).replace(".", ""))
+    filepath = filepath.with_suffix(file_extension)
+
+    return filepath, file_extension
+
+
+
+def arrows(xy0: np.ndarray or list, xy1: np.ndarray or list) -> list:
+    '''
+    Getting the arrows is a bit of a challenge, so I'm going to make a single function that will do the work for me.
+
+    The arrows need x, y, dx, dy. I want to get all of those form x0, y0, dx0, dy0, x1, y1, dx1, dy1 which generate the boxes.
+
+    The inputs should be a 2x2 numpy array, the first row being x, y, and the second row being dx, dy, or something that can be indexed twice like embedded lists.
+    '''
+    R = X = 0
+    D = Y = 1
+    r_half = lambda r, dr: r + (dr / 2)
+
+    start = [r_half(xy0[R][X], xy0[D][X]), r_half(xy0[R][Y], xy0[D][Y])]
+    delta = [r_half(xy1[R][X], xy1[D][X]) - r_half(xy0[R][X], xy0[D][X]), r_half(xy1[R][Y], xy1[D][Y]) - r_half(xy0[R][Y], xy0[D][Y])]
+
+    return [start, delta]
+
+
+
 def matplotfigure(frame: dict or pathlib.Path or str,
                   dir: str or pathlib.Path,
                   file_name: str or pathlib.Path,
@@ -152,14 +205,14 @@ def matplotfigure(frame: dict or pathlib.Path or str,
     The figure thing is redundent, so I'm going to try a single function to do everything.
 
     If frame == pathlib.Path or str then it loads that pickle file into the frame. dir is the output dir.
+
+    Boxes allows you to draw on the plot. Boxes is a list of lists, and every sublist has an anchor point, a height, and a width. 
+    The anchor point itself should be a tuple. So it's boxes = [[[x0, y0], h0, w0, [color0, linewidth0]], [[x1, y1], h1, w1, [color1, linewidth1]], ..., [[xn, yn], hn, wn, [colorn, linewidthn]]]
+    A fifth element can be added which includes arrow information: [x, y, dx, dy, width, color]
     '''
     if isinstance(file_name, str):
         file_name: pathlib.Path = pathlib.Path(file_name)
-
-    file_extension = file_name.suffix
-    file_name = file_name.with_suffix("")
-    file_name = pathlib.Path(str(file_name).replace(".", ""))
-    file_name = file_name.with_suffix(file_extension)
+    file_name, file_extension = _clean_filepath(file_name)
     file = dir / f"{file_name}"
 
     # print(file_name)
@@ -201,13 +254,18 @@ def matplotfigure(frame: dict or pathlib.Path or str,
 
     if isinstance(boxes, list):
         for box in boxes:
-            if isinstance(box[3], str):
-                color = box[3]
+            if isinstance(box[3], list):
+                color = box[3][0]
+                linewidth = box[3][1]
             else:
                 color = None
-            p = plt.Rectangle(box[0], box[1], box[2], edgecolor = color, linewidth = 2, fill = False)  #set_fill = False, 
-
+                linewidth = 2
+            p = plt.Rectangle(box[0], box[1], box[2], edgecolor = color, linewidth = linewidth, fill = False)  #set_fill = False, 
             ax.add_patch(p)
+
+            if len(box) == 5:
+                arrow = box[4]
+                plt.arrow(arrow[0], arrow[1], arrow[2], arrow[3], width = arrow[4], facecolor = arrow[5], edgecolor = "none", length_includes_head = True)
     
     if isinstance(x_tick_marks, dict):
         ax.set_xticks(list(x_tick_marks.keys()))
@@ -227,44 +285,51 @@ def matplotfigure(frame: dict or pathlib.Path or str,
 
 def reload_matplotlib(file_path: str or pathlib.Path,
                       output_file: str or pathlib.Path,
-                      x_lim: list = None, y_lim: list = None,
-                      x_tick_marks: dict = None, y_tick_marks: dict = None,
-                      dot_size: float = 0.1,
                       boxes: list = None):
     '''
+    This is overall not working. There is some difficulty in trying to get the plots to actually redo things, and I dont' want to waste time on it. I'm going to make dictionaries and pickle
+    those to save the data, then put it into a matplotlib and modify that. It will be a little slower but at least I can do things that way.
+
+
     Reloads a pickeled image. If the image was pickled this will reload it and allow the image to be zoomed in or out, or to put boxes on it. It's beacuse this beats
     having to do the same thing over and over again with N = very large number. Now I can make one plot with a very large N and then reload that same image to put boxes
     on them as I find them.
     '''
-    with open(file_path, "rb") as ax:
-        re_plt: plt  = pickle.load(ax)
+    file_path, _ = _clean_filepath(file_path)
+    re_plt, ax = _steal_manager()
 
-    if isinstance(x_lim, list):
-        plt.xlim(x_lim[0], x_lim[1])
-    if isinstance(y_lim, list):
-        plt.ylim(y_lim[0], y_lim[1])
+    with open(file_path, "rb") as file:
+        try:
+            re_plt: plt  = pickle.load(file)
+        except Exception as e:
+            print(type(e))
+            print(e)
+            exit()
 
-    # # print(type(fig))
-    # # fig.show()
-    # if isinstance(boxes, list):
-    #     for box in boxes:
-    #         if isinstance(box[3], str):
-    #             color = box[3]
-    #         else:
-    #             color = None
-    #         p = plt.Rectangle(box[0], box[1], box[2], edgecolor = color, linewidth = 2, fill = False)  #set_fill = False, 
+    # print(type(fig))
+    # fig.show()
+    if isinstance(boxes, list):
+        for box in boxes:
+            if isinstance(box[3], str):
+                color = box[3]
+            else:
+                color = None
+            p = plt.Rectangle(box[0], box[1], box[2], edgecolor = color, linewidth = 2, fill = False)  #set_fill = False, 
 
-    #         ax.add_patch(p)
+            ax.add_patch(p)
     
-    # if isinstance(x_tick_marks, dict):
-    #     ax.set_xticks(list(x_tick_marks.keys()))
-    #     ax.set_xticklabels(list(x_tick_marks.values()))
-    # if isinstance(y_tick_marks, dict):
-    #     ax.set_yticks(list(y_tick_marks.keys()))
-    #     ax.set_yticklabels(list(y_tick_marks.values()))
-
     re_plt.savefig(output_file)
     print(f"Output image to {output_file}")
+
+
+
+def _steal_manager():
+    '''
+    You can't just load the pickle file from matplot lib, you have to steal the canvas manager. This creates a dummy figure to hijack and use when loading a pickle file.
+    '''
+    fig, ax = plt.subplots()
+
+    return fig, ax
 
 
 def time_embedding(sequence: str, 
