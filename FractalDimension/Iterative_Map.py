@@ -63,6 +63,7 @@ def main():
     x2 = float(input("Input a value for x2: "))
     y1 = float(input("Input a value for y1: "))
     y2 = float(input("Input a value for y2: "))
+    k = int(input("Input number of iterations k: "))
     X, Y = 0, 1
 
     # print("Testing with [0.75, 1.0], [0.25. 0.5]")
@@ -81,7 +82,7 @@ def main():
     # print(f"Original position:\n\tx1 = {xy[1][X][0]}\tx2 = {xy[1][X][1]}\n\ty1 = {xy[1][Y][0]}\ty2 = {xy[1][Y][1]}")
     # print(f"Forwards propogation:\n\tx1 = {xy[2][X][0]}\tx2 = {xy[2][X][1]}\n\ty1 = {xy[2][Y][0]}\ty2 = {xy[2][Y][1]}")
 
-    xy = kscores(xy, 4)
+    xy = kscores(xy, k)
     xy = convert2frame(xy)
     xy.to_csv(score_file)
     print(f"Printed to {score_file}")
@@ -143,7 +144,7 @@ def kscores(score: np.ndarray, k: int) -> np.ndarray:
 
     # print(f"Back propogation")
     for i in range(k - 1, -1, -1):
-        y, x = _propogation(xy[i + k][Y], xy[i + 1][X])
+        y, x = _propogation(xy[i + 1][Y], xy[i + 1][X])
         xy[i][X][0], xy[i][X][1] = x[0], x[1]
         xy[i][Y][0], xy[i][Y][1] = y[0], y[1]
 
