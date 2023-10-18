@@ -11,13 +11,55 @@ import DistanceClass as distance
 # from statsmodels.graphics.tsaplots import plot_acf
 import pandas
 import pickle
+import icecream as ic
 
 
 def main():
     '''
     '''
+    data_set = 1
+    linux_path = f"/media/ethanspeakman/Elements/"
+    windows_path = f"F:/"
+
+    data_path = windows_path
+    exon_dict_file = f"ExonData_n100000_DS{data_set}_kp6_km6"
+
+
     # doeverything(plotlog = True, plotboth = False, autocorplot = False, dot_size = 2, line_width = 0.25)
-    doExonIntron()
+    # doExonIntron()
+
+    time_embedding_count(cwd / "TE_Images_ForPaper" / "Dict" / f"{exon_dict_file}.pkl")
+
+
+
+
+def _import_dict(file_path: pathlib.Path or str):
+    '''
+    Imports a dictioanry of data.
+    '''
+    if isinstance(file_path, str):
+        file_path = pathlib.Path(file_path)
+
+    with open(file_path, "rb") as p:
+        data = pickle.load(p)
+
+    return data
+
+
+
+def time_embedding_count(data: pathlib.Path or str or dict):
+    '''
+    Loads up a dataset and counts all the points in that region.
+    
+    Also could do the correlation dimension in that region too.
+    '''
+
+    if isinstance(data, str) or isinstance(data, pathlib.Path):
+        data: dict = _import_dict(data)
+
+    # print(data)
+    print(type(data))
+    print(data.keys())
 
 
 

@@ -18,6 +18,9 @@ import random
 
 def main():
     '''
+    Break this out and create a new script for playing with the boxes and arrows. Use something like: Green = 0th, Red = -N iterations, Blue = +N iterations. Have it fade or try lighter shades every iteration.
+    Also need to figure out a way to get the density of the points in these regions. Want to compare the Exon to Intron, so target low density regions. Then we want to count the points. Maybe consider a correlation dimension (my idea, not Dr. Gs)
+
     I really need a new name for this, Time Embedding doens't work.
 
     k-Mer Time Series. That's a better name.
@@ -27,8 +30,8 @@ def main():
     Time embedding v3: make one that goes through a gene (all its different forms) and plots the trajectory of the k windows. Does something happen for the introns and the exons?
     You'll have to also do the exons and introns seperatly, but we want to see how the trajectory can "jump" from exon to intron: maybe there is something of interest there?
     '''
-    # score_keys(k = 6)
-    # exit()
+    score_keys(k = 6)
+    exit()
 
     linux_path = f"/media/ethanspeakman/Elements/"
     windows_path = f"F:/"
@@ -48,50 +51,44 @@ def main():
     x_ticks = None
     y_ticks = None
     s = 0.01
+    n = 100_000
 
     # s = 1
     # data_set = f"1&2"
     data_set = 1
 
-    box1 = [[0, 0.8125], 1.0, 0.875 - 0.8125, ["blue", 4]]  # backward box
+    # box = [xB, yB, dxB, dyB, "color of box", box thickness, fill (true/false), alpha]
+    # fill = [x1, x2, y1, y2, color, alpha]
+    # arrow[xA, yA, dxA, dxY, arrow thickness, "color of arrow"]
+    box_4 = [0.0068359375, 0.0, 0.0078125 - 0.0068359375, 1.0, "red", 4, True, 0.2]
+    box_3 = [0.02734375, 0.0, 0.03125 - 0.02734375, 1.0, "red", 4, True, 0.3]
+    box_2 = [0.109375, 0.0, 0.125 - 0.109375, 1.0, "red", 4, True, 0.4]
+    box_1 = [0.4375, 0.0, 0.5 - 0.4375, 1.0, "red", 4, True, 0.5]  # backward box
     
-    box2 = [[0.75, 0.25], 0.25, 0.25, ["red", 4]]  # major box
-    arrow = arrows([[0, 0.8125], [1.0, 0.875 - 0.8125]], [[0.75, 0.25], [0.25, 0.25]])
-    # print(arrow)
-    box2.append([arrow[0][0], arrow[0][1], arrow[1][0], arrow[1][1], 0.008, "blue"])
+    box_m = [0.75, 0.25, 0.25, 0.25, "green", 4, True, 0.5]  # major box
     
-    box3 = [[0.4375, 0.0], 0.5 - 0.4375, 1.0, ["green", 4]]  # forward box
-    arrow = arrows([[0.75, 0.25], [0.25, 0.25]], [[0.4375, 0.0], [0.5 - 0.4375, 1.0]])
-    box3.append([arrow[0][0], arrow[0][1], arrow[1][0], arrow[1][1], 0.008, "red"])
-
-    # print(box1)
-    # print(box2)
-    # print(box3)
-    # exit()
+    boxp1 = [0.0, 0.8125, 1.0, 0.875 - 0.8125, "blue", 4, True, 0.5]  # forward box
+    boxp2 = [0.0, 0.203125, 1.0, 0.21875 - 0.203125, "blue", 4, True, 0.4]  # forward box
+    boxp3 = [0.0, 0.05078125, 1.0, 0.0546875 - 0.05078125, "blue", 4, True, 0.3]  # forward box
+    boxp4 = [0.0, 0.0126953125, 1.0, 0.013671875 - 0.0126953125, "blue", 4, True, 0.2]  # forward box
     
-    # box4 = [[0, 0.25], 0.25, 0.25, "green"] # comparison box
+    # arrow = arrows([[0.0, 0.203125], [1.0, 0.21875 - 0.203125]], [[1.0, 0.875 - 0.8125], [0.0, 0.8125]])
+    # box3.append([arrow[0][0], arrow[0][1], arrow[1][0], arrow[1][1], 0.008, "red"])
     
-    boxes = [box1, box2, box3]
-    # boxes = None
-    # title = "Still working on placement of boxes"
-    title = None
+    boxes = [box_m, box_1, box_2, box_3, box_4, boxp1, boxp2, boxp3, boxp4]
 
-    # arrow_box_expl = [0 + 1.0/2, 0.8125 + (0.875 - 0.8125)/2, (0.75 + (0.25/2)) - (0 + 1.0/2), (0.25 + (0.25/2)) - (0.8125 + ((0.875 - 0.8125) / 2)) , 0.008, "blue"]
-    # arrow_box_func = arrows([[0, 0.8125], [1.0, 0.875 - 0.8125], "blue"], [[0.75, 0.25], [0.25, 0.25], "red"])
+    bfa = [boxes]
 
-    # print(arrow_box_expl)
-    # print(arrow_box_func)
-    # exit()
-
-    n = 100_000
     if isinstance(x_lim, list):
         exon_dict_file = f"ExonData_n{n}_DS{data_set}_kp6_km6_zoomed_x{x_lim[0]}by{x_lim[1]}_y{y_lim[0]}by{y_lim[1]}"
+        intron_dict_file = f"IntronData_n{n}_DS{data_set}_kp6_km6_zoomed_x{x_lim[0]}by{x_lim[1]}_y{y_lim[0]}by{y_lim[1]}"
+        exon_png_file = f"{exon_dict_file}_IterativeMap.png"
+        intron_png_file = f"{intron_dict_file}_IterativeMap.png"
     else:
         exon_dict_file = f"ExonData_n{n}_DS{data_set}_kp6_km6"
-    if isinstance(y_lim, list):
-        intron_dict_file = f"IntronData_n{n}_DS{data_set}_kp6_km6_zoomed_x{x_lim[0]}by{x_lim[1]}_y{y_lim[0]}by{y_lim[1]}"
-    else:
         intron_dict_file = f"IntronData_n{n}_DS{data_set}_kp6_km6"
+        exon_png_file = f"{exon_dict_file}_IterativeMap_rgb_filled.png"
+        intron_png_file = f"{intron_dict_file}_IterativeMap_rgb_filled.png"
 
     # time_embedding_v2(pathlib.Path(f"{data_path}/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl"), 
     #                   n = n, 
@@ -102,25 +99,24 @@ def main():
     #                   exon_outfile = cwd / "TE_Images_ForPaper" / "Dict" / f"{exon_dict_file}.pkl",
     #                   intron_outfile = cwd / "TE_Images_ForPaper" / "Dict" / f"{intron_dict_file}.pkl")
     
-    matplotfigure(cwd / "TE_Images_ForPaper" / "Dict" / f"{exon_dict_file}.pkl",
-                  cwd / "TE_Images_ForPaper" / "Exon",
-                  f"{exon_dict_file}.png",
-                  x_lim=x_lim, y_lim=y_lim,
-                  x_tick_marks=x_ticks, y_tick_marks=y_ticks,
-                  boxes = boxes,
-                  dot_size=s)
+    # matplotfigure(cwd / "TE_Images_ForPaper" / "Dict" / f"{exon_dict_file}.pkl",
+    #               cwd / "TE_Images_ForPaper" / "Exon",
+    #               f"{exon_png_file}",
+    #               x_lim=x_lim, y_lim=y_lim,
+    #               x_tick_marks=x_ticks, y_tick_marks=y_ticks,
+    #               box_fill_arrow = bfa,
+    #               dot_size=s)
     
-    matplotfigure(cwd / "TE_Images_ForPaper" / "Dict" / f"{intron_dict_file}.pkl",
-                  cwd / "TE_Images_ForPaper" / "Intron",
-                  f"{intron_dict_file}.png",
-                  x_lim=x_lim, y_lim=y_lim,
-                  x_tick_marks=x_ticks, y_tick_marks=y_ticks,
-                  boxes = boxes,
-                  dot_size=s)
+    # matplotfigure(cwd / "TE_Images_ForPaper" / "Dict" / f"{intron_dict_file}.pkl",
+    #               cwd / "TE_Images_ForPaper" / "Intron",
+    #               f"{intron_png_file}",
+    #               x_lim=x_lim, y_lim=y_lim,
+    #               x_tick_marks=x_ticks, y_tick_marks=y_ticks,
+    #               box_fill_arrow = bfa,
+    #               dot_size=s)
 
     # reload_matplotlib(cwd / "TE_Images_ForPaper" / "Exon" / f"{exon_dict_file}_pkltest.pkl", cwd / "TE_Images_ForPaper" / "Exon" / f"{exon_dict_file}_pkltest.png", boxes = boxes)
     # reload_matplotlib(cwd / "TE_Images_ForPaper" / "Intron" / f"{intron_dict_file}_pkltest.pkl", cwd / "TE_Images_ForPaper" / "Intron" / f"{intron_dict_file}_pkltest.png", boxes = boxes)
-
 
 
 
@@ -151,9 +147,15 @@ def score_keys(k = 9, nucsequence: str = "AGTC"):
         scores[key]["history"] = score_m
 
     scores = pandas.DataFrame(data = scores).T
-    print(scores)
+    # print(scores)
+
+    cheat_sheet = {nucsequence[0]: np.dot(0, w_p), nucsequence[1]: np.dot(1, w_p), nucsequence[2]: np.dot(2, w_p), nucsequence[3]: np.dot(3, w_p)}
+    cheat_sheet = pandas.DataFrame(data = cheat_sheet).T
+    cheat_sheet.columns = [f"n/{x + 1}" for x in range(k)]
 
     scores.to_csv(cwd / f"ScoreKey_kmer_{k}_{nucsequence}.csv")
+    cheat_sheet.to_csv(cwd / f"CheatSheet_kmer_{k}_{nucsequence}.csv")
+    print("Finished Score and Cheat Sheet")
 
 
 
@@ -199,16 +201,18 @@ def matplotfigure(frame: dict or pathlib.Path or str,
                   x_tick_marks: dict = None,
                   y_tick_marks: dict = None,
                   dot_size: float = 0.1,
-                  boxes: list = None,
+                  box_fill_arrow: list = None,
                   *args, **kwargs):
     '''
     The figure thing is redundent, so I'm going to try a single function to do everything.
 
     If frame == pathlib.Path or str then it loads that pickle file into the frame. dir is the output dir.
 
-    Boxes allows you to draw on the plot. Boxes is a list of lists, and every sublist has an anchor point, a height, and a width. 
-    The anchor point itself should be a tuple. So it's boxes = [[[x0, y0], h0, w0, [color0, linewidth0]], [[x1, y1], h1, w1, [color1, linewidth1]], ..., [[xn, yn], hn, wn, [colorn, linewidthn]]]
-    A fifth element can be added which includes arrow information: [x, y, dx, dy, width, color]
+    box_fill_arrow allows you to draw on the plot. 
+    Boxes is a list of the anchor point (xy), the displacement (dxdy), and an optional color (str), linewidth (float), fill (bool), and transparency (float), so box = [x, y, dx, dy, color, width, fill, alpha]. The first 4 are required, the last four are optional and default to None, 2, False, and 0.5.
+    Arrows is a list for placing an arrow, with an anchor point (xy), displacement (dxdy), color and linewidth (optional), so arrow = [x, y, dx, dy, color, width].
+
+    Putting them all together, box_fill_arrow should look like box_fill_arrow = [box, fill, arrow]
     '''
     if isinstance(file_name, str):
         file_name: pathlib.Path = pathlib.Path(file_name)
@@ -252,20 +256,26 @@ def matplotfigure(frame: dict or pathlib.Path or str,
     plt.xlabel(x_title)
     plt.ylabel(y_title)
 
-    if isinstance(boxes, list):
+    if isinstance(box_fill_arrow, list):
+        boxes = box_fill_arrow[0]
+        try:
+            fills = box_fill_arrow[1]
+        except IndexError:
+            fills = None
+        try:
+            arrows = box_fill_arrow[2]
+        except IndexError:
+            arrows = None
+
         for box in boxes:
-            if isinstance(box[3], list):
-                color = box[3][0]
-                linewidth = box[3][1]
-            else:
-                color = None
-                linewidth = 2
-            p = plt.Rectangle(box[0], box[1], box[2], edgecolor = color, linewidth = linewidth, fill = False)  #set_fill = False, 
+            box_color, box_width, box_fill, box_alpha = _colorwidth(box)
+            p = plt.Rectangle([box[0], box[1]], box[2], box[3], color = box_color, linewidth = box_width, fill = box_fill, alpha = box_alpha)  #set_fill = False, 
             ax.add_patch(p)
 
-            if len(box) == 5:
-                arrow = box[4]
-                plt.arrow(arrow[0], arrow[1], arrow[2], arrow[3], width = arrow[4], facecolor = arrow[5], edgecolor = "none", length_includes_head = True)
+        if isinstance(arrows, list):
+            for arrow in arrows:
+                arrow_color, arrow_width, _ = _colorwidth(arrow, width = 0.08)
+                plt.arrow(arrow[0], arrow[1], arrow[2], arrow[3], width = arrow_color, facecolor = arrow_width, edgecolor = "none", length_includes_head = True)
     
     if isinstance(x_tick_marks, dict):
         ax.set_xticks(list(x_tick_marks.keys()))
@@ -281,6 +291,30 @@ def matplotfigure(frame: dict or pathlib.Path or str,
 
     print(f"Output image to {file}")
     plt.close()
+
+
+
+def _colorwidth(thing: list, width: float = 2, fill: bool = False, alpha: float = 0.5):
+    '''
+    '''
+    try:
+        color = thing[4]
+    except IndexError:
+        color = None
+    try:
+        width = thing[5]
+    except IndexError:
+        width = width
+    try:
+        fill = thing[6]
+    except IndexError:
+        fill = fill
+    try:
+        alpha = thing[7]
+    except IndexError:
+        alpha = alpha
+    
+    return color, width, fill, alpha
 
 
 def reload_matplotlib(file_path: str or pathlib.Path,
