@@ -259,10 +259,6 @@ def matplotfigure(frame: dict or pathlib.Path or str,
     if isinstance(box_fill_arrow, list):
         boxes = box_fill_arrow[0]
         try:
-            fills = box_fill_arrow[1]
-        except IndexError:
-            fills = None
-        try:
             arrows = box_fill_arrow[2]
         except IndexError:
             arrows = None
