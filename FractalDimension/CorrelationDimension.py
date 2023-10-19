@@ -22,13 +22,18 @@ def main():
     windows_path = f"F:/"
 
     data_path = windows_path
-    exon_dict_file = f"ExonData_n100000_DS{data_set}_kp6_km6"
+    # exon_dict_file = f"ExonData_n100000_DS{data_set}_kp6_km6"
+    exon_dict_file = "ExonData_n100000_DS1_kp6_km6_zoomed_x0.75by1.0_y0.25by0.5.pkl"
+    intron_dict_file = "IntronData_n100000_DS1_kp6_km6_zoomed_x0.75by1.0_y0.25by0.5.pkl"
 
 
     # doeverything(plotlog = True, plotboth = False, autocorplot = False, dot_size = 2, line_width = 0.25)
     # doExonIntron()
 
-    time_embedding_count(cwd / "TE_Images_ForPaper" / "Dict" / f"{exon_dict_file}.pkl")
+    count = time_embedding_count(cwd / "TE_Images_ForPaper" / "Dict" / f"{exon_dict_file}")
+    print(count)
+    count = time_embedding_count(cwd / "TE_Images_ForPaper" / "Dict" / f"{intron_dict_file}")
+    print(count)
 
 
 
@@ -58,8 +63,26 @@ def time_embedding_count(data: pathlib.Path or str or dict):
         data: dict = _import_dict(data)
 
     # print(data)
-    print(type(data))
-    print(data.keys())
+    # print(type(data))
+    # print(data.keys())
+
+    global_set = set()
+    global_l = 0
+
+    for points in data.values():
+        global_l += points.shape[0]
+
+
+        # print(points.shape)
+        # exit()
+    #     for point in points:
+
+    #         local_set = {point[0], point[1]}
+    #         global_set.update(local_set)
+
+
+    return global_l
+
 
 
 
