@@ -23,17 +23,70 @@ def main():
 
     data_path = windows_path
     # exon_dict_file = f"ExonData_n100000_DS{data_set}_kp6_km6"
-    exon_dict_file = "ExonData_n100000_DS1_kp6_km6_zoomed_x0.75by1.0_y0.25by0.5.pkl"
-    intron_dict_file = "IntronData_n100000_DS1_kp6_km6_zoomed_x0.75by1.0_y0.25by0.5.pkl"
+    full_exon_dict_file = "ExonData_n100000_DS1_kp6_km6.pkl"
+    zoom_x075_10_y025_050_exon_dict_file = "ExonData_n100000_DS1_kp6_km6_zoomed_x0.75by1.0_y0.25by0.5.pkl"
+    zoom_x07634_87456_y026523_0375_exon_dict_file = "ExonData_n100000_DS1_kp6_km6_zoomed_x0.7634by0.87456_y0.26523by0.375.pkl"
+    zoom_x82389_843_y032356_034467_exon_dict_file = "ExonData_n100000_DS1_kp6_km6_zoomed_x0.82389by0.843_y0.32356by0.34467.pkl"
+    zoom_x087478_0985278_y375_4377_exon_dict_file = "ExonData_n100000_DS1_kp6_km6_zoomed_x0.87478by0.95278_y0.375by0.4377.pkl"
+    zoom_x87478_10_y025_04377_exon_dict_file = "ExonData_n100000_DS1_kp6_km6_zoomed_x0.87478by1.0_y0.25by0.4377.pkl"
+    zoom_x075_10_y0375_03912_exon_dict_file = "ExonData_n100000_DS1_kp6_km6_zoomed_x0.75by1.0_y0.375by0.3912.pkl"
+    zoom_x075_10_y04377_05_exon_dict_file = "ExonData_n100000_DS1_kp6_km6_zoomed_x0.75by1.0_y0.4377by0.5.pkl"
+    zoom_x075_10_y025_026523_exon_dict_file = "ExonData_n100000_DS1_kp6_km6_zoomed_x0.75by1.0_y0.25by0.26523.pkl"
+
+    full_intron_dict_file = "IntronData_n100000_DS1_kp6_km6.pkl"
+    zoom_x075_10_y025_050_intron_dict_file = "IntronData_n100000_DS1_kp6_km6_zoomed_x0.75by1.0_y0.25by0.5.pkl"
+    zoom_x07634_87456_y026523_0375_intron_dict_file = "IntronData_n100000_DS1_kp6_km6_zoomed_x0.7634by0.87456_y0.26523by0.375.pkl"
+    zoom_x82389_843_y032356_034467_intron_dict_file = "IntronData_n100000_DS1_kp6_km6_zoomed_x0.82389by0.843_y0.32356by0.34467.pkl"
+    zoom_x087478_0985278_y375_4377_intron_dict_file = "IntronData_n100000_DS1_kp6_km6_zoomed_x0.87478by0.95278_y0.375by0.4377.pkl"
+    zoom_x87478_10_y025_04377_intron_dict_file = "IntronData_n100000_DS1_kp6_km6_zoomed_x0.87478by1.0_y0.25by0.4377.pkl"
+    zoom_x075_10_y0375_03912_intron_dict_file = "IntronData_n100000_DS1_kp6_km6_zoomed_x0.75by1.0_y0.375by0.3912.pkl"
+    zoom_x075_10_y04377_05_intron_dict_file = "IntronData_n100000_DS1_kp6_km6_zoomed_x0.75by1.0_y0.4377by0.5.pkl"
+    zoom_x075_10_y025_026523_intron_dict_file = "IntronData_n100000_DS1_kp6_km6_zoomed_x0.75by1.0_y0.25by0.26523.pkl"
+
 
 
     # doeverything(plotlog = True, plotboth = False, autocorplot = False, dot_size = 2, line_width = 0.25)
     # doExonIntron()
 
-    count = time_embedding_count(cwd / "TE_Images_ForPaper" / "Dict" / f"{exon_dict_file}")
-    print(count)
-    count = time_embedding_count(cwd / "TE_Images_ForPaper" / "Dict" / f"{intron_dict_file}")
-    print(count)
+    full_e_count = time_embedding_count(cwd / "TE_Images_ForPaper" / "Dict" / f"{full_exon_dict_file}")
+    zoom_x075_10_y025_050_exon_count = time_embedding_count(cwd / "TE_Images_ForPaper" / "Dict" / f"{zoom_x075_10_y025_050_exon_dict_file}")
+    zoom_x07634_87456_y026523_026523_exon_count = time_embedding_count(cwd / "TE_Images_ForPaper" / "Dict" / f"{zoom_x07634_87456_y026523_0375_exon_dict_file}")
+    zoom_x82389_843_y032356_034467_exon_count = time_embedding_count(cwd / "TE_Images_ForPaper" / "Dict" / f"{zoom_x82389_843_y032356_034467_exon_dict_file}")
+    zoom_x087478_0985278_y375_4377_exon_count = time_embedding_count(cwd / "TE_Images_ForPaper" / "Dict" / f"{zoom_x087478_0985278_y375_4377_exon_dict_file}")
+    zoom_x87478_10_y025_04377_exon_count = time_embedding_count(cwd / "TE_Images_ForPaper" / "Dict" / f"{zoom_x87478_10_y025_04377_exon_dict_file}")
+    zoom_x075_10_y0375_03912_exon_count = time_embedding_count(cwd / "TE_Images_ForPaper" / "Dict" / f"{zoom_x075_10_y0375_03912_exon_dict_file}")
+    zoom_x075_10_y04377_05_exon_count = time_embedding_count(cwd / "TE_Images_ForPaper" / "Dict" / f"{zoom_x075_10_y04377_05_exon_dict_file}")
+    zoom_x075_10_y025_026523_exon_count = time_embedding_count(cwd / "TE_Images_ForPaper" / "Dict" / f"{zoom_x075_10_y025_026523_exon_dict_file}")
+
+    full_i_count = time_embedding_count(cwd / "TE_Images_ForPaper" / "Dict" / f"{full_intron_dict_file}")
+    zoom_x075_10_y025_050_intron_count = time_embedding_count(cwd / "TE_Images_ForPaper" / "Dict" / f"{zoom_x075_10_y025_050_intron_dict_file}")
+    zoom_x07634_87456_y026523_026523_intron_count = time_embedding_count(cwd / "TE_Images_ForPaper" / "Dict" / f"{zoom_x07634_87456_y026523_0375_intron_dict_file}")
+    zoom_x82389_843_y032356_034467_intron_count = time_embedding_count(cwd / "TE_Images_ForPaper" / "Dict" / f"{zoom_x82389_843_y032356_034467_intron_dict_file}")
+    zoom_x087478_0985278_y375_4377_intron_count = time_embedding_count(cwd / "TE_Images_ForPaper" / "Dict" / f"{zoom_x087478_0985278_y375_4377_intron_dict_file}")
+    zoom_x87478_10_y025_04377_intron_count = time_embedding_count(cwd / "TE_Images_ForPaper" / "Dict" / f"{zoom_x87478_10_y025_04377_intron_dict_file}")
+    zoom_x075_10_y0375_03912_intron_count = time_embedding_count(cwd / "TE_Images_ForPaper" / "Dict" / f"{zoom_x075_10_y0375_03912_intron_dict_file}")
+    zoom_x075_10_y04377_05_intron_count = time_embedding_count(cwd / "TE_Images_ForPaper" / "Dict" / f"{zoom_x075_10_y04377_05_intron_dict_file}")
+    zoom_x075_10_y025_026523_intron_count = time_embedding_count(cwd / "TE_Images_ForPaper" / "Dict" / f"{zoom_x075_10_y025_026523_intron_dict_file}")
+
+    print(f"Full E Count= {full_e_count}")
+    print(f"\t\tZoom x = 0.75 1.0 y = 0.25 0.50\n\tE Count = {zoom_x075_10_y025_050_exon_count}\t{zoom_x075_10_y025_050_exon_count / full_e_count}")
+    print(f"\t\tZoom x = 0.7634 0.87456 y = 0.26523 0.26523\n\tE Count = {zoom_x07634_87456_y026523_026523_exon_count}\t{zoom_x07634_87456_y026523_026523_exon_count / full_e_count}")
+    print(f"\t\tZoom x = 0.82389 0.843 y = 0.32356 0.34467\n\tE Count = {zoom_x82389_843_y032356_034467_exon_count}\t{zoom_x82389_843_y032356_034467_exon_count / full_e_count}")
+    print(f"\t\tZoom x = 0.87478 0.985278 y = 0.375 0.4377\n\tE Count = {zoom_x087478_0985278_y375_4377_exon_count}\t{zoom_x087478_0985278_y375_4377_exon_count / full_e_count}")
+    print(f"\t\tZoom x = 0.87478 1.0 y = 0.25 0.4377\n\tE Count = {zoom_x87478_10_y025_04377_exon_count}\t{zoom_x87478_10_y025_04377_exon_count / full_e_count}")
+    print(f"\t\tZoom x = 0.75 1.0 y = 0.375 0.3912\n\tE Count = {zoom_x075_10_y0375_03912_exon_count}\t{zoom_x075_10_y0375_03912_exon_count / full_e_count}")
+    print(f"\t\tZoom x = 0.75 1.0 y = 0.4377 0.5\n\tE Count = {zoom_x075_10_y04377_05_exon_count}\t{zoom_x075_10_y04377_05_exon_count / full_e_count}")
+    print(f"\t\tZoom x = 0.75 1.0 y = 0.25 0.26523\n\tE Count = {zoom_x075_10_y025_026523_exon_count}\t{zoom_x075_10_y025_026523_exon_count / full_e_count}")
+    
+    print(f"Full i Count= {full_i_count}")
+    print(f"\t\tZoom x = 0.75 1.0 y = 0.25 0.50\n\tI Count = {zoom_x075_10_y025_050_intron_count}\t{zoom_x075_10_y025_050_intron_count / full_i_count}")
+    print(f"\t\tZoom x = 0.7634 0.87456 y = 0.26523 0.26523\n\tI Count = {zoom_x07634_87456_y026523_026523_intron_count}\t{zoom_x07634_87456_y026523_026523_intron_count / full_i_count}")
+    print(f"\t\tZoom x = 0.82389 0.843 y = 0.32356 0.34467\n\tI Count = {zoom_x82389_843_y032356_034467_intron_count}\t{zoom_x82389_843_y032356_034467_intron_count / full_i_count}")
+    print(f"\t\tZoom x = 0.87478 0.985278 y = 0.375 0.4377\n\tI Count = {zoom_x087478_0985278_y375_4377_intron_count}\t{zoom_x087478_0985278_y375_4377_intron_count / full_i_count}")
+    print(f"\t\tZoom x = 0.87478 1.0 y = 0.25 0.4377\n\tI Count = {zoom_x87478_10_y025_04377_intron_count}\t{zoom_x87478_10_y025_04377_intron_count / full_i_count}")
+    print(f"\t\tZoom x = 0.75 1.0 y = 0.375 0.3912\n\tI Count = {zoom_x075_10_y0375_03912_intron_count}\t{zoom_x075_10_y0375_03912_intron_count / full_i_count}")
+    print(f"\t\tZoom x = 0.75 1.0 y = 0.4377 0.5\n\tI Count = {zoom_x075_10_y04377_05_intron_count}\t{zoom_x075_10_y04377_05_intron_count / full_i_count}")
+    print(f"\t\tZoom x = 0.75 1.0 y = 0.25 0.26523\n\tI Count = {zoom_x075_10_y025_026523_intron_count}\t{zoom_x075_10_y025_026523_intron_count / full_i_count}")
 
 
 
@@ -44,6 +97,7 @@ def _import_dict(file_path: pathlib.Path or str):
     '''
     if isinstance(file_path, str):
         file_path = pathlib.Path(file_path)
+    print(f"\tImporting from {file_path}")
 
     with open(file_path, "rb") as p:
         data = pickle.load(p)
@@ -66,12 +120,11 @@ def time_embedding_count(data: pathlib.Path or str or dict):
     # print(type(data))
     # print(data.keys())
 
-    global_set = set()
     global_l = 0
-
+    
+    print("\tBegining count")
     for points in data.values():
         global_l += points.shape[0]
-
 
         # print(points.shape)
         # exit()
@@ -79,7 +132,6 @@ def time_embedding_count(data: pathlib.Path or str or dict):
 
     #         local_set = {point[0], point[1]}
     #         global_set.update(local_set)
-
 
     return global_l
 
