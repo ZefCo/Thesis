@@ -30,90 +30,129 @@ def main():
     Time embedding v3: make one that goes through a gene (all its different forms) and plots the trajectory of the k windows. Does something happen for the introns and the exons?
     You'll have to also do the exons and introns seperatly, but we want to see how the trajectory can "jump" from exon to intron: maybe there is something of interest there?
     '''
-    score_keys(k = 6)
-    exit()
+    # score_keys(k = 6)
+    # exit()
 
     linux_path = f"/media/ethanspeakman/Elements/"
     windows_path = f"F:/"
 
     data_path = windows_path
 
-    # # Zoomed in Picture    
-    # x_lim = [0.75, 1.0]
-    # y_lim = [0.25, 0.5]
-    # x_ticks = {x/100:x/100 for x in range(75, 100 + 1, 1)}
-    # y_ticks = {y/100:y/100 for y in range(25, 50 + 1, 1)}
-    # s = 0.5
+    # # Zoomed in Picture
+    exon_dict_file = "ExonData_n100000_DS1_kp6_km6_zoomed_x0.75by1.0_y0.25by0.5"
+    intron_dict_file = "IntronData_n100000_DS1_kp6_km6_zoomed_x0.75by1.0_y0.25by0.5"
+    x_lim = [0.75, 1.0]
+    # y_lim = [0.25, 0.26523]
+    y_lim = [0.25, 0.5]
+    x_ticks = {x/100:x/100 for x in range(75, 100 + 1, 1)}
+    y_ticks = {y/100:y/100 for y in range(25, 50 + 1, 1)}
 
     # Non Zoomed Picture
-    x_lim = None
-    y_lim = None
-    x_ticks = None
-    y_ticks = None
-    s = 0.01
-    n = 100_000
+    # x_lim = None
+    # y_lim = None
+    # x_ticks = None
+    # y_ticks = None
 
+    n = 100_000
+    s = 0.5
+    data_set = 1
+    # s = 0.01
     # s = 1
     # data_set = f"1&2"
-    data_set = 1
+    # data_set = 1
 
     # box = [xB, yB, dxB, dyB, "color of box", box thickness, fill (true/false), alpha]
     # fill = [x1, x2, y1, y2, color, alpha]
     # arrow[xA, yA, dxA, dxY, arrow thickness, "color of arrow"]
-    box_4 = [0.0068359375, 0.0, 0.0078125 - 0.0068359375, 1.0, "red", 4, True, 0.2]
-    box_3 = [0.02734375, 0.0, 0.03125 - 0.02734375, 1.0, "red", 4, True, 0.3]
-    box_2 = [0.109375, 0.0, 0.125 - 0.109375, 1.0, "red", 4, True, 0.4]
-    box_1 = [0.4375, 0.0, 0.5 - 0.4375, 1.0, "red", 4, True, 0.5]  # backward box
+    box_1 = [0.7634, 0.26523, 0.87456 - 0.7634, 0.375 - 0.26523, "red", 4, True, 0.4]
+
+    box_2 = [0.82389, 0.32356, 0.843 - 0.82389, 0.34467 - 0.32356, "blue", 4, True, 0.4]
+
+    box_3 = [0.87478, 0.375, 0.985278 - 0.87478, 0.4377 - 0.375, "green", 4, True, 0.4]
+
+    box_4 = [0.87478, 0.25, 1.0 - 0.87478, 0.4377 - 0.25, "yellow", 4, True, 0.4]
+
+    box_5 = [0.75, 0.4377, 0.25, 0.5 - 0.4377, "teal", 4, True, 0.4]
+
+    box_6 = [0.75, 0.375, 0.25, 0.3912 - 0.375, "brown", 4, True, 0.4]
+
+    box_7 = [0.75, 0.25, 0.25, 0.26523 - 0.25, "violet", 4, True, 0.4]
+
     
-    box_m = [0.75, 0.25, 0.25, 0.25, "green", 4, True, 0.5]  # major box
+    # box_m = [0.75, 0.25, 0.25, 0.25, "green", 4, True, 0.5]  # major box
     
-    boxp1 = [0.0, 0.8125, 1.0, 0.875 - 0.8125, "blue", 4, True, 0.5]  # forward box
-    boxp2 = [0.0, 0.203125, 1.0, 0.21875 - 0.203125, "blue", 4, True, 0.4]  # forward box
-    boxp3 = [0.0, 0.05078125, 1.0, 0.0546875 - 0.05078125, "blue", 4, True, 0.3]  # forward box
-    boxp4 = [0.0, 0.0126953125, 1.0, 0.013671875 - 0.0126953125, "blue", 4, True, 0.2]  # forward box
-    
-    # arrow = arrows([[0.0, 0.203125], [1.0, 0.21875 - 0.203125]], [[1.0, 0.875 - 0.8125], [0.0, 0.8125]])
-    # box3.append([arrow[0][0], arrow[0][1], arrow[1][0], arrow[1][1], 0.008, "red"])
-    
-    boxes = [box_m, box_1, box_2, box_3, box_4, boxp1, boxp2, boxp3, boxp4]
+    # boxp1 = [0.0, 0.8125, 1.0, 0.875 - 0.8125, "blue", 4, True, 0.5]  # forward box
+    # boxp2 = [0.0, 0.203125, 1.0, 0.21875 - 0.203125, "blue", 4, True, 0.4]  # forward box
+    # boxp3 = [0.0, 0.05078125, 1.0, 0.0546875 - 0.05078125, "blue", 4, True, 0.3]  # forward box
+    # boxp4 = [0.0, 0.0126953125, 1.0, 0.013671875 - 0.0126953125, "blue", 4, True, 0.2]  # forward box
+
+    boxes = [box_1, box_2, box_3, box_4, box_5, box_6, box_7]
+    exon_png_file = "ExonZoomed_x075_10_y025_05_7Regions"
+    intron_png_file = "IntronZoomed_x075_10_y025_05_7Regions"
+
+    # boxes = [box_1]
+    # exon_png_file = "ExonZoomed_x075_10_y025_05_R1"
+    # intron_png_file = "IntronZoomed_x075_10_y025_05_R1"
+
+    # boxes = [box_2]
+    # exon_png_file = "ExonZoomed_x075_10_y025_05_R2"
+    # intron_png_file = "IntronZoomed_x075_10_y025_05_R2"
+
+    # boxes = [box_3]
+    # exon_png_file = "ExonZoomed_x075_10_y025_05_R3"
+    # intron_png_file = "IntronZoomed_x075_10_y025_05_R3"
+
+    # boxes = [box_4]
+    # exon_png_file = "ExonZoomed_x075_10_y025_05_R4"
+    # intron_png_file = "IntronZoomed_x075_10_y025_05_R4"
+
+    # boxes = [box_5]
+    # exon_png_file = "ExonZoomed_x075_10_y025_05_R5"
+    # intron_png_file = "IntronZoomed_x075_10_y025_05_R5"
+
+    # boxes = [box_6]
+    # exon_png_file = "ExonZoomed_x075_10_y025_05_R6"
+    # intron_png_file = "IntronZoomed_x075_10_y025_05_R6"
+
+    # boxes = [box_7]
+    # exon_png_file = "ExonZoomed_x075_10_y025_05_R7"
+    # intron_png_file = "IntronZoomed_x075_10_y025_05_R7"
 
     bfa = [boxes]
+    # bfa = None
 
-    if isinstance(x_lim, list):
-        exon_dict_file = f"ExonData_n{n}_DS{data_set}_kp6_km6_zoomed_x{x_lim[0]}by{x_lim[1]}_y{y_lim[0]}by{y_lim[1]}"
-        intron_dict_file = f"IntronData_n{n}_DS{data_set}_kp6_km6_zoomed_x{x_lim[0]}by{x_lim[1]}_y{y_lim[0]}by{y_lim[1]}"
-        exon_png_file = f"{exon_dict_file}_IterativeMap.png"
-        intron_png_file = f"{intron_dict_file}_IterativeMap.png"
-    else:
-        exon_dict_file = f"ExonData_n{n}_DS{data_set}_kp6_km6"
-        intron_dict_file = f"IntronData_n{n}_DS{data_set}_kp6_km6"
-        exon_png_file = f"{exon_dict_file}_IterativeMap_rgb_filled.png"
-        intron_png_file = f"{intron_dict_file}_IterativeMap_rgb_filled.png"
+    # if isinstance(x_lim, list):
+    #     exon_dict_file = f"ExonData_n{n}_DS{data_set}_kp6_km6_zoomed_x{x_lim[0]}by{x_lim[1]}_y{y_lim[0]}by{y_lim[1]}"
+    #     intron_dict_file = f"IntronData_n{n}_DS{data_set}_kp6_km6_zoomed_x{x_lim[0]}by{x_lim[1]}_y{y_lim[0]}by{y_lim[1]}"
+    #     exon_png_file = f"{exon_dict_file}_IterativeMap.png"
+    #     intron_png_file = f"{intron_dict_file}_IterativeMap.png"
+    # else:
+    #     exon_dict_file = f"ExonData_n{n}_DS{data_set}_kp6_km6"
+    #     intron_dict_file = f"IntronData_n{n}_DS{data_set}_kp6_km6"
+    #     exon_png_file = f"{exon_dict_file}_IterativeMap_rgb_filled.png"
+    #     intron_png_file = f"{intron_dict_file}_IterativeMap_rgb_filled.png"
 
     # time_embedding_v2(pathlib.Path(f"{data_path}/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl"), 
     #                   n = n, 
-    #                   backwards = True, 
     #                   x_lim = x_lim, y_lim = y_lim, 
-    #                   ioxes = boxes,
-    #                   eoxes = boxes,
     #                   exon_outfile = cwd / "TE_Images_ForPaper" / "Dict" / f"{exon_dict_file}.pkl",
     #                   intron_outfile = cwd / "TE_Images_ForPaper" / "Dict" / f"{intron_dict_file}.pkl")
     
-    # matplotfigure(cwd / "TE_Images_ForPaper" / "Dict" / f"{exon_dict_file}.pkl",
-    #               cwd / "TE_Images_ForPaper" / "Exon",
-    #               f"{exon_png_file}",
-    #               x_lim=x_lim, y_lim=y_lim,
-    #               x_tick_marks=x_ticks, y_tick_marks=y_ticks,
-    #               box_fill_arrow = bfa,
-    #               dot_size=s)
+    matplotfigure(cwd / "TE_Images_ForPaper" / "Dict" / f"{exon_dict_file}.pkl",
+                  cwd / "TE_Images_ForPaper" / "Exon",
+                  f"{exon_png_file}",
+                  x_lim=x_lim, y_lim=y_lim,
+                  x_tick_marks=x_ticks, y_tick_marks=y_ticks,
+                  box_fill_arrow = bfa,
+                  dot_size=s)
     
-    # matplotfigure(cwd / "TE_Images_ForPaper" / "Dict" / f"{intron_dict_file}.pkl",
-    #               cwd / "TE_Images_ForPaper" / "Intron",
-    #               f"{intron_png_file}",
-    #               x_lim=x_lim, y_lim=y_lim,
-    #               x_tick_marks=x_ticks, y_tick_marks=y_ticks,
-    #               box_fill_arrow = bfa,
-    #               dot_size=s)
+    matplotfigure(cwd / "TE_Images_ForPaper" / "Dict" / f"{intron_dict_file}.pkl",
+                  cwd / "TE_Images_ForPaper" / "Intron",
+                  f"{intron_png_file}",
+                  x_lim=x_lim, y_lim=y_lim,
+                  x_tick_marks=x_ticks, y_tick_marks=y_ticks,
+                  box_fill_arrow = bfa,
+                  dot_size=s)
 
     # reload_matplotlib(cwd / "TE_Images_ForPaper" / "Exon" / f"{exon_dict_file}_pkltest.pkl", cwd / "TE_Images_ForPaper" / "Exon" / f"{exon_dict_file}_pkltest.png", boxes = boxes)
     # reload_matplotlib(cwd / "TE_Images_ForPaper" / "Intron" / f"{intron_dict_file}_pkltest.pkl", cwd / "TE_Images_ForPaper" / "Intron" / f"{intron_dict_file}_pkltest.png", boxes = boxes)
@@ -573,10 +612,10 @@ def time_embedding_v2(data: pandas.DataFrame,
             print(f"Finished row {row} of {rows}")
 
     with open(exon_outfile, "wb") as e_file:
-        print(f"Writing to {exon_outfile}.pkl")
+        print(f"Writing to {exon_outfile}")
         pickle.dump(e_frame, e_file)
     with open(intron_outfile, "wb") as i_file:
-        print(f"Writing to {intron_outfile}.pkl")
+        print(f"Writing to {intron_outfile}")
         pickle.dump(i_frame, i_file)
 
     # save the dictionary here
