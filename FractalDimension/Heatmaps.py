@@ -21,43 +21,83 @@ def main():
     Create a heat map: X = past, Y = future, Z = count. So count the occurences of a k-mer - to k-mer +.
     '''
     linux_path = f"/media/ethanspeakman/Elements/"
-    windows_path = f"G:/"
-
+    windows_path = f"F:/"
     data_path = windows_path
     data_set = 2
+    k = 6
+    n = 100_000
+    if 1 == k:
+        label_points = True
+        label_axis = True
+    elif ((3 > k) and (k > 1)):
+        label_points = False
+        label_axis = True
+    else:
+        label_points = False
+        label_axis = False
+
+    master_rescale = [9874, 26]
+    exon_rescale = [2180, 76]
+    intron_rescale = [13972, 40]
+
     output_files = [cwd / "TE_Images_ForPaper" / "Dict" / f"Heat_DS{data_set}_Master.pkl", cwd / "TE_Images_ForPaper" / "Dict" / f"Heat_DS{data_set}_Exon.pkl", cwd / "TE_Images_ForPaper" / "Dict" / f"Heat_DS{data_set}_Intron.pkl"]
     
-    master, _, _ = heat_embedding(pathlib.Path(f"{data_path}/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl"),
-                   n = 1_000,
-                   k_m = 1, k_p = 1)
+    master, exon, intron = heat_embedding(pathlib.Path(f"{data_path}/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl"),
+                                          n = n,
+                                          k_m = k, k_p = k)
                 #    dict_output_files = output_files)
 
-    heatmap(master, label_points=True)
+    master_max, master_min = min_max(master)
+    print(f"Master Max = {master_max}\tMaster Min = {master_min}")
+    exon_max, exon_min = min_max(exon)
+    print(f"Exon Max = {exon_max}\Exon Min = {exon_min}")
+    intron_max, intron_min = min_max(intron)
+    print(f"Intron Max = {intron_max}\tIntron Min = {intron_min}")
+
+    # master = _rescale_data(master, master_rescale[0], master_rescale[1])
+    # exon = _rescale_data(exon, exon_rescale[0], exon_rescale[1])
+    # intron = _rescale_data(intron, master_rescale[0], intron_rescale[1])
+
+    # heatmap(master, 
+    #         label_points = label_points, label_axis = label_axis,
+    #         title = "Master Heatmap") #vmin = master_rescale[0], vmax = master_rescale[1]) #, file_output = cwd / "TE_Images_ForPaper" / "Heatmaps" / f"Master_DS{data_set}_n{n}_{k*2}mer.png")
+    # heatmap(exon, 
+    #         label_points = label_points, label_axis = label_axis,
+    #         title = "Exon Heatmap") #vmin = exon_rescale[0], vmax = exon_rescale[1]) #, file_output = cwd / "TE_Images_ForPaper" / "Heatmaps" / f"Exon_DS{data_set}_n{n}_{k*2}mer.png")
+    # heatmap(intron, 
+    #         label_points = label_points, label_axis = label_axis,
+    #         title = "Intron Heatmap") #vmin = intron_rescale[0], vmax = intron_rescale[1]) #, file_output = cwd / "TE_Images_ForPaper" / "Heatmaps" / f"Intron_DS{data_set}_n{n}_{k*2}mer.png")
 
 
-def heatmap(data: dict,
-            label_points: bool = False):
+def heatmap(data: dict or pandas.DataFrame or pathlib.Path,
+            label_points: bool = False,
+            label_axis: bool = True,
+            file_output: str or pathlib.Path = None,
+            title: str = None,
+            *args, **kwargs):
     '''
-    This feels like it's doing this backwards and it's driving me nuts.
+    Creates a heatmap. The input can either be a pathlib (in which case it will import the data), a dictionary (in which case it will convert it to a dataframe), or a dataframe (in which case it will create a heatmap).
     '''
     if isinstance(data, pathlib.Path) or isinstance(data, str):
         data = _import_data(data, just_import = True)
 
-    data["A_p"] = data.pop("A")
+    if isinstance(data, dict):
+        data: pandas.DataFrame = pandas.DataFrame(data)
 
-    data: pandas.DataFrame = pandas.DataFrame(data).T
+    data = data.fillna(0)
     data = data.reindex(sorted(data.columns), axis = 1)
     data = data.sort_index()
-    print(data)
+    # print(data)
     rows, cols = data.shape
     
     fig, ax = plt.subplots()
-    im = ax.imshow(data)
+    im = ax.imshow(data, *args, **kwargs)
     # print(list(data.index))
-
-    ax.set_xticks(np.arange(rows), labels = list(data.index))
-    ax.set_yticks(np.arange(cols), labels = list(data.columns))
-    plt.setp(ax.get_xticklabels(), ha = "right", rotation_mode = "anchor")
+    
+    if label_axis:
+        ax.set_xticks(np.arange(rows), labels = list(data.columns))
+        ax.set_yticks(np.arange(cols), labels = list(data.index))
+        plt.setp(ax.get_xticklabels(), ha = "right", rotation_mode = "anchor")
 
     if label_points:
         for i in range(rows):
@@ -67,8 +107,15 @@ def heatmap(data: dict,
     plt.colorbar(im)
     plt.xlabel("Back")
     plt.ylabel("Forward")
-    plt.title("Heatmap of Back vs Forward")
-    plt.show()
+    if isinstance(title, str):
+        plt.title(title)
+    else:
+        plt.title("Heatmap of Back vs Forward")
+
+    if isinstance(file_output, str) or isinstance(file_output, pathlib.Path):
+        plt.savefig(file_output)
+    else:   
+        plt.show()
 
 
 def heat_embedding(data: pandas.DataFrame,
@@ -120,7 +167,8 @@ def heat_embedding(data: pandas.DataFrame,
     exon_dict = _normalize(exon_dict, int(4**(k_p + k_m)))
     intron_dict = _normalize(intron_dict, int(4**(k_p + k_m)))
 
-    ic(master_dict)
+    if k_m + k_p < 5:
+        ic(master_dict)
 
     if isinstance(dict_output_files, list):
         try:
@@ -209,7 +257,7 @@ def _heat_data(sequence: str,
     return local_dict
 
 
-def _import_data(data: pandas.DataFrame,
+def _import_data(data: pathlib.Path,
                  n: int = 50_000,
                  k_p: int = 6, k_m: int = 6,
                  just_import: bool = False,
@@ -217,9 +265,13 @@ def _import_data(data: pandas.DataFrame,
     '''
     Generates the heat map data. Feeds in a pandas Dataframe (or pathlib to import the data), then outputs the overall data.
     '''
-    if isinstance(data, pathlib.Path):
-        with open(data, "rb") as p:
-            data = pickle.load(p)
+    try:
+        if isinstance(data, pathlib.Path):
+            with open(data, "rb") as p:
+                data = pickle.load(p)
+    except FileNotFoundError:
+        print(f"File was not found, did you mean to try to import this file?\n{data}")
+        exit()
 
     if just_import:
         pass
@@ -245,22 +297,75 @@ def _import_data(data: pandas.DataFrame,
     return data
 
 
-def _normalize(data: dict, k: int):
+
+def min_max(data: dict):
+    '''
+    Finds the minimum and maximum values in the dictionaries. Because they're embedded dictionaries this will have to use some embedded for loops.
+    Even though Dictionaries are fast I'm doing both at once since I don't want to iterate across the same datasets twice.
+    '''
+    max_value, min_value = None, None
+    for _, sub_dict in data.items():
+        for _, _ in sub_dict.items():
+
+            if max_value is None:
+                max_key: str = max(sub_dict, key = sub_dict.get)
+                max_value: float = sub_dict[max_key]
+
+                min_key: str = min(sub_dict, key = sub_dict.get)
+                min_value: float = sub_dict[min_key]
+
+            else:
+                max_key: str = max(sub_dict, key = sub_dict.get)
+                max_local: float = sub_dict[max_key]
+                if max_local > max_value:
+                    max_value = max_local
+
+                min_key: str = min(sub_dict, key = sub_dict.get)
+                min_local: float = sub_dict[min_key]
+                if min_value > min_local:
+                    min_value = min_local
+
+    return max_value, min_value
+
+
+
+def _normalize(data: dict, k: int, norm_constant: int = None):
     '''
     Normalizes the data by: counting and summing all values for a normalization constant, then doing: value = 4**(kp + km) * value / constant
 
     4**(kp + km) = k. I don't want to figure it out here so... you do it. It's a necessary input.
+
+    Add in a part to get the min/max out of here. Find it as you move through the dict.
     '''
-    norm_constant = 0
-    for sub_dict in data.values():
-        for value in sub_dict.values():
-            norm_constant += value
+    if isinstance(norm_constant, int) or isinstance(norm_constant, float):
+        pass
+    else:
+        norm_constant = 0
+        for sub_dict in data.values():
+            for value in sub_dict.values():
+                norm_constant += value
 
     for master_key, sub_dict in data.items():
         for key, value in sub_dict.items():
             data[master_key][key] = (k * value) / norm_constant
 
     return data
+
+
+def _rescale_data(data: dict, rescale_max: float, rescale_min: float):
+    '''
+    '''
+    old_max, _ = min_max(data)
+    M = ((rescale_max - rescale_min) / old_max)
+
+    for master_key, sub_dict in data.items():
+        for key, value in sub_dict.items():
+
+            rescale_value = M * value + rescale_min
+            data[master_key][key] = rescale_value
+
+    return data
+
 
 
 def _write_pickle(data, filepath: str):
