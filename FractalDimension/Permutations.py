@@ -3,6 +3,12 @@ import pandas
 import numpy
 
 
+def main():
+    nuc_perm: dict = nucleotide_permutations()
+
+    print(nuc_perm)
+
+
 def nucleotide_permutations(length: int = 5) -> dict:
     nuc_perm = dict()
     for len in range(1, length + 1):
@@ -29,10 +35,6 @@ def similarity_key(length: int = 9, rows: int = 1) -> pandas.DataFrame:
 
 
 
-def main():
-    nuc_perm: dict = nucleotide_permutations()
-
-    print(nuc_perm)
 
 
 

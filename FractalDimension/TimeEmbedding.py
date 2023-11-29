@@ -18,6 +18,8 @@ import random
 
 def main():
     '''
+    Do this with different permutations of nucelotides.
+
     Break this out and create a new script for playing with the boxes and arrows. Use something like: Green = 0th, Red = -N iterations, Blue = +N iterations. Have it fade or try lighter shades every iteration.
     Also need to figure out a way to get the density of the points in these regions. Want to compare the Exon to Intron, so target low density regions. Then we want to count the points. Maybe consider a correlation dimension (my idea, not Dr. Gs)
 
@@ -39,24 +41,65 @@ def main():
     data_path = windows_path
 
     # # Zoomed in Picture
-    exon_dict_file = "ExonData_n100000_DS1_kp6_km6_zoomed_x0.75by1.0_y0.25by0.5"
-    intron_dict_file = "IntronData_n100000_DS1_kp6_km6_zoomed_x0.75by1.0_y0.25by0.5"
-    x_lim = [0.75, 1.0]
-    # y_lim = [0.25, 0.26523]
-    y_lim = [0.25, 0.5]
-    x_ticks = {x/100:x/100 for x in range(75, 100 + 1, 1)}
-    y_ticks = {y/100:y/100 for y in range(25, 50 + 1, 1)}
+    # exon_dict_file = "ExonData_n100000_DS1_kp6_km6_zoomed_x0.75by1.0_y0.25by0.5"
+    # intron_dict_file = "IntronData_n100000_DS1_kp6_km6_zoomed_x0.75by1.0_y0.25by0.5"
+    # x_lim = [0.75, 1.0]
+    # # y_lim = [0.25, 0.26523]
+    # y_lim = [0.25, 0.5]
+    # x_ticks = {x/100:x/100 for x in range(75, 100 + 1, 1)}
+    # y_ticks = {y/100:y/100 for y in range(25, 50 + 1, 1)}
+    # s = 0.5
+
+    # box_1 = [0.7634, 0.26523, 0.87456 - 0.7634, 0.375 - 0.26523, "red", 4, True, 0.4]
+
+    # box_2 = [0.82389, 0.32356, 0.843 - 0.82389, 0.34467 - 0.32356, "blue", 4, True, 0.4]
+
+    # box_3 = [0.87478, 0.375, 0.985278 - 0.87478, 0.4377 - 0.375, "green", 4, True, 0.4]
+
+    # box_4 = [0.87478, 0.25, 1.0 - 0.87478, 0.4377 - 0.25, "yellow", 4, True, 0.4]
+
+    # box_5 = [0.75, 0.4377, 0.25, 0.5 - 0.4377, "teal", 4, True, 0.4]
+
+    # box_6 = [0.75, 0.375, 0.25, 0.3912 - 0.375, "brown", 4, True, 0.4]
+
+    # box_7 = [0.75, 0.25, 0.25, 0.26523 - 0.25, "violet", 4, True, 0.4]
+
+    # boxes = [box_1, box_2, box_3, box_4, box_5, box_6, box_7]
+    # exon_png_file = "ExonZoomed_x075_10_y025_05_7Regions"
+    # intron_png_file = "IntronZoomed_x075_10_y025_05_7Regions"
+
 
     # Non Zoomed Picture
-    # x_lim = None
-    # y_lim = None
-    # x_ticks = None
-    # y_ticks = None
+    exon_dict_file = "ExonData_n100000_DS1_kp6_km6"
+    intron_dict_file = "IntronData_n100000_DS1_kp6_km6"
+    x_lim = None
+    y_lim = None
+    x_ticks = None
+    y_ticks = None
+    s = 0.01
 
-    n = 100_000
-    s = 0.5
-    data_set = 1
-    # s = 0.01
+    box_1 = [0.75, 0.0, 0.25, 1.0, "red", 4, True, 0.4]
+
+    box_2 = [0, 0.75, 1.0, 0.25, "blue", 4, True, 0.4]
+
+    box_3 = [0.0, 0.1875, 1.0, 0.25 - 0.1875, "green", 4, True, 0.4]
+
+    # box_4 = [0.87478, 0.25, 1.0 - 0.87478, 0.4377 - 0.25, "yellow", 4, True, 0.4]
+
+    # box_5 = [0.75, 0.4377, 0.25, 0.5 - 0.4377, "teal", 4, True, 0.4]
+
+    # box_6 = [0.75, 0.375, 0.25, 0.3912 - 0.375, "brown", 4, True, 0.4]
+
+    # box_7 = [0.75, 0.25, 0.25, 0.26523 - 0.25, "violet", 4, True, 0.4]
+
+    # boxes = [box_1, box_2, box_3]
+    boxes = None
+    bfa = None
+    exon_png_file = "Exon_FlippedCords"
+    intron_png_file = "Intron_FlippedCords"
+
+    # n = 100_000
+    # data_set = 1
     # s = 1
     # data_set = f"1&2"
     # data_set = 1
@@ -64,19 +107,6 @@ def main():
     # box = [xB, yB, dxB, dyB, "color of box", box thickness, fill (true/false), alpha]
     # fill = [x1, x2, y1, y2, color, alpha]
     # arrow[xA, yA, dxA, dxY, arrow thickness, "color of arrow"]
-    box_1 = [0.7634, 0.26523, 0.87456 - 0.7634, 0.375 - 0.26523, "red", 4, True, 0.4]
-
-    box_2 = [0.82389, 0.32356, 0.843 - 0.82389, 0.34467 - 0.32356, "blue", 4, True, 0.4]
-
-    box_3 = [0.87478, 0.375, 0.985278 - 0.87478, 0.4377 - 0.375, "green", 4, True, 0.4]
-
-    box_4 = [0.87478, 0.25, 1.0 - 0.87478, 0.4377 - 0.25, "yellow", 4, True, 0.4]
-
-    box_5 = [0.75, 0.4377, 0.25, 0.5 - 0.4377, "teal", 4, True, 0.4]
-
-    box_6 = [0.75, 0.375, 0.25, 0.3912 - 0.375, "brown", 4, True, 0.4]
-
-    box_7 = [0.75, 0.25, 0.25, 0.26523 - 0.25, "violet", 4, True, 0.4]
 
     
     # box_m = [0.75, 0.25, 0.25, 0.25, "green", 4, True, 0.5]  # major box
@@ -85,10 +115,6 @@ def main():
     # boxp2 = [0.0, 0.203125, 1.0, 0.21875 - 0.203125, "blue", 4, True, 0.4]  # forward box
     # boxp3 = [0.0, 0.05078125, 1.0, 0.0546875 - 0.05078125, "blue", 4, True, 0.3]  # forward box
     # boxp4 = [0.0, 0.0126953125, 1.0, 0.013671875 - 0.0126953125, "blue", 4, True, 0.2]  # forward box
-
-    boxes = [box_1, box_2, box_3, box_4, box_5, box_6, box_7]
-    exon_png_file = "ExonZoomed_x075_10_y025_05_7Regions"
-    intron_png_file = "IntronZoomed_x075_10_y025_05_7Regions"
 
     # boxes = [box_1]
     # exon_png_file = "ExonZoomed_x075_10_y025_05_R1"
@@ -118,7 +144,7 @@ def main():
     # exon_png_file = "ExonZoomed_x075_10_y025_05_R7"
     # intron_png_file = "IntronZoomed_x075_10_y025_05_R7"
 
-    bfa = [boxes]
+    # bfa = [boxes]
     # bfa = None
 
     # if isinstance(x_lim, list):
@@ -141,16 +167,18 @@ def main():
     matplotfigure(cwd / "TE_Images_ForPaper" / "Dict" / f"{exon_dict_file}.pkl",
                   cwd / "TE_Images_ForPaper" / "Exon",
                   f"{exon_png_file}",
-                  x_lim=x_lim, y_lim=y_lim,
-                  x_tick_marks=x_ticks, y_tick_marks=y_ticks,
+                #   x_lim=x_lim, y_lim=y_lim,
+                #   x_tick_marks=x_ticks, y_tick_marks=y_ticks,
+                #   title = "Red -> Blue -> Green",
                   box_fill_arrow = bfa,
                   dot_size=s)
     
     matplotfigure(cwd / "TE_Images_ForPaper" / "Dict" / f"{intron_dict_file}.pkl",
                   cwd / "TE_Images_ForPaper" / "Intron",
                   f"{intron_png_file}",
-                  x_lim=x_lim, y_lim=y_lim,
-                  x_tick_marks=x_ticks, y_tick_marks=y_ticks,
+                #   x_lim=x_lim, y_lim=y_lim,
+                #   x_tick_marks=x_ticks, y_tick_marks=y_ticks,
+                #   title = "Red -> Blue -> Green",
                   box_fill_arrow = bfa,
                   dot_size=s)
 
@@ -241,6 +269,7 @@ def matplotfigure(frame: dict or pathlib.Path or str,
                   y_tick_marks: dict = None,
                   dot_size: float = 0.1,
                   box_fill_arrow: list = None,
+                  transpose: bool = True,
                   *args, **kwargs):
     '''
     The figure thing is redundent, so I'm going to try a single function to do everything.
@@ -251,7 +280,10 @@ def matplotfigure(frame: dict or pathlib.Path or str,
     Boxes is a list of the anchor point (xy), the displacement (dxdy), and an optional color (str), linewidth (float), fill (bool), and transparency (float), so box = [x, y, dx, dy, color, width, fill, alpha]. The first 4 are required, the last four are optional and default to None, 2, False, and 0.5.
     Arrows is a list for placing an arrow, with an anchor point (xy), displacement (dxdy), color and linewidth (optional), so arrow = [x, y, dx, dy, color, width].
 
-    Putting them all together, box_fill_arrow should look like box_fill_arrow = [box, fill, arrow]
+    Putting them all together, box_fill_arrow should look like box_fill_arrow = [box, fill, arrow].
+
+    Transpose is because I originally put the backwards on the x axis and the forwards on the y axis. Instead of going back and swapping those in other places, it's up to the user to know which ones are which. This script is designed such that the backwards is on the x axis and the forwards is on the y: 
+    if you want to do it the other way use Transpose = True (which is true by default), else do false. This flips the coordinates for you.
     '''
     if isinstance(file_name, str):
         file_name: pathlib.Path = pathlib.Path(file_name)
@@ -265,6 +297,17 @@ def matplotfigure(frame: dict or pathlib.Path or str,
     if isinstance(frame, pathlib.Path) or isinstance(frame, str):
         with open(frame, "rb") as f:
             frame = pickle.load(f)
+
+    x_title = f"Backwards: {k_m}-Mer"
+    y_title = f"Forwards: {k_p}-Mer"
+
+    if transpose:
+        for i, (key, points) in enumerate(frame.items()):
+            old_x, old_y = np.copy(points[:, 0]), np.copy(points[:, 1])
+            frame[key][:, 0] = old_y
+            frame[key][:, 1] = old_x
+            y_title = f"Backwards: {k_m}-Mer"
+            x_title = f"Forwards: {k_p}-Mer"
 
     count = list(frame.keys())[len(list(frame.keys())) - 1]
 
@@ -282,8 +325,6 @@ def matplotfigure(frame: dict or pathlib.Path or str,
     # b_title = f"{b_title}{weights}{NS}"
     title = f"{title}{weights}{nucsequence}"
 
-    x_title = f"History: {k_m}-Mer"
-    y_title = f"Future: {k_p}-Mer"
 
     # Plot
     fig, ax = plt.subplots()

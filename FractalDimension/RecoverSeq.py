@@ -20,30 +20,30 @@ import random
 def main():
     '''
     '''
-    # score: float = float(input("Enter a score: "))
-    # k: int = int(input("Enter the length of the sequence: "))
-    # recovered_seq, remainder, score = recover_seq(score, k)
+    score: float = float(input("Enter a score: "))
+    k: int = int(input("Enter the length of the sequence: "))
+    recovered_seq, remainder, score = recover_seq(score, k)
 
-    # print(f"Recovered Sequenc: {recovered_seq}\tRemainder = {remainder}\tOriginal Score: {score}")
+    print(f"Recovered Sequenc: {recovered_seq}\tRemainder = {remainder}\tOriginal Score: {score}")
 
-    scores = [0.7634, 
-              0.87456, 
-              0.26523,  
-              0.82389, 
-              0.843, 
-              0.32356, 
-              0.34467, 
-              0.87478, 
-              0.985278, 
-              0.375, 
-              0.4377,
-              0.26523,
-              0.3912]
+    # scores = [0.7634, 
+    #           0.87456, 
+    #           0.26523,  
+    #           0.82389, 
+    #           0.843, 
+    #           0.32356, 
+    #           0.34467, 
+    #           0.87478, 
+    #           0.985278, 
+    #           0.375, 
+    #           0.4377,
+    #           0.26523,
+    #           0.3912]
     
-    for score in scores:
-        seq, remain, score = recover_seq(score, 6)
+    # for score in scores:
+    #     seq, remain, score = recover_seq(score, 6)
 
-        print(f"Score = {score}\tSeq = {seq}\t\tRemainder = {remain}")
+    #     print(f"Score = {score}\tSeq = {seq}\t\tRemainder = {remain}")
 
 
 
