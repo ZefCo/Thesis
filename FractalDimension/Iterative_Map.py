@@ -63,7 +63,7 @@ def main():
     x2 = float(input("Input a value for x2: "))
     y1 = float(input("Input a value for y1: "))
     y2 = float(input("Input a value for y2: "))
-    k = int(input("Input number of iterations k: "))
+    k = int(input("Input number of iterations: "))
     X, Y = 0, 1
 
     # print("Testing with [0.75, 1.0], [0.25. 0.5]")
