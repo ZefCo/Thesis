@@ -11,7 +11,7 @@ import DistanceClass as distance
 import pandas
 import pickle
 import GeneClass as Gene
-import TimeEmbedding as TE
+import TimeEmbedding as TE  # probably actually time embedding old script
 
 
 
