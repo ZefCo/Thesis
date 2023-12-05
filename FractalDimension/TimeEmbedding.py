@@ -18,6 +18,10 @@ import random
 
 def main():
     '''
+    So traditionally I did the backwards on the x axis and forwards on the y axis, and that's getting me into trouble. The Kneeding transform is best done with it flipped. So I introduced a simple
+    transform bool, but... that's getting confusing. The point is: be careful how you use this.
+
+
     Do this with different permutations of nucelotides.
 
     Break this out and create a new script for playing with the boxes and arrows. Use something like: Green = 0th, Red = -N iterations, Blue = +N iterations. Have it fade or try lighter shades every iteration.
@@ -40,150 +44,64 @@ def main():
 
     data_path = windows_path
 
-    # # Zoomed in Picture
-    # exon_dict_file = "ExonData_n100000_DS1_kp6_km6_zoomed_x0.75by1.0_y0.25by0.5"
-    # intron_dict_file = "IntronData_n100000_DS1_kp6_km6_zoomed_x0.75by1.0_y0.25by0.5"
-    # x_lim = [0.75, 1.0]
-    # # y_lim = [0.25, 0.26523]
-    # y_lim = [0.25, 0.5]
-    # x_ticks = {x/100:x/100 for x in range(75, 100 + 1, 1)}
-    # y_ticks = {y/100:y/100 for y in range(25, 50 + 1, 1)}
-    # s = 0.5
-
-    # box_1 = [0.7634, 0.26523, 0.87456 - 0.7634, 0.375 - 0.26523, "red", 4, True, 0.4]
-
-    # box_2 = [0.82389, 0.32356, 0.843 - 0.82389, 0.34467 - 0.32356, "blue", 4, True, 0.4]
-
-    # box_3 = [0.87478, 0.375, 0.985278 - 0.87478, 0.4377 - 0.375, "green", 4, True, 0.4]
-
-    # box_4 = [0.87478, 0.25, 1.0 - 0.87478, 0.4377 - 0.25, "yellow", 4, True, 0.4]
-
-    # box_5 = [0.75, 0.4377, 0.25, 0.5 - 0.4377, "teal", 4, True, 0.4]
-
-    # box_6 = [0.75, 0.375, 0.25, 0.3912 - 0.375, "brown", 4, True, 0.4]
-
-    # box_7 = [0.75, 0.25, 0.25, 0.26523 - 0.25, "violet", 4, True, 0.4]
-
-    # boxes = [box_1, box_2, box_3, box_4, box_5, box_6, box_7]
-    # exon_png_file = "ExonZoomed_x075_10_y025_05_7Regions"
-    # intron_png_file = "IntronZoomed_x075_10_y025_05_7Regions"
-
-
-    # Non Zoomed Picture
-    exon_dict_file = "ExonData_n100000_DS1_kp6_km6"
-    intron_dict_file = "IntronData_n100000_DS1_kp6_km6"
-    x_lim = None
-    y_lim = None
-    x_ticks = None
-    y_ticks = None
-    s = 0.01
-
-    box_1 = [0.75, 0.0, 0.25, 1.0, "red", 4, True, 0.4]
-
-    box_2 = [0, 0.75, 1.0, 0.25, "blue", 4, True, 0.4]
-
-    box_3 = [0.0, 0.1875, 1.0, 0.25 - 0.1875, "green", 4, True, 0.4]
-
-    # box_4 = [0.87478, 0.25, 1.0 - 0.87478, 0.4377 - 0.25, "yellow", 4, True, 0.4]
-
-    # box_5 = [0.75, 0.4377, 0.25, 0.5 - 0.4377, "teal", 4, True, 0.4]
-
-    # box_6 = [0.75, 0.375, 0.25, 0.3912 - 0.375, "brown", 4, True, 0.4]
-
-    # box_7 = [0.75, 0.25, 0.25, 0.26523 - 0.25, "violet", 4, True, 0.4]
-
-    # boxes = [box_1, box_2, box_3]
-    boxes = None
-    bfa = None
-    exon_png_file = "Exon_FlippedCords"
-    intron_png_file = "Intron_FlippedCords"
-
-    # n = 100_000
-    # data_set = 1
-    # s = 1
-    # data_set = f"1&2"
-    # data_set = 1
-
-    # box = [xB, yB, dxB, dyB, "color of box", box thickness, fill (true/false), alpha]
-    # fill = [x1, x2, y1, y2, color, alpha]
-    # arrow[xA, yA, dxA, dxY, arrow thickness, "color of arrow"]
-
-    
-    # box_m = [0.75, 0.25, 0.25, 0.25, "green", 4, True, 0.5]  # major box
-    
-    # boxp1 = [0.0, 0.8125, 1.0, 0.875 - 0.8125, "blue", 4, True, 0.5]  # forward box
-    # boxp2 = [0.0, 0.203125, 1.0, 0.21875 - 0.203125, "blue", 4, True, 0.4]  # forward box
-    # boxp3 = [0.0, 0.05078125, 1.0, 0.0546875 - 0.05078125, "blue", 4, True, 0.3]  # forward box
-    # boxp4 = [0.0, 0.0126953125, 1.0, 0.013671875 - 0.0126953125, "blue", 4, True, 0.2]  # forward box
-
-    # boxes = [box_1]
-    # exon_png_file = "ExonZoomed_x075_10_y025_05_R1"
-    # intron_png_file = "IntronZoomed_x075_10_y025_05_R1"
-
-    # boxes = [box_2]
-    # exon_png_file = "ExonZoomed_x075_10_y025_05_R2"
-    # intron_png_file = "IntronZoomed_x075_10_y025_05_R2"
-
-    # boxes = [box_3]
-    # exon_png_file = "ExonZoomed_x075_10_y025_05_R3"
-    # intron_png_file = "IntronZoomed_x075_10_y025_05_R3"
-
-    # boxes = [box_4]
-    # exon_png_file = "ExonZoomed_x075_10_y025_05_R4"
-    # intron_png_file = "IntronZoomed_x075_10_y025_05_R4"
-
-    # boxes = [box_5]
-    # exon_png_file = "ExonZoomed_x075_10_y025_05_R5"
-    # intron_png_file = "IntronZoomed_x075_10_y025_05_R5"
-
-    # boxes = [box_6]
-    # exon_png_file = "ExonZoomed_x075_10_y025_05_R6"
-    # intron_png_file = "IntronZoomed_x075_10_y025_05_R6"
-
-    # boxes = [box_7]
-    # exon_png_file = "ExonZoomed_x075_10_y025_05_R7"
-    # intron_png_file = "IntronZoomed_x075_10_y025_05_R7"
-
-    # bfa = [boxes]
+    # # Non Zoomed Picture
+    # exon_dict_file = "ExonData_n100000_DS1_kp6_km6"
+    # intron_dict_file = "IntronData_n100000_DS1_kp6_km6"
+    # x_lim = None
+    # y_lim = None
+    # x_ticks = None
+    # y_ticks = None
+    # s = 0.01
     # bfa = None
+    # inches = 20
+    # exon_png_file = "ExonXBackYForward"
+    # intron_png_file = "IntronXBackYForward"
 
-    # if isinstance(x_lim, list):
-    #     exon_dict_file = f"ExonData_n{n}_DS{data_set}_kp6_km6_zoomed_x{x_lim[0]}by{x_lim[1]}_y{y_lim[0]}by{y_lim[1]}"
-    #     intron_dict_file = f"IntronData_n{n}_DS{data_set}_kp6_km6_zoomed_x{x_lim[0]}by{x_lim[1]}_y{y_lim[0]}by{y_lim[1]}"
-    #     exon_png_file = f"{exon_dict_file}_IterativeMap.png"
-    #     intron_png_file = f"{intron_dict_file}_IterativeMap.png"
-    # else:
-    #     exon_dict_file = f"ExonData_n{n}_DS{data_set}_kp6_km6"
-    #     intron_dict_file = f"IntronData_n{n}_DS{data_set}_kp6_km6"
-    #     exon_png_file = f"{exon_dict_file}_IterativeMap_rgb_filled.png"
-    #     intron_png_file = f"{intron_dict_file}_IterativeMap_rgb_filled.png"
 
-    # time_embedding_v2(pathlib.Path(f"{data_path}/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl"), 
-    #                   n = n, 
-    #                   x_lim = x_lim, y_lim = y_lim, 
-    #                   exon_outfile = cwd / "TE_Images_ForPaper" / "Dict" / f"{exon_dict_file}.pkl",
-    #                   intron_outfile = cwd / "TE_Images_ForPaper" / "Dict" / f"{intron_dict_file}.pkl")
+    # Zoomed in Picture
+    general_dict_file = "Data_zoomed_x025y075T"
+    exon_dict_file = f"Exon{general_dict_file}"
+    intron_dict_file = f"Intron{general_dict_file}"
+    y_lim = [0.25, 0.5]  # if this looks backwards, it's because of that stupid transpose command...
+    x_lim = [0.75, 1.0]
+    x_ticks = {x/100:x/100 for x in range(75, 100 + 1, 1)}
+    y_ticks = {y/100:y/100 for y in range(25, 50 + 1, 1)}
+    s = 0.1
+    n = 100_000
+    data_set = 1
+    exon_png_file = "ExonZoomed_x025_050_y075_100"
+    intron_png_file = "IntronZoomed_x025_050_y075_100"
+    bfa = None
+    inches = 10
+
+
+    time_embedding_v2(pathlib.Path(f"{data_path}/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl"), 
+                      n = n, 
+                      x_lim = x_lim, y_lim = y_lim, 
+                      exon_outfile = cwd / "TE_Images_ForPaper" / "Dict" / f"{exon_dict_file}.pkl",
+                      intron_outfile = cwd / "TE_Images_ForPaper" / "Dict" / f"{intron_dict_file}.pkl")
     
     matplotfigure(cwd / "TE_Images_ForPaper" / "Dict" / f"{exon_dict_file}.pkl",
                   cwd / "TE_Images_ForPaper" / "Exon",
                   f"{exon_png_file}",
+                #   transpose=False,
                 #   x_lim=x_lim, y_lim=y_lim,
                 #   x_tick_marks=x_ticks, y_tick_marks=y_ticks,
-                #   title = "Red -> Blue -> Green",
+                  inches = inches,
+                  title = "Exon Low Density Region",
                   box_fill_arrow = bfa,
                   dot_size=s)
     
     matplotfigure(cwd / "TE_Images_ForPaper" / "Dict" / f"{intron_dict_file}.pkl",
                   cwd / "TE_Images_ForPaper" / "Intron",
                   f"{intron_png_file}",
+                #   transpose=False,
                 #   x_lim=x_lim, y_lim=y_lim,
                 #   x_tick_marks=x_ticks, y_tick_marks=y_ticks,
-                #   title = "Red -> Blue -> Green",
+                  inches = inches,
+                  title = "Intron Low Density Region",
                   box_fill_arrow = bfa,
                   dot_size=s)
-
-    # reload_matplotlib(cwd / "TE_Images_ForPaper" / "Exon" / f"{exon_dict_file}_pkltest.pkl", cwd / "TE_Images_ForPaper" / "Exon" / f"{exon_dict_file}_pkltest.png", boxes = boxes)
-    # reload_matplotlib(cwd / "TE_Images_ForPaper" / "Intron" / f"{intron_dict_file}_pkltest.pkl", cwd / "TE_Images_ForPaper" / "Intron" / f"{intron_dict_file}_pkltest.png", boxes = boxes)
 
 
 
@@ -270,6 +188,7 @@ def matplotfigure(frame: dict or pathlib.Path or str,
                   dot_size: float = 0.1,
                   box_fill_arrow: list = None,
                   transpose: bool = True,
+                  inches: float = 20,
                   *args, **kwargs):
     '''
     The figure thing is redundent, so I'm going to try a single function to do everything.
@@ -278,9 +197,11 @@ def matplotfigure(frame: dict or pathlib.Path or str,
 
     box_fill_arrow allows you to draw on the plot. 
     Boxes is a list of the anchor point (xy), the displacement (dxdy), and an optional color (str), linewidth (float), fill (bool), and transparency (float), so box = [x, y, dx, dy, color, width, fill, alpha]. The first 4 are required, the last four are optional and default to None, 2, False, and 0.5.
+    
+    This section is currenlty not working: you cannot put arrows on the plots.
     Arrows is a list for placing an arrow, with an anchor point (xy), displacement (dxdy), color and linewidth (optional), so arrow = [x, y, dx, dy, color, width].
-
     Putting them all together, box_fill_arrow should look like box_fill_arrow = [box, fill, arrow].
+    End of section that is not working. At some point it might work, but not today.
 
     Transpose is because I originally put the backwards on the x axis and the forwards on the y axis. Instead of going back and swapping those in other places, it's up to the user to know which ones are which. This script is designed such that the backwards is on the x axis and the forwards is on the y: 
     if you want to do it the other way use Transpose = True (which is true by default), else do false. This flips the coordinates for you.
@@ -328,7 +249,7 @@ def matplotfigure(frame: dict or pathlib.Path or str,
 
     # Plot
     fig, ax = plt.subplots()
-    fig.set_size_inches(20, 20)
+    fig.set_size_inches(inches, inches)
     for i, points in enumerate(frame.values()):
         # ax.scatter(points[:, 0], points[:, 1], s = dot_size, marker = "s", color = "k", linewidths = 0)
         plt.plot(points[:, 0], points[:, 1], markersize = dot_size, marker = "s", linestyle = "", color = "k")
@@ -337,11 +258,14 @@ def matplotfigure(frame: dict or pathlib.Path or str,
     plt.ylabel(y_title)
 
     if isinstance(box_fill_arrow, list):
-        boxes = box_fill_arrow[0]
-        try:
-            arrows = box_fill_arrow[2]
-        except IndexError:
-            arrows = None
+        boxes = box_fill_arrow
+        arrows = None
+
+        # boxes = box_fill_arrow[0]
+        # try:
+        #     arrows = box_fill_arrow[2]
+        # except IndexError:
+        #     arrows = None
 
         for box in boxes:
             box_color, box_width, box_fill, box_alpha = _colorwidth(box)
@@ -372,6 +296,7 @@ def matplotfigure(frame: dict or pathlib.Path or str,
 
 def _colorwidth(thing: list, width: float = 2, fill: bool = False, alpha: float = 0.5):
     '''
+    4 == color, 5 == width, 6 == fill, 7 == alpha/transparency
     '''
     try:
         color = thing[4]
@@ -601,6 +526,9 @@ def time_embedding_v2(data: pandas.DataFrame,
     both_dir = image_dir / "Both"
     both_dir.mkdir(parents = True, exist_ok = True)
 
+    _check_file(exon_outfile)
+    _check_file(intron_outfile)
+
     # gene: Gene.Gene
     # ncib: str
 
@@ -614,6 +542,7 @@ def time_embedding_v2(data: pandas.DataFrame,
 
     e_frame, i_frame = {}, {}  # OK this may seem weird, but hear me out: lists are slow, especially when you have a very large N in a list. But a dictionary is hashable, so I can store the lists in the dictionary, who cares about the key, and it should be faster for large N
     e_count, i_count = 0, 0
+
 
     for row in range(rows):
         try:
@@ -676,6 +605,131 @@ def time_embedding_v2(data: pandas.DataFrame,
     #               x_lim = x_lim, y_lim = y_lim,
     #               x_tick_marks = x_tick_marks, y_tick_marks = y_tick_marks,
     #               dot_size = dot_size, boxes = eoxes, file_extension = file_extension)
+
+
+def _check_file(file_path: pathlib.Path):
+    '''
+    Checks if the file path is free: if it is not it gives the option to abandon the script. If the it is free then a temp empty dictionary is put there
+    in case multiple scripts are running at once.
+    '''
+    if file_path.is_file():
+        print(f"{file_path} already exists!")
+        overwrite = input(f"Do you wish to continue [y/n]? ")
+        if (overwrite in "n") or (overwrite in "No") or (overwrite in "no") or (overwrite in "NO"):
+            print("Ending script")
+            exit()
+        
+        else:
+            temp = {}
+            with open(file_path, "wb") as file:
+                pickle.dump(temp, file)
+
+
+
+def _junk():
+    '''
+    So this stuff at one point was useful, and I don't think it is anymore, but I don't have the guts to delete it. So it goes here in case I do need it.
+    '''
+    # box_1 = [0.7634, 0.26523, 0.87456 - 0.7634, 0.375 - 0.26523, "red", 4, True, 0.4]
+
+    # box_2 = [0.82389, 0.32356, 0.843 - 0.82389, 0.34467 - 0.32356, "blue", 4, True, 0.4]
+
+    # box_3 = [0.87478, 0.375, 0.985278 - 0.87478, 0.4377 - 0.375, "green", 4, True, 0.4]
+
+    # box_4 = [0.87478, 0.25, 1.0 - 0.87478, 0.4377 - 0.25, "yellow", 4, True, 0.4]
+
+    # box_5 = [0.75, 0.4377, 0.25, 0.5 - 0.4377, "teal", 4, True, 0.4]
+
+    # box_6 = [0.75, 0.375, 0.25, 0.3912 - 0.375, "brown", 4, True, 0.4]
+
+    # box_7 = [0.75, 0.25, 0.25, 0.26523 - 0.25, "violet", 4, True, 0.4]
+
+    # boxes = [box_1, box_2, box_3, box_4, box_5, box_6, box_7]
+    # exon_png_file = "ExonZoomed_x075_10_y025_05_7Regions"
+    # intron_png_file = "IntronZoomed_x075_10_y025_05_7Regions"
+
+
+
+    # box_1 = [0.8125, 0.0, 0.875 - 0.8125, 1.0, "red", 4, True, 0.4]  #[x, y, dx, dy, color, width, fill, alpha]
+
+    # box_2 = [0.25, 0.75, 0.25, 0.25, "green", 4, True, 0.4]
+
+    # box_3 = [0.0, 0.4375, 1.0, 0.5 - 0.4375, "blue", 4, True, 0.4]
+
+    # # box_4 = [0.87478, 0.25, 1.0 - 0.87478, 0.4377 - 0.25, "yellow", 4, True, 0.4]
+
+    # # box_5 = [0.75, 0.4377, 0.25, 0.5 - 0.4377, "teal", 4, True, 0.4]
+
+    # # box_6 = [0.75, 0.375, 0.25, 0.3912 - 0.375, "brown", 4, True, 0.4]
+
+    # # box_7 = [0.75, 0.25, 0.25, 0.26523 - 0.25, "violet", 4, True, 0.4]
+
+    # boxes = [box_1, box_2, box_3]
+    # # boxes = None
+    # bfa = boxes
+    # exon_png_file = "Exon_IterativeMapRGB_x025y075"
+    # intron_png_file = "Intron_IterativeMapRGB_x025y075"
+
+    # n = 100_000
+    # data_set = 1
+    # s = 1
+    # data_set = f"1&2"
+    # data_set = 1
+
+    # box = [xB, yB, dxB, dyB, "color of box", box thickness, fill (true/false), alpha]
+    # fill = [x1, x2, y1, y2, color, alpha]
+    # arrow[xA, yA, dxA, dxY, arrow thickness, "color of arrow"]
+
+    
+    # box_m = [0.75, 0.25, 0.25, 0.25, "green", 4, True, 0.5]  # major box
+    
+    # boxp1 = [0.0, 0.8125, 1.0, 0.875 - 0.8125, "blue", 4, True, 0.5]  # forward box
+    # boxp2 = [0.0, 0.203125, 1.0, 0.21875 - 0.203125, "blue", 4, True, 0.4]  # forward box
+    # boxp3 = [0.0, 0.05078125, 1.0, 0.0546875 - 0.05078125, "blue", 4, True, 0.3]  # forward box
+    # boxp4 = [0.0, 0.0126953125, 1.0, 0.013671875 - 0.0126953125, "blue", 4, True, 0.2]  # forward box
+
+    # boxes = [box_1]
+    # exon_png_file = "ExonZoomed_x075_10_y025_05_R1"
+    # intron_png_file = "IntronZoomed_x075_10_y025_05_R1"
+
+    # boxes = [box_2]
+    # exon_png_file = "ExonZoomed_x075_10_y025_05_R2"
+    # intron_png_file = "IntronZoomed_x075_10_y025_05_R2"
+
+    # boxes = [box_3]
+    # exon_png_file = "ExonZoomed_x075_10_y025_05_R3"
+    # intron_png_file = "IntronZoomed_x075_10_y025_05_R3"
+
+    # boxes = [box_4]
+    # exon_png_file = "ExonZoomed_x075_10_y025_05_R4"
+    # intron_png_file = "IntronZoomed_x075_10_y025_05_R4"
+
+    # boxes = [box_5]
+    # exon_png_file = "ExonZoomed_x075_10_y025_05_R5"
+    # intron_png_file = "IntronZoomed_x075_10_y025_05_R5"
+
+    # boxes = [box_6]
+    # exon_png_file = "ExonZoomed_x075_10_y025_05_R6"
+    # intron_png_file = "IntronZoomed_x075_10_y025_05_R6"
+
+    # boxes = [box_7]
+    # exon_png_file = "ExonZoomed_x075_10_y025_05_R7"
+    # intron_png_file = "IntronZoomed_x075_10_y025_05_R7"
+
+    # bfa = [boxes]
+    # bfa = None
+
+    # if isinstance(x_lim, list):
+    #     exon_dict_file = f"ExonData_n{n}_DS{data_set}_kp6_km6_zoomed_x{x_lim[0]}by{x_lim[1]}_y{y_lim[0]}by{y_lim[1]}"
+    #     intron_dict_file = f"IntronData_n{n}_DS{data_set}_kp6_km6_zoomed_x{x_lim[0]}by{x_lim[1]}_y{y_lim[0]}by{y_lim[1]}"
+    #     exon_png_file = f"{exon_dict_file}_IterativeMap.png"
+    #     intron_png_file = f"{intron_dict_file}_IterativeMap.png"
+    # else:
+    #     exon_dict_file = f"ExonData_n{n}_DS{data_set}_kp6_km6"
+    #     intron_dict_file = f"IntronData_n{n}_DS{data_set}_kp6_km6"
+    #     exon_png_file = f"{exon_dict_file}_IterativeMap_rgb_filled.png"
+    #     intron_png_file = f"{intron_dict_file}_IterativeMap_rgb_filled.png"
+
 
 
 if __name__ in "__main__":

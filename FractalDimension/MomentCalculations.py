@@ -47,14 +47,15 @@ def main():
     max_n = 2
     min_n = 0.5
     ns = [n / step for n in range(int(step*(min_n)), int(step*max_n) + 1)]
-    moments(cwd / "Dicts", ns, min_k = 1, max_k = 6, convergence = True, logy = False)
+    title = f"E v I log"
+    moments(cwd / "Dicts", ns, min_k = 1, max_k = 6, convergence = False, logy = True, N_value = False, title = title)
     # evalue = moment(exon_file, unlog = True, k = 2*k, n = 1)
     # ivalue = moment(intron_file, unlog = True, k = 2*k, n = 1)
     # print(f"k = {k}\te value = {evalue}\ti = value = {ivalue}")
 
 
 
-def moments(file_dir: pathlib.Path, ns: list, min_k: int = 1, max_k: int = 6, unlog: bool = False, convergence: bool = False, logy: bool = False, *args, **kwargs):
+def moments(file_dir: pathlib.Path, ns: list, min_k: int = 1, max_k: int = 6, unlog: bool = False, convergence: bool = False, logy: bool = False, N_value: bool = False, title: str = None, *args, **kwargs):
     '''
     Moment calculations do NOT need the 4**s part multiplied, everything just needs to be scaled from 0 to 1 in a traditional normalization.
 
@@ -107,6 +108,12 @@ def moments(file_dir: pathlib.Path, ns: list, min_k: int = 1, max_k: int = 6, un
             
             exon_v = moment(exon_data, n = n, k = 2*k, unlog = False, *args, **kwargs)
             intron_v = moment(intron_data, n = n, k = 2*k, unlog = False, *args, **kwargs)
+
+            if N_value:
+                N = 4**(2*k)
+                N = N**((1/n) - 1)
+                exon_v = N * exon_v
+                intron_v = N * intron_v
 
             if logy:
                 exon_v = np.log2(exon_v)
@@ -170,6 +177,9 @@ def moments(file_dir: pathlib.Path, ns: list, min_k: int = 1, max_k: int = 6, un
 
                 axs[1].plot(ns, pd[key])
                 axs[1].set_ylabel("Percent Difference")
+
+    if isinstance(title, str):
+        plt.suptitle(title)
 
     plt.show()
 
