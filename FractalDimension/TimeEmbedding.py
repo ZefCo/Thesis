@@ -40,7 +40,7 @@ def main():
     # exit()
 
     linux_path = f"/media/ethanspeakman/Elements/"
-    windows_path = f"F:/"
+    windows_path = f"G:/"
 
     data_path = windows_path
 
@@ -59,21 +59,28 @@ def main():
 
 
     # Zoomed in Picture
-    general_dict_file = "Data_zoomed_x025y075T"
+    general_dict_file = "Data_zoomed_x025y050T"
     exon_dict_file = f"Exon{general_dict_file}"
     intron_dict_file = f"Intron{general_dict_file}"
-    y_lim = [0.25, 0.5]  # if this looks backwards, it's because of that stupid transpose command...
-    x_lim = [0.75, 1.0]
+    y_lim = [0.25, 0.5]
+    x_lim = [0.25, 0.5]
     x_ticks = {x/100:x/100 for x in range(75, 100 + 1, 1)}
     y_ticks = {y/100:y/100 for y in range(25, 50 + 1, 1)}
     s = 0.1
     n = 100_000
     data_set = 1
-    exon_png_file = "ExonZoomed_x025_050_y075_100"
-    intron_png_file = "IntronZoomed_x025_050_y075_100"
-    bfa = None
+    exon_png_file = "ExonZoomed_x025_050_y025_050"
+    intron_png_file = "IntronZoomed_x025_050_y025_050"
     inches = 10
 
+    # box_1 = [0.375, 0.75, 0.4375 - 0.375, 0.8125 - 0.75, "red", 4, True, 0.4]
+
+    # box_2 = [0.3125, 0.9375, 0.375 - 0.3125, 1.0 - 0.9375, "blue", 4, True, 0.4]
+
+    # box_3 = [0.25, 0.75, 0.0625, 0.0625, "green", 4, True, 0.4]
+
+    # bfa = [box_1, box_2, box_3]
+    bfa = None
 
     time_embedding_v2(pathlib.Path(f"{data_path}/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl"), 
                       n = n, 
