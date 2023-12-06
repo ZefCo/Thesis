@@ -40,7 +40,7 @@ def main():
     # exit()
 
     linux_path = f"/media/ethanspeakman/Elements/"
-    windows_path = f"G:/"
+    windows_path = f"F:/"
 
     data_path = windows_path
 
@@ -59,27 +59,27 @@ def main():
 
 
     # Zoomed in Picture
-    general_dict_file = "Data_zoomed_x025y050T"
+    general_dict_file = "Data_zoomed_xZoomyZoomT"
     exon_dict_file = f"Exon{general_dict_file}"
     intron_dict_file = f"Intron{general_dict_file}"
-    y_lim = [0.25, 0.5]
-    x_lim = [0.25, 0.5]
-    x_ticks = {x/100:x/100 for x in range(75, 100 + 1, 1)}
+    y_lim = [0.375, 0.375 + 0.03125]
+    x_lim = [0.375 - 0.03126, 0.375]
+    x_ticks = {x/100:x/100 for x in range(25, 50 + 1, 1)}
     y_ticks = {y/100:y/100 for y in range(25, 50 + 1, 1)}
     s = 0.1
     n = 100_000
     data_set = 1
-    exon_png_file = "ExonZoomed_x025_050_y025_050"
-    intron_png_file = "IntronZoomed_x025_050_y025_050"
-    inches = 10
+    exon_png_file = "ExonZoomed_xZoom_yZoom"
+    intron_png_file = "IntronZoomed_xZoom_yZoom"
+    inches = 5
 
-    # box_1 = [0.375, 0.75, 0.4375 - 0.375, 0.8125 - 0.75, "red", 4, True, 0.4]
+    box_1 = [0.375, 0.375 - 0.03125, 0.03125, 0.03125, "red", 4, True, 0.4]
 
     # box_2 = [0.3125, 0.9375, 0.375 - 0.3125, 1.0 - 0.9375, "blue", 4, True, 0.4]
 
     # box_3 = [0.25, 0.75, 0.0625, 0.0625, "green", 4, True, 0.4]
 
-    # bfa = [box_1, box_2, box_3]
+    # bfa = [box_1]
     bfa = None
 
     time_embedding_v2(pathlib.Path(f"{data_path}/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl"), 
@@ -91,22 +91,24 @@ def main():
     matplotfigure(cwd / "TE_Images_ForPaper" / "Dict" / f"{exon_dict_file}.pkl",
                   cwd / "TE_Images_ForPaper" / "Exon",
                   f"{exon_png_file}",
+                  default_title = False,
                 #   transpose=False,
-                #   x_lim=x_lim, y_lim=y_lim,
+                  x_lim=x_lim, y_lim=y_lim,
                 #   x_tick_marks=x_ticks, y_tick_marks=y_ticks,
                   inches = inches,
-                  title = "Exon Low Density Region",
+                  title = "Exon",
                   box_fill_arrow = bfa,
                   dot_size=s)
     
     matplotfigure(cwd / "TE_Images_ForPaper" / "Dict" / f"{intron_dict_file}.pkl",
                   cwd / "TE_Images_ForPaper" / "Intron",
                   f"{intron_png_file}",
+                  default_title = False,
                 #   transpose=False,
-                #   x_lim=x_lim, y_lim=y_lim,
+                  x_lim=x_lim, y_lim=y_lim,
                 #   x_tick_marks=x_ticks, y_tick_marks=y_ticks,
                   inches = inches,
-                  title = "Intron Low Density Region",
+                  title = "Intron",
                   box_fill_arrow = bfa,
                   dot_size=s)
 
@@ -190,6 +192,7 @@ def matplotfigure(frame: dict or pathlib.Path or str,
                   backwards: bool = True, 
                   nucsequence: str = "AGTC",
                   title: str = None,
+                  default_title: bool = True,
                   x_tick_marks: dict = None,
                   y_tick_marks: dict = None,
                   dot_size: float = 0.1,
@@ -239,20 +242,18 @@ def matplotfigure(frame: dict or pathlib.Path or str,
 
     count = list(frame.keys())[len(list(frame.keys())) - 1]
 
-    if isinstance(title, str):
-        title = f"{title}\nTime Embedding w/ {gap}-mer Gap\n{count} Total Regions"
-    else:
-        title = f"Time Embedding w/ {gap}-mer Gap\n{count} Total Regions"
+    if default_title:
+        base_title = f"Time Embedding w/ {gap}-mer Gap\n{count} Total Regions"
 
-    if backwards:
-        weights = ": weights are forwards and backwards"
-    else:
-        weights = ": weights are forwards"
+        if isinstance(title, str):
+            title = f"{title}\n{base_title}"
+        
+        if backwards:
+            weights = ": weights are forwards and backwards"
+        else:
+            weights = ": weights are forwards"
 
-
-    # b_title = f"{b_title}{weights}{NS}"
-    title = f"{title}{weights}{nucsequence}"
-
+        title = f"{title}{weights}{nucsequence}"
 
     # Plot
     fig, ax = plt.subplots()
