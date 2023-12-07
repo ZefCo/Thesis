@@ -40,53 +40,59 @@ def main():
     # exit()
 
     linux_path = f"/media/ethanspeakman/Elements/"
-    windows_path = f"F:/"
+    windows_path = f"G:/"
 
     data_path = windows_path
 
-    # # Non Zoomed Picture
-    # exon_dict_file = "ExonData_n100000_DS1_kp6_km6"
-    # intron_dict_file = "IntronData_n100000_DS1_kp6_km6"
-    # x_lim = None
-    # y_lim = None
-    # x_ticks = None
-    # y_ticks = None
-    # s = 0.01
-    # bfa = None
-    # inches = 20
-    # exon_png_file = "ExonXBackYForward"
-    # intron_png_file = "IntronXBackYForward"
-
-
-    # Zoomed in Picture
-    general_dict_file = "Data_zoomed_xZoomyZoomT"
-    exon_dict_file = f"Exon{general_dict_file}"
-    intron_dict_file = f"Intron{general_dict_file}"
-    y_lim = [0.375, 0.375 + 0.03125]
-    x_lim = [0.375 - 0.03126, 0.375]
-    x_ticks = {x/100:x/100 for x in range(25, 50 + 1, 1)}
-    y_ticks = {y/100:y/100 for y in range(25, 50 + 1, 1)}
-    s = 0.1
+    # Non Zoomed Picture
+    exon_dict_file = "ExonData_n100000_DS1_kp6_km6"
+    intron_dict_file = "IntronData_n100000_DS1_kp6_km6"
+    x_lim = None
+    y_lim = None
+    x_ticks = None
+    y_ticks = None
+    s = 0.01
+    bfa = None
+    inches = 20
+    exon_png_file = "Exon_textsize_20"
+    intron_png_file = "Intron_textsize_20"
+    # box_1 = [0.25, 0.25, 0.25, 0.25, "red", 4, True, 0.4]
+    # bfa = [box_1]
+    bfa = None
+    textsize = 40
     n = 100_000
     data_set = 1
-    exon_png_file = "ExonZoomed_xZoom_yZoom"
-    intron_png_file = "IntronZoomed_xZoom_yZoom"
-    inches = 5
 
-    box_1 = [0.375, 0.375 - 0.03125, 0.03125, 0.03125, "red", 4, True, 0.4]
+
+    # # Zoomed in Picture
+    # general_dict_file = "Data_zoomed_x0375_04375_y03125_0375T"
+    # exon_dict_file = f"Exon{general_dict_file}"
+    # intron_dict_file = f"Intron{general_dict_file}"
+    # y_lim = [0.375, 0.4375]
+    # x_lim = [0.3125, 0.375]
+    # x_ticks = {x/100:x/100 for x in range(25, 50 + 1, 1)}
+    # y_ticks = {y/100:y/100 for y in range(25, 50 + 1, 1)}
+    # s = 0.5
+    # exon_png_file = "ExonZoomed_x0375_04375_y03125_0375_boxed"
+    # intron_png_file = "IntronZoomed_x0375_04375_y03125_0375_boxed"
+    # inches = 10
+    # textsize = 12
+    # n = 100_000
+    # data_set = 1
+    # box_1 = [0.375, 0.3125 + 3*(0.015625), 0.015625, 0.015625, "red", 4, True, 0.4]
 
     # box_2 = [0.3125, 0.9375, 0.375 - 0.3125, 1.0 - 0.9375, "blue", 4, True, 0.4]
 
     # box_3 = [0.25, 0.75, 0.0625, 0.0625, "green", 4, True, 0.4]
 
     # bfa = [box_1]
-    bfa = None
+    # bfa = None
 
-    time_embedding_v2(pathlib.Path(f"{data_path}/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl"), 
-                      n = n, 
-                      x_lim = x_lim, y_lim = y_lim, 
-                      exon_outfile = cwd / "TE_Images_ForPaper" / "Dict" / f"{exon_dict_file}.pkl",
-                      intron_outfile = cwd / "TE_Images_ForPaper" / "Dict" / f"{intron_dict_file}.pkl")
+    # time_embedding_v2(pathlib.Path(f"{data_path}/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl"), 
+    #                   n = n, 
+    #                   x_lim = x_lim, y_lim = y_lim, 
+    #                   exon_outfile = cwd / "TE_Images_ForPaper" / "Dict" / f"{exon_dict_file}.pkl",
+    #                   intron_outfile = cwd / "TE_Images_ForPaper" / "Dict" / f"{intron_dict_file}.pkl")
     
     matplotfigure(cwd / "TE_Images_ForPaper" / "Dict" / f"{exon_dict_file}.pkl",
                   cwd / "TE_Images_ForPaper" / "Exon",
@@ -98,7 +104,8 @@ def main():
                   inches = inches,
                   title = "Exon",
                   box_fill_arrow = bfa,
-                  dot_size=s)
+                  textsize = textsize,
+                  dot_size = s)
     
     matplotfigure(cwd / "TE_Images_ForPaper" / "Dict" / f"{intron_dict_file}.pkl",
                   cwd / "TE_Images_ForPaper" / "Intron",
@@ -110,7 +117,8 @@ def main():
                   inches = inches,
                   title = "Intron",
                   box_fill_arrow = bfa,
-                  dot_size=s)
+                  textsize = textsize,
+                  dot_size = s)
 
 
 
@@ -199,6 +207,7 @@ def matplotfigure(frame: dict or pathlib.Path or str,
                   box_fill_arrow: list = None,
                   transpose: bool = True,
                   inches: float = 20,
+                  textsize: int = None,
                   *args, **kwargs):
     '''
     The figure thing is redundent, so I'm going to try a single function to do everything.
@@ -256,6 +265,9 @@ def matplotfigure(frame: dict or pathlib.Path or str,
         title = f"{title}{weights}{nucsequence}"
 
     # Plot
+    if isinstance(textsize, int):
+        plt.rc("font", size = textsize)
+
     fig, ax = plt.subplots()
     fig.set_size_inches(inches, inches)
     for i, points in enumerate(frame.values()):
@@ -264,7 +276,7 @@ def matplotfigure(frame: dict or pathlib.Path or str,
     plt.title(title)
     plt.xlabel(x_title)
     plt.ylabel(y_title)
-
+    
     if isinstance(box_fill_arrow, list):
         boxes = box_fill_arrow
         arrows = None
