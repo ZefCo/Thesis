@@ -37,41 +37,50 @@ def main():
     # title_details = f"Independent Scaling Log2 Transform {nucsequence} Order Cbins = {cbins}"
     # file_details = title_details.replace(" ", "")
 
-    # k = 1
+    k = 1
     # colors: list = ['darkred', 'red', 'orange', 'gold', 'yellow'] 
-    # bounds: list = [0, 0.8, 1.0, 1.1, 2.0]
-    # # bounds: list = [0, 0.8, 1.0, 1.1, 2.0]
-    # # bounds: list = [0, 0.8, 1.0, 1.1, 1.2]
+    # bounds: list = [0, 0.8, 1.0, 1.1, 2.0] # OG - so I tried being slick and finding various points, but the problem is that these spacing are way to close together. I'm going back to eyeballing it, which gives a better color distribution
+    # # bounds: list = [0, 0.8, 1.0, 1.1, 2.0] # 0.98
+    # # bounds: list = [0, 0.8, 1.0, 1.1, 2.0] # 0.95
+    # # bounds: list = [0, 0.8, 1.0, 1.1, 1.2] # 0.92
 
-    # k = 2
+    k = 2
     # colors: list = ['darkred', 'firebrick', 'red', 'orange', 'gold', 'yellow']
-    # # bounds: list = [0, 0.65, 0.87, 0.97, 1.1, 1.2] # 0.92
-    # # bounds: list = [0, 0.65, 0.87, 0.97, 1.1, 1.38]  # 0.95
+    # bounds: list = [0, 0.7, 0.98, 1.20, 1.40, 2.00]
     # bounds: list = [0, 0.65, 0.87, 0.97, 1.1, 1.49]  # 0.98
+    # bounds: list = [0, 0.65, 0.87, 0.97, 1.1, 1.38]  # 0.95
+    # bounds: list = [0, 0.65, 0.87, 0.97, 1.1, 1.2] # 0.92
 
-    # k = 3
-    # colors: list = ['darkred', 'firebrick', 'red', 'orange', 'gold', 'yellow']
+    k = 3
+    colors: list = ['black', 'darkred', 'firebrick', 'red', 'orange', 'gold', 'yellow']
+    # bounds: list = [0, 0.46, 0.96, 1.30, 1.60, 2.00]
+    bounds: list = [0.05, 0.351, 0.652, 0.853, 1.054, 1.355, 3.664]
     # # bounds: list = [0, 0.45, 0.85, 0.95, 1.2, 1.75]  # 0.98
     # # bounds: list = [0, 0.45, 0.85, 0.95, 1.2, 1.5]  # 0.95
     # bounds: list = [0, 0.45, 0.85, 0.95, 1.2, 1.4]  # 0.92
 
     k = 4
-    colors: list = ['darkred', 'firebrick', 'red', 'orange', 'gold', 'yellow']
+    colors: list = ['black', 'darkred', 'firebrick', 'red', 'orange', 'gold', 'yellow']
+    # bounds: list = [0, 0.4, 0.96, 1.30, 1.80, 2.00]
+    bounds: list = [0.05, 0.353, 0.655, 0.856, 1.058, 1.36, 3.298]
     # bounds: list = [0, 0.35, 0.65, 0.95, 1.2, 2.0]  # 0.98
     # bounds: list = [0, 0.35, 0.65, 0.95, 1.2, 1.76]  # 0.95
-    bounds: list = [0, 0.35, 0.65, 0.95, 1.2, 1.56]  # 0.92
+    # bounds: list = [0, 0.35, 0.65, 0.95, 1.2, 1.56]  # 0.92
 
     k = 5
-    colors: list = ['darkred', 'firebrick', 'red', 'orange', 'gold', 'yellow']
-    bounds: list = [0, 0.15, 0.45, 0.85, 1.26, 3.5]
-    bounds: list = [0, 0.15, 0.45, 0.85, 1.26, 3.5]
-    bounds: list = [0, 0.15, 0.45, 0.85, 1.26, 3.5]
+    # colors: list = ['black', 'darkred', 'firebrick', 'red', 'orange', 'gold', 'yellow']
+    # bounds: list = [0, 0.15, 0.90, 1.30, 2.00, 3.50]
+    bounds: list = [0.05, 0.252, 0.555, 0.858, 1.16, 1.665, 4.635]
+    # bounds: list = [0, 0.15, 0.45, 0.85, 1.26, 3.00] # 0.98
+    # bounds: list = [0, 0.15, 0.45, 0.85, 1.26, 1.96] # 0.95
+    # bounds: list = [0, 0.15, 0.45, 0.85, 1.26, 1.7] # 0.92
 
     # k = 6
     # colors: list = ['black', 'darkred', 'firebrick', 'red', 'orange', 'gold', 'yellow']
-    # bounds: list = [0, 0.754, 1.056, 1.457, 1.859, 2.462, 3.165]
-    # bounds: list = [0, 0.754, 1.056, 1.457, 1.859, 2.462, 3.165]
-    # bounds: list = [0, 0.754, 1.056, 1.457, 1.859, 2.462, 3.165]
+    # bounds: list = [0, 0.75, 1.05, 1.45, 1.859, 2.462, 3.165]
+    # bounds: list = [0, 0.754, 1.056, 1.457, 1.859, 2.462, 3.165] # 0.98
+    # bounds: list = [0, 0.754, 1.056, 1.457, 1.859, 2.462, 3.165] # 0.95
+    # bounds: list = [0, 0.754, 1.056, 1.457, 1.859, 2.462, 3.165] # 0.92
 
     if 1 == k:
         label_points = True
@@ -83,8 +92,8 @@ def main():
         label_points = False
         label_axis = False
 
-    exon_file = cwd / "Dicts" / f"Exon_{k}mer.pkl"
-    intron_file = cwd / "Dicts" / f"Intron_{k}mer.pkl"
+    exon_file = cwd / "Dicts" / f"Exon_{k}mer_LT.pkl"
+    intron_file = cwd / "Dicts" / f"Intron_{k}mer_LT.pkl"
 
     output_files = [cwd / "TE_Images_ForPaper" / "Dict" / f"Heat_DS{data_set}_Master.pkl", cwd / "TE_Images_ForPaper" / "Dict" / f"Heat_DS{data_set}_Exon.pkl", cwd / "TE_Images_ForPaper" / "Dict" / f"Heat_DS{data_set}_Intron.pkl"]
 
@@ -97,19 +106,19 @@ def main():
 
     exon = _import_data(exon_file, just_import=True)
     intron = _import_data(intron_file, just_import=True)
-    intron_max, intron_min = min_max(intron)
+    # intron_max, intron_min = min_max(intron)
 
     # cticks = [((intron_max - 0) / cbins)*i for i in range(cbins)]
     # title_details = f"Independent Scaling Log2 Transform {nucsequence} Order Cbins = {len(bounds)}"
-    title_details = f"Same Area Heatmap bounds v3"
+    title_details = f"Same Area Heatmap bounds v4"
     file_details = title_details.replace(" ", "")
 
 
     # pdf_cdf(exon_file, intron_file,
     #         # print_targets = [0.7, 0.8, 0.85, 0.9, 0.95, 0.98], 
     #         print_targets = [0.2, 0.4, 0.6, 0.8, 0.85, 0.9, 0.92, 0.95, 0.98], 
-    #         pdf_title = f"PDF for {2*k}mer", pdf_outpath = cwd / "TE_Images_ForPaper" / "Histograms" / f"PDF_{2*k}mer.png",
-    #         cdf_title = f"CDF for {2*k}mer", cdf_outpath = cwd / "TE_Images_ForPaper" / "Histograms" / f"CDF_{2*k}mer.png")
+    #         pdf_title = f"PDF for {2*k}mer", pdf_outpath = cwd / "TE_Images_ForPaper" / "Histograms" / f"PDF_{2*k}mer_v2.png",
+    #         cdf_title = f"CDF for {2*k}mer", cdf_outpath = cwd / "TE_Images_ForPaper" / "Histograms" / f"CDF_{2*k}mer_v2.png")
     # exit()
 
     # # master_max, master_min = min_max(master)
@@ -197,26 +206,67 @@ def pdf_cdf(data1: dict or pathlib.Path, data2: dict or pandas.DataFrame,
         cumm += pdf[i, 3]
         cdf[i, 3] = cumm
 
+    i_xticks = equal_area(cdf)
+    # print(set_xticks)
+    set_xticks = {}  # yes I am naming this after the matplotlib argument... sue me.
+    for i, j in i_xticks.items():
+        set_xticks[j] = xticks[int(j)]
+
     if isinstance(print_targets, list):
         for target in print_targets:
             idx = np.asarray(cdf[:, 3])
             idx = (np.abs(idx - target)).argmin()
 
-            print(f"Closest to {target}: {xticks[idx]}")
+            print(f"Closest to {target}: {xticks[idx]}\t{idx}")
+            # set_xticks[idx] = xticks[idx]
 
-    bar_chart(pdf, xticks = xticks, title = pdf_title, outpath = pdf_outpath)
-    bar_chart(cdf, xticks = xticks, title = cdf_title, outpath = cdf_outpath)
+    bar_chart(pdf, title = pdf_title, outpath = pdf_outpath, xticks = set_xticks)
+    bar_chart(cdf, title = cdf_title, outpath = cdf_outpath, xticks = set_xticks)
 
 
-def bar_chart(data: np.array, xticks: list = None, title: str = None, outpath: pathlib.Path = None, *args, **kwargs):
+def equal_area(data: np.ndarray, p: int = 7):
+    '''
+    '''
+    # print(data)
+    # print(type(data))
+    target_a = (1 - data[0, 3]) / p
+    # print(target_a)
+
+    idx = {}
+    idx[0] = data[0, 0]
+    rows, _ = data.shape
+
+    idx_start = 1
+    for i in range(1, p + 1):
+        a = 0
+        for j in range(idx_start, rows- 1):
+            a += data[j + 1, 3] - data[j, 3]
+            
+            if a >= target_a:
+                idx[i] = int(data[j, 0])
+                idx_start = j + 1
+                break
+
+        else:
+            idx[i] = int(data[j, 0])
+
+    print(idx)
+
+    return idx
+
+
+
+
+
+def bar_chart(data: np.array, xticks: dict = None, title: str = None, outpath: pathlib.Path = None, *args, **kwargs):
     '''
     Does the PDF/CDF chart for input data.
     '''
     fig, ax = plt.subplots()
     ax.bar(data[:, 0], data[:, 3])
 
-    if isinstance(xticks, list):
-        ax.set_xticks(data[:, 0], xticks, rotation = 90)
+    if isinstance(xticks, dict):
+        ax.set_xticks(list(xticks.keys()), labels = list(xticks.values()), rotation = 45)
     
     if isinstance(title, str):
         plt.title(title)
@@ -244,6 +294,8 @@ def _init_pdf_cdf(bins: int, delta: float):
     Actually returns two: one for the pdf and one for the cdf.
 
     OK this looks a lot like a pandas Dataframe... sue me.
+
+    xticks is output, but it's not really used: at higher k values it's too cluttered on the x axis.
     '''
     pdf = np.zeros(shape = (bins, 4))
     cdf = np.zeros(shape = (bins, 4))
@@ -286,9 +338,12 @@ def heatmapv2(data: dict or pandas.DataFrame or pathlib.Path,
               bounds: list = [0, 0.8, 1.0, 1.1, 2.0],
               title: str = None,
               fileoutput: pathlib.Path = None,
+              transpose: bool = True,
               *args, **kwargs):
     '''
     Uses seaborn and does an 'equal area' heatmap.
+
+    Used this because the equal area heatmaps were near impossible with matplotlib.
     '''
     if isinstance(data, pathlib.Path) or isinstance(data, str):
         data = _import_data(data, just_import = True)
@@ -298,7 +353,6 @@ def heatmapv2(data: dict or pandas.DataFrame or pathlib.Path,
 
     data = _reorder_frame(data, *args, **kwargs)
 
-
     cus_cmap = ListedColormap(colors)
     cus_norm = BoundaryNorm(bounds, ncolors = len(bounds))
 
@@ -307,9 +361,10 @@ def heatmapv2(data: dict or pandas.DataFrame or pathlib.Path,
                 ax = ax,
                 cmap = cus_cmap,
                 norm = cus_norm)
+    # ax.tick_params(left = False, bottom = False)
     
-    plt.xlabel("Back")
-    plt.ylabel("Forward")
+    # plt.xlabel("Back")
+    # plt.ylabel("Forward")
     if isinstance(title, str):
         plt.title(title)
     else:
@@ -470,11 +525,16 @@ def heat_embedding(data: pandas.DataFrame,
         return master_dict, exon_dict, intron_dict, master_max, master_min, exon_max, exon_min, intron_max, intron_min
     
 
-def _reorder_frame(dataframe: pandas.DataFrame, *args, **kwargs):
+def _reorder_frame(dataframe: pandas.DataFrame, transpose: bool = True, *args, **kwargs):
     '''
     finds the current index and columns, then reorders them in an alternative alphabet i.e. ACGT or AGCT or AGTC.
 
     This is probably redundent since I'm using Perms earlier to set the order, but I'm going to keep this here in case I want to change the order during the script.
+
+    Also transpose is the result of me originally putting the backwards propogation on the x axis and the forwards on the y axis. It's [probably] better the other way, but
+    since I saved all the data transposed I'm going to handle it here... which will probably confuse the crap out of someone in the future (sorry future me). AND becuase of how
+    pandas handles the origin of the dataframe you can't just transpose the damn thing, you have to transpose then re order the columns and rows. Don't believe me? Comment out the
+    stuff reoragnizing the rows and columns and see what happens.
     '''
     rows = list(dataframe.index)
     new_rows = {row: _digitize_seq(row, *args, **kwargs) for row in rows}
@@ -501,6 +561,11 @@ def _reorder_frame(dataframe: pandas.DataFrame, *args, **kwargs):
     # print("###Reindexed###")
     # print(dataframe)
     # print(dataframe)
+
+    if transpose:
+        dataframe = dataframe.T
+        dataframe = dataframe.iloc[::-1]
+        dataframe = dataframe.iloc[:, ::-1]
 
     return dataframe
 

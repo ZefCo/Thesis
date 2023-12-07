@@ -48,7 +48,11 @@ Thesis.Rproj
 !/ML/FractalModels/IvE/version_home_fedora_*/*
 !/FractalDimension/TE_Images_ForPaper/*/*
 !/FractalDimension/TE_Images_ForPaper/*
+!/FractalDimension/TE_Images_ForPaper/*/*/*
 !GenePerChrom.pkl
 !Iterative_Process_TGGCAGGTGTTTAGTTTAGGTCCCTACAGAATAGGCTGGTTATTCTGGGTCAGATCCGAGTTCATTTCAATACGGTGGCTATCCTTAAGGTCTTGGATCG.csv
 
 /FractalDimension/TE_Images_ForPaper/Dict/
+/FractalDimension/TE_Images_ForPaper/*/Old
+/FractalDimension/TE_Images_ForPaper/*/*/Old
+
