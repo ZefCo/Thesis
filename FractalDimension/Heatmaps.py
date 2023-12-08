@@ -37,50 +37,57 @@ def main():
     # title_details = f"Independent Scaling Log2 Transform {nucsequence} Order Cbins = {cbins}"
     # file_details = title_details.replace(" ", "")
 
-    k = 1
-    # colors: list = ['darkred', 'red', 'orange', 'gold', 'yellow'] 
-    # bounds: list = [0, 0.8, 1.0, 1.1, 2.0] # OG - so I tried being slick and finding various points, but the problem is that these spacing are way to close together. I'm going back to eyeballing it, which gives a better color distribution
-    # # bounds: list = [0, 0.8, 1.0, 1.1, 2.0] # 0.98
-    # # bounds: list = [0, 0.8, 1.0, 1.1, 2.0] # 0.95
-    # # bounds: list = [0, 0.8, 1.0, 1.1, 1.2] # 0.92
+    # k = 1
+    # colors: list = ['black', 'darkred', 'red', 'orange', 'gold', 'yellow'] 
+    # bounds: list = [0, 0.7, 0.8, 1.0, 1.1, 1.2] # 0.98
+    # # # bounds: list = [0, 0.8, 1.0, 1.1, 2.0] # OG - so I tried being slick and finding various points, but the problem is that these spacing are way to close together. I'm going back to eyeballing it, which gives a better color distribution
+    # # # bounds: list = [0, 0.25, 0.687, 0.899, 1.004, 1.216]
+    # # # bounds: list = [0, 0.8, 1.0, 1.1, 2.0] # 0.95
+    # # # bounds: list = [0, 0.8, 1.0, 1.1, 1.2] # 0.92
 
-    k = 2
-    # colors: list = ['darkred', 'firebrick', 'red', 'orange', 'gold', 'yellow']
-    # bounds: list = [0, 0.7, 0.98, 1.20, 1.40, 2.00]
-    # bounds: list = [0, 0.65, 0.87, 0.97, 1.1, 1.49]  # 0.98
-    # bounds: list = [0, 0.65, 0.87, 0.97, 1.1, 1.38]  # 0.95
-    # bounds: list = [0, 0.65, 0.87, 0.97, 1.1, 1.2] # 0.92
-
-    k = 3
-    colors: list = ['black', 'darkred', 'firebrick', 'red', 'orange', 'gold', 'yellow']
-    # bounds: list = [0, 0.46, 0.96, 1.30, 1.60, 2.00]
-    bounds: list = [0.05, 0.351, 0.652, 0.853, 1.054, 1.355, 3.664]
-    # # bounds: list = [0, 0.45, 0.85, 0.95, 1.2, 1.75]  # 0.98
-    # # bounds: list = [0, 0.45, 0.85, 0.95, 1.2, 1.5]  # 0.95
-    # bounds: list = [0, 0.45, 0.85, 0.95, 1.2, 1.4]  # 0.92
-
-    k = 4
-    colors: list = ['black', 'darkred', 'firebrick', 'red', 'orange', 'gold', 'yellow']
-    # bounds: list = [0, 0.4, 0.96, 1.30, 1.80, 2.00]
-    bounds: list = [0.05, 0.353, 0.655, 0.856, 1.058, 1.36, 3.298]
-    # bounds: list = [0, 0.35, 0.65, 0.95, 1.2, 2.0]  # 0.98
-    # bounds: list = [0, 0.35, 0.65, 0.95, 1.2, 1.76]  # 0.95
-    # bounds: list = [0, 0.35, 0.65, 0.95, 1.2, 1.56]  # 0.92
-
-    k = 5
+    # k = 2
     # colors: list = ['black', 'darkred', 'firebrick', 'red', 'orange', 'gold', 'yellow']
-    # bounds: list = [0, 0.15, 0.90, 1.30, 2.00, 3.50]
-    bounds: list = [0.05, 0.252, 0.555, 0.858, 1.16, 1.665, 4.635]
-    # bounds: list = [0, 0.15, 0.45, 0.85, 1.26, 3.00] # 0.98
-    # bounds: list = [0, 0.15, 0.45, 0.85, 1.26, 1.96] # 0.95
-    # bounds: list = [0, 0.15, 0.45, 0.85, 1.26, 1.7] # 0.92
+    # bounds: list = [0, 0.65, 0.87, 0.97, 1.1, 1.2, 1.3]  # 0.98
+    # # # bounds: list = [0.977, 1.183, 1.388, 1.594, 1.8, 2.005, 2.211]
+    # # # bounds: list = [0, 0.5, 1.08, 1.388, 1.697, 1.903, 2.108]
+    # # # bounds: list = [0, 0.65, 0.87, 0.97, 1.1, 1.38]  # 0.95
+    # # # bounds: list = [0, 0.65, 0.87, 0.97, 1.1, 1.2] # 0.92
 
-    # k = 6
+    # k = 3
+    # measure_target = 0.05
     # colors: list = ['black', 'darkred', 'firebrick', 'red', 'orange', 'gold', 'yellow']
-    # bounds: list = [0, 0.75, 1.05, 1.45, 1.859, 2.462, 3.165]
-    # bounds: list = [0, 0.754, 1.056, 1.457, 1.859, 2.462, 3.165] # 0.98
-    # bounds: list = [0, 0.754, 1.056, 1.457, 1.859, 2.462, 3.165] # 0.95
-    # bounds: list = [0, 0.754, 1.056, 1.457, 1.859, 2.462, 3.165] # 0.92
+    # bounds: list = [0, 0.45, 0.85, 0.95, 1.2, 1.4, 1.75]  # 0.98
+    # # # bounds: list = [0.853, 1.154, 1.355, 1.556, 1.757, 1.957, 2.158]
+    # # # bounds: list = [1.154, 1.556, 1.857, 2.158, 2.459, 2.76, 2.961]
+    # # # bounds: list = [0, 0.46, 0.96, 1.30, 1.60, 2.00]
+    # # # bounds: list = [0, 0.45, 0.85, 0.95, 1.2, 1.5]  # 0.95
+    # # # bounds: list = [0, 0.45, 0.85, 0.95, 1.2, 1.4]  # 0.92
+
+    # k = 4
+    # colors: list = ['black', 'darkred', 'firebrick', 'red', 'orange', 'gold', 'yellow']
+    # bounds: list = [0, 0.35, 0.65, 0.95, 1.2, 1.4, 1.7]  # 0.98
+    # # # bounds: list = [0.756, 1.058, 1.26, 1.461, 1.663, 1.864, 2.066]
+    # # # bounds: list = [1.26, 1.763, 2.166, 2.469, 2.771, 3.073, 3.376]
+    # # # bounds: list = [0, 0.4, 0.96, 1.30, 1.80, 2.00]
+    # # # bounds: list = [0, 0.35, 0.65, 0.95, 1.2, 1.76]  # 0.95
+    # # # bounds: list = [0, 0.35, 0.65, 0.95, 1.2, 1.56]  # 0.92
+
+    # k = 5
+    # colors: list = ['black', 'darkred', 'firebrick', 'red', 'orange', 'gold', 'yellow']
+    # bounds: list = [0, 0.15, 0.45, 0.85, 1.26, 1.7, 2.4] # 0.98
+    # # # bounds: list = [0.555, 0.858, 1.16, 1.362, 1.564, 1.766, 1.967]
+    # # # bounds: list = [0.555, 0.858, 1.16, 1.362, 1.564, 1.766, 1.967]
+    # # # bounds: list = [0.05, 0.252, 0.555, 0.858, 1.16, 1.665, 4.635]
+    # # # bounds: list = [0, 0.15, 0.45, 0.85, 1.26, 1.96] # 0.95
+    # # # bounds: list = [0, 0.15, 0.45, 0.85, 1.26, 1.7] # 0.92
+
+    k = 6
+    measure_target = 0.01
+    colors: list = ['black', 'darkred', 'firebrick', 'red', 'orange', 'gold', 'yellow']
+    bounds: list = [0, 0.452, 0.85, 1.45, 1.85, 2.36, 3.2] # 0.98
+    # # # bounds: list = [0, 0.75, 1.05, 1.45, 1.859, 2.462, 3.165]
+    # # # bounds: list = [0, 0.754, 1.056, 1.457, 1.859, 2.462, 3.165] # 0.95
+    # # # bounds: list = [0, 0.754, 1.056, 1.457, 1.859, 2.462, 3.165] # 0.92
 
     if 1 == k:
         label_points = True
@@ -110,15 +117,14 @@ def main():
 
     # cticks = [((intron_max - 0) / cbins)*i for i in range(cbins)]
     # title_details = f"Independent Scaling Log2 Transform {nucsequence} Order Cbins = {len(bounds)}"
-    title_details = f"Same Area Heatmap bounds v4"
+    title_details = f"EAH_vF"
     file_details = title_details.replace(" ", "")
 
 
     # pdf_cdf(exon_file, intron_file,
-    #         # print_targets = [0.7, 0.8, 0.85, 0.9, 0.95, 0.98], 
-    #         print_targets = [0.2, 0.4, 0.6, 0.8, 0.85, 0.9, 0.92, 0.95, 0.98], 
-    #         pdf_title = f"PDF for {2*k}mer", pdf_outpath = cwd / "TE_Images_ForPaper" / "Histograms" / f"PDF_{2*k}mer_v2.png",
-    #         cdf_title = f"CDF for {2*k}mer", cdf_outpath = cwd / "TE_Images_ForPaper" / "Histograms" / f"CDF_{2*k}mer_v2.png")
+    #         measure_target = measure_target, 
+    #         pdf_title = f"PDF for {2*k}mer", pdf_outpath = cwd / "TE_Images_ForPaper" / "Histograms" / f"PDF_{2*k}mer_JT_001.png",
+    #         cdf_title = f"CDF for {2*k}mer", cdf_outpath = cwd / "TE_Images_ForPaper" / "Histograms" / f"CDF_{2*k}mer_JT_001.png")
     # exit()
 
     # # master_max, master_min = min_max(master)
@@ -169,12 +175,16 @@ def main():
 def pdf_cdf(data1: dict or pathlib.Path, data2: dict or pandas.DataFrame, 
             pdf_title: str = None, cdf_title: str = None, 
             pdf_outpath: pathlib.Path = None, cdf_outpath: pathlib.Path = None,
-            print_targets: list = None,
+            measure_target: str or float or list = None,
             *args, **kwargs):
     '''
     Does the PDF and CDF of the data all at once.
 
     It's just going to be easier to do it like this.
+
+    Measure_target is a str, float, or list: if it's a string it looks for equal area (you should put in equal area but just any string should do): if it's a list it goes to print target, and if it's a float it goes to jumps.
+
+    Jumps is a float threshold: if the value is greater then that it marks it as an output.
     '''
     if isinstance(data1, pathlib.Path):
         data1 = _import_data(data1, just_import = True)
@@ -206,56 +216,108 @@ def pdf_cdf(data1: dict or pathlib.Path, data2: dict or pandas.DataFrame,
         cumm += pdf[i, 3]
         cdf[i, 3] = cumm
 
-    i_xticks = equal_area(cdf)
-    # print(set_xticks)
-    set_xticks = {}  # yes I am naming this after the matplotlib argument... sue me.
-    for i, j in i_xticks.items():
-        set_xticks[j] = xticks[int(j)]
-
-    if isinstance(print_targets, list):
-        for target in print_targets:
-            idx = np.asarray(cdf[:, 3])
-            idx = (np.abs(idx - target)).argmin()
-
-            print(f"Closest to {target}: {xticks[idx]}\t{idx}")
-            # set_xticks[idx] = xticks[idx]
+    if isinstance(measure_target, list):
+        set_xticks = _print_targets(cdf, measure_target, xticks) # yes I am naming this after the matplotlib argument... sue me.
+    elif isinstance(measure_target, str):
+        set_xticks = _equal_area(cdf, xticks, *args, **kwargs)
+    elif isinstance(measure_target, float):
+        set_xticks = _jumps(cdf, xticks, threshold = measure_target, *args, **kwargs)
 
     bar_chart(pdf, title = pdf_title, outpath = pdf_outpath, xticks = set_xticks)
     bar_chart(cdf, title = cdf_title, outpath = cdf_outpath, xticks = set_xticks)
 
 
-def equal_area(data: np.ndarray, p: int = 7):
+def _jumps(data: np.ndarray, xticks: list, threshold: float = 0.05):
     '''
+    Looks for high "jumps" in the cdf. Probably better for the 2-mer and 12-mers as they have a wicked discontinuous CDF curve. If the adjacent y positions are above a certain threshold it marks it in the set_xticks 
+    (the second one: you can then set the color on the heatmap just below this value)
+
+    The reason why I use xticks here is because it's just easier. xticks already has the middle between the two columns, so instead of doing that same calculation over again, just index out the information
+    '''
+    rows, _ = data.shape
+    set_xticks = {}
+
+    for row in range(rows - 1):
+        f1 = data[row, 3]
+        f2 = data[row + 1, 3]
+
+        if abs(f1 - f2) >= threshold:
+            set_xticks[row + 1] = xticks[row + 1]
+
+    return set_xticks
+
+
+def _print_targets(data: np.ndarray, targets: list, xticks: list):
+    '''
+    This takes a list and prints the x position closest to that position.
+
+    The reason why I use xticks here is because it's just easier. xticks already has the middle between the two columns, so instead of doing that same calculation over again, just index out the information
+    '''
+    set_xticks = {}
+
+    for target in targets:
+        idx = np.asarray(data[:, 3])
+        idx = (np.abs(idx - target)).argmin()
+
+        print(f"Closest to {target}: {xticks[idx]}\tindex = {idx}")
+
+        set_xticks[idx] = xticks[idx]
+
+    return set_xticks
+
+
+def _equal_area(data: np.ndarray, xticks: list, p: int = 7):
+    '''
+    Basically a cheap integration function.
+
+    The reason why I use xticks here is because it's just easier. xticks already has the middle between the two columns, so instead of doing that same calculation over again, just index out the information
     '''
     # print(data)
     # print(type(data))
-    target_a = (1 - data[0, 3]) / p
+    # target_a = (1 - data[0, 3]) / p
+    target_a = 1 / p
     # print(target_a)
 
-    idx = {}
-    idx[0] = data[0, 0]
+    set_xticks = {}
+    # idx[0] = data[0, 0]
     rows, _ = data.shape
 
-    idx_start = 1
-    for i in range(1, p + 1):
+    idx_start = 0
+    stop_condition = False
+    for i in range(p):
         a = 0
-        for j in range(idx_start, rows- 1):
-            a += data[j + 1, 3] - data[j, 3]
-            
+        for j in range(idx_start + 1, rows - 1):
+            m = (data[j, 2] + data[j, 1]) / rows
+            a += m * data[j, 3]
             if a >= target_a:
-                idx[i] = int(data[j, 0])
+                set_xticks[i] = xticks[i]
                 idx_start = j + 1
                 break
 
         else:
-            idx[i] = int(data[j, 0])
+            set_xticks[i] = xticks[i]
+            
+    # for i in range(p + 1):
+    #     if stop_condition:
+    #         break
 
-    print(idx)
+    #     a = 0
+    #     for j in range(idx_start, rows - 1):
+    #         # a += data[j + 1, 3] - data[j, 3]
+    #         a += data[j + 1, 3]
+            
+    #         if a >= target_a:
+    #             idx[i] = int(data[j, 0])
+    #             idx_start = j + 1
+    #             break
 
-    return idx
+    #     else:
+    #         idx[i] = int(data[j, 0])
+    #         stop_condition = True
 
+    # # print(idx)
 
-
+    return set_xticks
 
 
 def bar_chart(data: np.array, xticks: dict = None, title: str = None, outpath: pathlib.Path = None, *args, **kwargs):
@@ -361,7 +423,11 @@ def heatmapv2(data: dict or pandas.DataFrame or pathlib.Path,
                 ax = ax,
                 cmap = cus_cmap,
                 norm = cus_norm)
-    # ax.tick_params(left = False, bottom = False)
+    ax.set(xticklabels = [])
+    ax.set(yticklabels = [])
+    ax.set(xlabel = "Forwards Sequence")
+    ax.set(ylabel = "Backwards Sequence")
+    ax.tick_params(left = False, bottom = False)
     
     # plt.xlabel("Back")
     # plt.ylabel("Forward")
