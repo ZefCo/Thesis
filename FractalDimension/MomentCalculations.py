@@ -46,20 +46,20 @@ def main():
     step = 100
     max_n = 2
     min_n = 0.5
-    ns = [n / step for n in range(int(step*(min_n)), int(step*max_n) + 1)]
-    title = f"E v I log"
-    moments(cwd / "Dicts", ns, min_k = 1, max_k = 6, convergence = False, logy = True, N_value = False, title = title)
+    ms = [n / step for n in range(int(step*(min_n)), int(step*max_n) + 1)]
+    title = f"E v I log w/N divided"
+    moments(cwd / "Dicts", ms, min_k = 1, max_k = 6, convergence = False, logy = False, N_value = True, title = title)
     # evalue = moment(exon_file, unlog = True, k = 2*k, n = 1)
     # ivalue = moment(intron_file, unlog = True, k = 2*k, n = 1)
     # print(f"k = {k}\te value = {evalue}\ti = value = {ivalue}")
 
 
 
-def moments(file_dir: pathlib.Path, ns: list, min_k: int = 1, max_k: int = 6, unlog: bool = False, convergence: bool = False, logy: bool = False, N_value: bool = False, title: str = None, *args, **kwargs):
+def moments(file_dir: pathlib.Path, ms: list, min_k: int = 1, max_k: int = 6, unlog: bool = False, convergence: bool = False, logy: bool = False, N_value: bool = False, title: str = None, *args, **kwargs):
     '''
-    Moment calculations do NOT need the 4**s part multiplied, everything just needs to be scaled from 0 to 1 in a traditional normalization.
+    Moment calculations do NOT need the 4**s part multiplied, everything just needs to be scaled from 0 to 1 in a traditional normalization.*
 
-    You have to feed in the list of n, because I don't want to deal with a for float loop... I have that code somewhere I just can't find it.
+    You have to feed in the list of moments, because I don't want to deal with a for float loop... I have that code somewhere I just can't find it. It's a for loop with floats, and it's pretty easy but there's a trick and I just don't want to do it... should be called the run on sentence bandit...
 
 
     Does a for loop of this. Each file needs to be a pickle file and have the same basic file name. Just give it the path and the filename and it will iterate over it.
@@ -68,7 +68,7 @@ def moments(file_dir: pathlib.Path, ns: list, min_k: int = 1, max_k: int = 6, un
 
     The for loop for the k iterations is range(min_k, max_k + 1) so you do not need to artifically increase the max_k. That's done for you.
 
-    Do this as well with a N**(1/m - 1) term where N = 4**k (or in this case 4**2k) which should set all moment calculations for an evenly distributed heatmap to 1 (no matter what the moment is) and will
+    *Do this as well with a N**(1/m - 1) term where N = 4**k (or in this case 4**2k) which should set all moment calculations for an evenly distributed heatmap to 1 (no matter what the moment is) and will
     adjust the other moment calculations to be either above or below 1. Sort of like subtracting the mean.
     '''
 
@@ -76,15 +76,15 @@ def moments(file_dir: pathlib.Path, ns: list, min_k: int = 1, max_k: int = 6, un
         print("Cannot continue, convergence can only be checked with more then 1 k value")
         return None 
 
-    ne = {}
-    ni = {}
+    me = {}
+    mi = {}
     pd = {}
 
     for k in range(min_k, max_k + 1):
         print(f"K = {k}")
 
-        ne[k]: list = []
-        ni[k]: list = []
+        me[k]: list = []
+        mi[k]: list = []
         pd[k]: list = []
 
         exon_file = file_dir / f"Exon_{k}mer.pkl"
@@ -102,18 +102,25 @@ def moments(file_dir: pathlib.Path, ns: list, min_k: int = 1, max_k: int = 6, un
             intron_data = _unrenormalize(intron_data, 2*k)
         print(f"\tImported Intron File")
 
-        for n in ns:
+        for m in ms:
 
-            print(f"\t\tn = {n}")
-            
-            exon_v = moment(exon_data, n = n, k = 2*k, unlog = False, *args, **kwargs)
-            intron_v = moment(intron_data, n = n, k = 2*k, unlog = False, *args, **kwargs)
 
             if N_value:
                 N = 4**(2*k)
-                N = N**((1/n) - 1)
-                exon_v = N * exon_v
-                intron_v = N * intron_v
+                N = N**((1/m) - 1)
+                print(f"\t\tm = {m}\tN = {N}")
+            else:
+                N = 1
+                print(f"\t\tm = {m}")
+
+            exon_v = moment(exon_data, m = m, k = 2*k, unlog = False, N = N, *args, **kwargs)
+            intron_v = moment(intron_data, m = m, k = 2*k, unlog = False, N = N, *args, **kwargs)
+
+            # if N_value:
+            #     N = 4**(2*k)
+            #     N = N**((1/m) - 1)
+            #     exon_v = N * exon_v
+            #     intron_v = N * intron_v
 
             if logy:
                 exon_v = np.log2(exon_v)
@@ -124,58 +131,58 @@ def moments(file_dir: pathlib.Path, ns: list, min_k: int = 1, max_k: int = 6, un
             except ZeroDivisionError:
                 per_diff = 0
             
-            ne[k].append(exon_v)
-            ni[k].append(intron_v)
+            me[k].append(exon_v)
+            mi[k].append(intron_v)
             pd[k].append(per_diff)
 
     print(f"Finished data, printing to plots")
     if convergence:
         fig, axs = plt.subplots(nrows = max_k - min_k, ncols = 4)
 
-        keys = list(ne.keys())
+        keys = list(me.keys())
         # keys = keys[0: len(keys) - 2] # removing last entry, so that way I don't have to 
 
         for i in range(len(keys) - 1):
 
-            axs[i, 0].plot(ns, ni[keys[i]], label = f"{2*keys[i]}-mer")
-            axs[i, 0].plot(ns, ni[keys[i + 1]], label = f"{2*keys[i + 1]}-mer")
+            axs[i, 0].plot(ms, mi[keys[i]], label = f"{2*keys[i]}-mer")
+            axs[i, 0].plot(ms, mi[keys[i + 1]], label = f"{2*keys[i + 1]}-mer")
             axs[i, 0].legend()
 
-            ipd = perdiff_list(ni[keys[i]], ni[keys[i + 1]])
+            ipd = perdiff_list(mi[keys[i]], mi[keys[i + 1]])
 
-            axs[i, 1].plot(ns, ipd)
+            axs[i, 1].plot(ms, ipd)
             axs[i, 1].set_ylabel("PD")
 
-            axs[i, 2].plot(ns, ne[keys[i]], label = f"{2*keys[i]}-mer")
-            axs[i, 2].plot(ns, ne[keys[i + 1]], label = f"{2*keys[i + 1]}-mer")
+            axs[i, 2].plot(ms, me[keys[i]], label = f"{2*keys[i]}-mer")
+            axs[i, 2].plot(ms, me[keys[i + 1]], label = f"{2*keys[i + 1]}-mer")
             axs[i, 2].legend()
 
-            epd = perdiff_list(ne[keys[i]], ne[keys[i + 1]])
+            epd = perdiff_list(me[keys[i]], me[keys[i + 1]])
 
-            axs[i, 3].plot(ns, epd)
+            axs[i, 3].plot(ms, epd)
             axs[i, 3].set_ylabel("PD")
 
     else:
         fig, axs = plt.subplots(nrows = max_k - min_k + 1, ncols = 2)
 
-        if len(ne) > 1:
-            for i, (key, value) in enumerate(ne.items()):
-                axs[i, 0].plot(ns, value, label = f"Exon")
-                axs[i, 0].plot(ns, ni[key], label = f"Intron")
+        if len(me) > 1:
+            for i, (key, value) in enumerate(me.items()):
+                axs[i, 0].plot(ms, value, label = f"Exon")
+                axs[i, 0].plot(ms, mi[key], label = f"Intron")
                 axs[i, 0].set_ylabel(f"{2*key}-mer")
                 axs[i, 0].legend()
 
-                axs[i, 1].plot(ns, pd[key])
+                axs[i, 1].plot(ms, pd[key])
                 axs[i, 1].set_ylabel("PD (0 to 1)")
 
         else:
-            for key, value in ne.items():
-                axs[0].plot(ns, value, label = f"Exon")
-                axs[0].plot(ns, ni[key], label = f"Intron")
+            for key, value in me.items():
+                axs[0].plot(ms, value, label = f"Exon")
+                axs[0].plot(ms, mi[key], label = f"Intron")
                 axs[0].set_ylabel(f"{2*key}-mer")
                 axs[0].legend()
 
-                axs[1].plot(ns, pd[key])
+                axs[1].plot(ms, pd[key])
                 axs[1].set_ylabel("Percent Difference")
 
     if isinstance(title, str):
@@ -219,7 +226,7 @@ def _percent_difference(a, b):
 
 
 
-def moment(data: pandas.DataFrame or dict or pathlib, n: float = 1, regions = None, unlog: bool = False, *args, **kwargs):
+def moment(data: pandas.DataFrame or dict or pathlib, m: float = 1, N: float = 1, unlog: bool = False, *args, **kwargs):
     '''
     Takes a region and finds the moment of that region.
 
@@ -228,7 +235,7 @@ def moment(data: pandas.DataFrame or dict or pathlib, n: float = 1, regions = No
     It will have to import the whole data, then isolate a single area and count that. Maybe I shoudl count by region, add them, then calculate each moment.
     This would divide the space into R regions
     '''
-    u: float = 1 / n  # think of this as an upside down n
+    w: float = 1 / m  # think of this as an upside down m
 
     if isinstance(data, pathlib.Path) or isinstance(data, str):
         data = hm._import_data(data, just_import = True)
@@ -239,9 +246,9 @@ def moment(data: pandas.DataFrame or dict or pathlib, n: float = 1, regions = No
     if unlog:
         data = _unrenormalize(data, *args, **kwargs)
 
-    data = data.pow(n)
+    data = data.pow(m)
     values = data.to_numpy().sum()
-    values = values**u
+    values = (1 / N) * (values**w)
 
     return values
 
