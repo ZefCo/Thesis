@@ -104,7 +104,6 @@ def moments(file_dir: pathlib.Path, ms: list, min_k: int = 1, max_k: int = 6, un
 
         for m in ms:
 
-
             if N_value:
                 N = 4**(2*k)
                 N = N**((1/m) - 1)
@@ -232,6 +231,7 @@ def moment(data: pandas.DataFrame or dict or pathlib, m: float = 1, N: float = 1
 
     m = [sum(region)**n / sum(area)]**(1/n)
 
+    Acutally I never did this next part so basically you can ignore it. Don't know if it would have been useful:
     It will have to import the whole data, then isolate a single area and count that. Maybe I shoudl count by region, add them, then calculate each moment.
     This would divide the space into R regions
     '''
@@ -262,6 +262,8 @@ def _unrenormalize(data: pandas.DataFrame, k: int, *args, **kwargs):
     4**s * x + 1 = 2**y
     4**s * x = 2**y - 1
     x = ((2**y) - 1) / 4**s
+
+    s = 2*k -> I've always done this as k forward = k backward even though the scripts can handle the two being different.
     '''
 
     rows, cols = data.shape

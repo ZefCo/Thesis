@@ -151,8 +151,12 @@ def main():
     #         label_points = label_points, label_axis = label_axis,
     #         title = f"Master Heatmap {2*k}mer") #vmin = master_rescale[0], vmax = master_rescale[1]) #, file_output = cwd / "TE_Images_ForPaper" / "Heatmaps" / f"Master_DS{data_set}_n{n}_{k*2}mer.png")
     
-    heatmapv2(exon, colors = colors, bounds = bounds, title = f"Exon Equal Area Heatmap\n{2*k}mer", fileoutput = cwd / "TE_Images_ForPaper" / "Heatmaps" / "EA" / f"Exon_HEA_DS{data_set}_n{n}_{k*2}mer_{file_details}.png")
-    heatmapv2(intron, colors = colors, bounds = bounds, title = f"Intron Equal Area Heatmap\n{2*k}mer", fileoutput = cwd / "TE_Images_ForPaper" / "Heatmaps" / "EA" / f"Intron_HEA_DS{data_set}_n{n}_{k*2}mer_{file_details}.png")
+    heatmapv2(exon, colors = colors, bounds = bounds, 
+    x_title = f"Forward {k}-mer", y_title = f"Backward {k}-mer",
+    title = f"Exon Equal Area Heatmap\n{2*k}mer", fileoutput = cwd / "TE_Images_ForPaper" / "Heatmaps" / "EA" / f"Exon_HEA_DS{data_set}_n{n}_{k*2}mer_{file_details}.png")
+    heatmapv2(intron, colors = colors, bounds = bounds, 
+    x_title = f"Forward {k}-mer", y_title = f"Backward {k}-mer",
+    title = f"Intron Equal Area Heatmap\n{2*k}mer", fileoutput = cwd / "TE_Images_ForPaper" / "Heatmaps" / "EA" / f"Intron_HEA_DS{data_set}_n{n}_{k*2}mer_{file_details}.png")
     exit()
 
 
@@ -399,6 +403,8 @@ def heatmapv2(data: dict or pandas.DataFrame or pathlib.Path,
               colors: list = ['darkred', 'red', 'orange', 'gold', 'yellow'], 
               bounds: list = [0, 0.8, 1.0, 1.1, 2.0],
               title: str = None,
+              x_title: str = None,
+              y_title: str = None,
               fileoutput: pathlib.Path = None,
               transpose: bool = True,
               *args, **kwargs):
@@ -425,8 +431,15 @@ def heatmapv2(data: dict or pandas.DataFrame or pathlib.Path,
                 norm = cus_norm)
     ax.set(xticklabels = [])
     ax.set(yticklabels = [])
-    ax.set(xlabel = "Forwards Sequence")
-    ax.set(ylabel = "Backwards Sequence")
+
+    if isinstance(x_title, str):
+        ax.set(xlabel = x_title)
+    else:
+        ax.set(xlabel = f"Forward  Sequence")
+    if isinstance(y_title, str):
+        ax.set(ylabel = y_title)
+    else:
+        ax.set(ylabel = f"Backward Sequence")
     ax.tick_params(left = False, bottom = False)
     
     # plt.xlabel("Back")
