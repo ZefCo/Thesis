@@ -29,15 +29,15 @@ def main():
 
     # This needs to use the same data for the histogram
     data_1 = pathlib.Path(f"{data_path}/Gene_Data_Sets/Data_Set_1_histogram.pkl")  # I know the method says it was a dataframe, but I also coded it where it can just take a pathlib and load the data. I got lazy
-    output_file_1 = cwd / f"GeneSurvey_1_{kmer}mer_hist_reversed.pkl"
+    output_file_1 = cwd / f"GeneSurvey_1_{kmer}mer.pkl"
     data_2 = pathlib.Path(f"{data_path}/Gene_Data_Sets/Data_Set_2_histogram.pkl")  # I know the method says it was a dataframe, but I also coded it where it can just take a pathlib and load the data. I got lazy
-    output_file_2 = cwd / f"GeneSurvey_2_{kmer}mer_hist_reversed.pkl"
+    output_file_2 = cwd / f"GeneSurvey_2_{kmer}mer.pkl"
 
     # print(data_1)
-    survey(data_1, output_file_1, kmer, reverse = True)
-    survey(data_2, output_file_2, kmer, reverse = True)
-    recreate(output_file_1, kmer, title = "Dataset 1 Histogram Method Reversed Seqeunces", labels = True, output_file = pathlib.Path(cwd / f"GeneSurvey_Dataset1_{kmer}mer_reversed.html"))
-    recreate(output_file_2, kmer, title = "Dataset 2 Histogram Method Reversed Seqeunces", labels = True, output_file = pathlib.Path(cwd / f"GeneSurvey_Dataset2_{kmer}mer_reversed.html"))
+    # survey(data_1, output_file_1, kmer, reverse = True)
+    # survey(data_2, output_file_2, kmer, reverse = True)
+    recreate(output_file_1, kmer, title = "Dataset 1 Histogram Method Seqeunces", labels = True, output_file = pathlib.Path(cwd / f"GeneSurvey_Dataset1_{kmer}mer.html"))
+    recreate(output_file_2, kmer, title = "Dataset 2 Histogram Method Seqeunces", labels = True, output_file = pathlib.Path(cwd / f"GeneSurvey_Dataset2_{kmer}mer.html"))
 
 
 def count_occurences(sequence: str, permutations: list):
@@ -212,6 +212,7 @@ def recreate(filepath: pathlib.Path, kmer, output_file: pathlib.Path = None,
     fig.update_xaxes(showticklabels = labels)
     fig.show()
     if output_file is not None:
+        print(f"Output to \t{output_file}")
         fig.write_html(str(output_file))
 
 
