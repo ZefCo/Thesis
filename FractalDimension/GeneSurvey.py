@@ -21,9 +21,9 @@ def main():
 
     This script is meant to scan through all the different regions and take note of what they are composed of.
     '''
-    kmer = 3
+    kmer = 6
     linux_path = f"/media/ethanspeakman/Elements/"
-    windows_path = f"G:/"
+    windows_path = f"F:/"
 
     data_path = windows_path
 
@@ -36,8 +36,8 @@ def main():
     # print(data_1)
     # survey(data_1, output_file_1, kmer, reverse = True)
     # survey(data_2, output_file_2, kmer, reverse = True)
-    recreate(output_file_1, kmer, title = "Dataset 1 Histogram Method Seqeunces", labels = True, output_file = pathlib.Path(cwd / f"GeneSurvey_Dataset1_{kmer}mer.html"))
-    recreate(output_file_2, kmer, title = "Dataset 2 Histogram Method Seqeunces", labels = True, output_file = pathlib.Path(cwd / f"GeneSurvey_Dataset2_{kmer}mer.html"))
+    recreate(output_file_1, kmer, title = "Dataset 1 Histogram Method Seqeunces", labels = True, output_file = pathlib.Path(cwd / f"GeneSurvey_DS1_{kmer}mer.html"), pd_output_file = pathlib.Path(cwd / f"GeneSurvey_DS1_PD_{kmer}mer.html"))
+    recreate(output_file_2, kmer, title = "Dataset 2 Histogram Method Seqeunces", labels = True, output_file = pathlib.Path(cwd / f"GeneSurvey_DS2_{kmer}mer.html"), pd_output_file = pathlib.Path(cwd / f"GeneSurvey_DS2_PD_{kmer}mer.html"))
 
 
 def count_occurences(sequence: str, permutations: list):
@@ -167,7 +167,7 @@ def survey(data: pandas.DataFrame or pathlib.Path, output_file: pathlib.Path, km
     counts_frame.to_pickle(output_file, )
 
 
-def recreate(filepath: pathlib.Path, kmer, output_file: pathlib.Path = None, 
+def recreate(filepath: pathlib.Path, kmer, output_file: pathlib.Path = None, pd_output_file: pathlib.Path = None,
              shaded = False, labels = False, title = None, 
              read_type = "pkl"):
     '''
@@ -181,9 +181,9 @@ def recreate(filepath: pathlib.Path, kmer, output_file: pathlib.Path = None,
     elif read_type in "csv":
         data: pandas.DataFrame = pandas.read_csv(filepath, header = 0)
         x_column = data["Unnamed: 0"]
-    # print(data)
 
     average = 0.25**kmer
+    data["PD"] = (data["E%"] - data["I%"]) / (0.5 * (data["E%"] + data["I%"]+ (2*average)))
 
     fig = go.Figure()
     fig.add_trace(go.Bar(x = x_column, y = data["G%"], name = "Full Seq"))
@@ -215,6 +215,16 @@ def recreate(filepath: pathlib.Path, kmer, output_file: pathlib.Path = None,
         print(f"Output to \t{output_file}")
         fig.write_html(str(output_file))
 
+    fig2 = go.Figure()
+    fig2.add_trace(go.Bar(x = x_column, y = data["PD"]))
+    title = f"|Percent Diff|"
+    fig2.update_layout(title = title)
+    fig2.update_xaxes(showticklabels = labels)
+    fig2.show()
+
+    if pd_output_file is not None:
+        print(f"Output to \t{pd_output_file}")
+        fig2.write_html(str(pd_output_file))
 
 
 if __name__ in "__main__":
