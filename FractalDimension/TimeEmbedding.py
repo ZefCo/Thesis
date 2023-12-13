@@ -18,6 +18,20 @@ import random
 
 def main():
     '''
+    Zoom in on CGA|CTA
+
+    x = CTA
+    y = AGC
+    box1 = A|G
+    box2 = GA|CT
+    box3 = CGA|CTA
+
+    0.25 -> 1/4
+    0.0625 -> 1/8
+    0.015625 -> 1/16
+    0.00390625 -> 1/32
+    0.0009765625 -> 1/64
+
     So traditionally I did the backwards on the x axis and forwards on the y axis, and that's getting me into trouble. The Kneeding transform is best done with it flipped. So I introduced a simple
     transform bool, but... that's getting confusing. The point is: be careful how you use this.
 
@@ -40,7 +54,7 @@ def main():
     # exit()
 
     linux_path = f"/media/ethanspeakman/Elements/"
-    windows_path = f"G:/"
+    windows_path = f"F:/"
 
     data_path = windows_path
 
@@ -49,37 +63,43 @@ def main():
     intron_dict_file = "IntronData_n100000_DS1_kp6_km6"
     x_lim = None
     y_lim = None
-    x_ticks = None
-    y_ticks = None
+    x_ticks = {0.0: 0.0, 1.0: 1.0}
+    y_ticks = {0.0: 0.0, 1.0: 1.0}
     s = 0.01
     bfa = None
     inches = 20
-    exon_png_file = "Exon_textsize_20"
-    intron_png_file = "Intron_textsize_20"
-    # box_1 = [0.25, 0.25, 0.25, 0.25, "red", 4, True, 0.4]
-    # bfa = [box_1]
-    bfa = None
+    exon_png_file = "Exon_box1_x075_100_y000_025_marked"
+    intron_png_file = "Intron_box1_x075_100_y000_025_marked"
+    box_1 = [0.75, 0.00, 0.25, 0.25, "red", 4, True, 0.2]
+    bfa = [box_1]
+    # bfa = None
+    border = 8
+    # bfa = None
     textsize = 40
     n = 100_000
     data_set = 1
-
+    x_title, y_title = "X", "Y"
+    label_coords = [0.5, -0.02, -0.02, 0.5]  # [None, None, -0.1, 0.5] for "Data_zoomed_x0875y00625T"
 
     # # Zoomed in Picture
-    # general_dict_file = "Data_zoomed_x0375_04375_y03125_0375T"
+    # general_dict_file = "Data_zoomed_x075y000T"
     # exon_dict_file = f"Exon{general_dict_file}"
     # intron_dict_file = f"Intron{general_dict_file}"
-    # y_lim = [0.375, 0.4375]
-    # x_lim = [0.3125, 0.375]
-    # x_ticks = {x/100:x/100 for x in range(25, 50 + 1, 1)}
-    # y_ticks = {y/100:y/100 for y in range(25, 50 + 1, 1)}
+    # x_lim = [0.109375, 0.125]
+    # y_lim = [0.875, 0.890625]
+    # y_ticks = {0.0: 0.0, 0.25: 0.25}
+    # x_ticks = {0.75: 0.75, 1.0: 1.0}
+    # border = 8
     # s = 0.5
-    # exon_png_file = "ExonZoomed_x0375_04375_y03125_0375_boxed"
-    # intron_png_file = "IntronZoomed_x0375_04375_y03125_0375_boxed"
-    # inches = 10
-    # textsize = 12
+    # exon_png_file = "ExonZoomed_x075_100_y000_025"
+    # intron_png_file = "IntronZoomed_x075_100_y000_025"
+    # inches = 20
+    # textsize = 40
     # n = 100_000
     # data_set = 1
-    # box_1 = [0.375, 0.3125 + 3*(0.015625), 0.015625, 0.015625, "red", 4, True, 0.4]
+    # x_title, y_title = "X", "Y"
+    # label_coords = [0.5, -0.02, -0.02, 0.5]  # [None, None, -0.1, 0.5] for "Data_zoomed_x0875y00625T"
+    # box_1 = [0.875, 0.109375, 0.015625, 0.015625, "red", 4, True, 0.2]
 
     # box_2 = [0.3125, 0.9375, 0.375 - 0.3125, 1.0 - 0.9375, "blue", 4, True, 0.4]
 
@@ -99,26 +119,30 @@ def main():
                   f"{exon_png_file}",
                   default_title = False,
                 #   transpose=False,
-                  x_lim=x_lim, y_lim=y_lim,
-                #   x_tick_marks=x_ticks, y_tick_marks=y_ticks,
+                #   x_lim=x_lim, y_lim=y_lim,
+                  x_title = x_title, y_title = y_title,
+                  border= border,
+                  x_tick_marks=x_ticks, y_tick_marks=y_ticks,
                   inches = inches,
                   title = "Exon",
                   box_fill_arrow = bfa,
                   textsize = textsize,
-                  dot_size = s)
+                  dot_size = s, label_coords = label_coords)
     
     matplotfigure(cwd / "TE_Images_ForPaper" / "Dict" / f"{intron_dict_file}.pkl",
                   cwd / "TE_Images_ForPaper" / "Intron",
                   f"{intron_png_file}",
                   default_title = False,
                 #   transpose=False,
-                  x_lim=x_lim, y_lim=y_lim,
-                #   x_tick_marks=x_ticks, y_tick_marks=y_ticks,
+                #   x_lim=x_lim, y_lim=y_lim,
+                  x_title = x_title, y_title = y_title,
+                  border= border,
+                  x_tick_marks=x_ticks, y_tick_marks=y_ticks,
                   inches = inches,
                   title = "Intron",
                   box_fill_arrow = bfa,
                   textsize = textsize,
-                  dot_size = s)
+                  dot_size = s, label_coords = label_coords)
 
 
 
@@ -208,6 +232,9 @@ def matplotfigure(frame: dict or pathlib.Path or str,
                   transpose: bool = True,
                   inches: float = 20,
                   textsize: int = None,
+                  border: int = 1,
+                  x_title: str = "Forward", y_title: str = "Backward",
+                  label_coords: list = None,
                   *args, **kwargs):
     '''
     The figure thing is redundent, so I'm going to try a single function to do everything.
@@ -224,6 +251,10 @@ def matplotfigure(frame: dict or pathlib.Path or str,
 
     Transpose is because I originally put the backwards on the x axis and the forwards on the y axis. Instead of going back and swapping those in other places, it's up to the user to know which ones are which. This script is designed such that the backwards is on the x axis and the forwards is on the y: 
     if you want to do it the other way use Transpose = True (which is true by default), else do false. This flips the coordinates for you.
+
+    ax.patch.set_edgecolor('pink') to adjust the actual edge of the box: make this thicker and darker.
+
+    Remove outer frame of the image.
     '''
     if isinstance(file_name, str):
         file_name: pathlib.Path = pathlib.Path(file_name)
@@ -238,16 +269,11 @@ def matplotfigure(frame: dict or pathlib.Path or str,
         with open(frame, "rb") as f:
             frame = pickle.load(f)
 
-    x_title = f"Backwards: {k_m}-Mer"
-    y_title = f"Forwards: {k_p}-Mer"
-
     if transpose:
         for i, (key, points) in enumerate(frame.items()):
             old_x, old_y = np.copy(points[:, 0]), np.copy(points[:, 1])
             frame[key][:, 0] = old_y
             frame[key][:, 1] = old_x
-            y_title = f"Backwards: {k_m}-Mer"
-            x_title = f"Forwards: {k_p}-Mer"
 
     count = list(frame.keys())[len(list(frame.keys())) - 1]
 
@@ -303,6 +329,22 @@ def matplotfigure(frame: dict or pathlib.Path or str,
     if isinstance(y_tick_marks, dict):
         ax.set_yticks(list(y_tick_marks.keys()))
         ax.set_yticklabels(list(y_tick_marks.values()))
+
+    if isinstance(label_coords, list):
+        if isinstance(label_coords[0], float) and isinstance(label_coords[1], float):
+            ax.xaxis.set_label_coords(label_coords[0], label_coords[1])
+        if isinstance(label_coords[2], float) and isinstance(label_coords[3], float):
+            ax.yaxis.set_label_coords(label_coords[2], label_coords[3])
+
+
+    if isinstance(x_tick_marks, dict) and isinstance(y_tick_marks, dict):
+        p = plt.Rectangle([list(x_tick_marks.values())[0], list(y_tick_marks.values())[0]], list(x_tick_marks.values())[1] - list(x_tick_marks.values())[0], list(y_tick_marks.values())[1] - list(y_tick_marks.values())[0], color = "black", linewidth = border, fill = False)  #set_fill = False, 
+        ax.add_patch(p)
+
+    # axes = ax.axes.flat
+
+    for axis in ['top','bottom','left','right']:
+        ax.spines[axis].set_linewidth(0)
 
     if (file_extension in ".png") or (file_extension in ".pdf"):
         plt.savefig(f"{file}")
