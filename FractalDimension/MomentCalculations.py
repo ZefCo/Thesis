@@ -49,13 +49,19 @@ def main():
     min_n = 0.5
     ms = [n / step for n in range(int(step*(min_n)), int(step*max_n) + 1)]
     title = f"E v I log w/N divided"
-    moments_v2(cwd / "Dicts", ms, min_k = 1, max_k = 6, convergence = False, logy = False, N_value = True, title = title)
+    moments_v2(cwd / "Dicts", ms, min_k = 1, max_k = 6, convergence = False, logy = False, N_value = True, title = title, x_ticks={0.5: 0.5, 1.0: 1.0, 1.5: 1.5, 2.0: 2.0})
     # evalue = moment(exon_file, unlog = True, k = 2*k, n = 1)
     # ivalue = moment(intron_file, unlog = True, k = 2*k, n = 1)
     # print(f"k = {k}\te value = {evalue}\ti = value = {ivalue}")
 
 
-def moments_v2(file_dir: pathlib.Path, ms: list, min_k: int = 1, max_k: int = 6, unlog: bool = False, convergence: bool = False, logy: bool = False, N_value: bool = False, title: str = None, *args, **kwargs):
+def moments_v2(file_dir: pathlib.Path, 
+               ms: list, 
+               min_k: int = 1, max_k: int = 6, 
+               unlog: bool = False, convergence: bool = False, logy: bool = False, N_value: bool = False, 
+               title: str = None, 
+               x_ticks: dict = None, y_ticks: dict = None,
+               *args, **kwargs):
     '''
     Moment calculations do NOT need the 4**s part multiplied, everything just needs to be scaled from 0 to 1 in a traditional normalization.*
 
@@ -143,18 +149,33 @@ def moments_v2(file_dir: pathlib.Path, ms: list, min_k: int = 1, max_k: int = 6,
 
     print(f"Finished data, printing to plots")
 
+    plt.rc('axes', linewidth=2)
     for key, value in me.items():
         print(f"plotting for {2*key}-mer")
         fig, axs = plt.subplots()
+        fig.set_size_inches(8, 8)
         fig_pd, axs_pd = plt.subplots()
 
         axs.plot(ms, value, label = f"Exon")
         axs.plot(ms, mi[key], label = f"Intron")
         axs.plot(ms, uni[key], linestyle = "dotted")
         axs.set_title(f"{2*key}-mer")
-        axs.set_ylabel(r"$(\sum\rho^{m})^{1/m}$")
+        axs.set_ylabel(r"$(\sum\rho^{m})^{1/m}$", rotation='horizontal')
         axs.set_xlabel(r"$m$")
         axs.legend()
+
+        if isinstance(x_ticks, dict):
+            axs.set_xticks(list(x_ticks.keys()))
+            axs.set_xticklabels(list(x_ticks.values()))
+        else:
+            axs.set_xticks([])
+        if isinstance(y_ticks, dict):
+            axs.set_yticks(list(y_ticks.keys()))
+            axs.set_yticklabels(list(y_ticks.values()))
+        else:
+            axs.set_yticks([])
+
+        axs.yaxis.set_label_coords(-0.08, 0.9)
 
         axs_pd.plot(ms, pd[key])
         axs_pd.set_title(f"Per Diff for {2*key}-mer")
