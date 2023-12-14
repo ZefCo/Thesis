@@ -68,11 +68,11 @@ def main():
     s = 0.01
     bfa = None
     inches = 20
-    exon_png_file = "Exon_box1_x075_100_y000_025_marked"
-    intron_png_file = "Intron_box1_x075_100_y000_025_marked"
+    exon_png_file = "Exon_KT"
+    intron_png_file = "Intron_KT"
     box_1 = [0.75, 0.00, 0.25, 0.25, "red", 4, True, 0.2]
     bfa = [box_1]
-    # bfa = None
+    bfa = None
     border = 8
     # bfa = None
     textsize = 40
@@ -82,17 +82,17 @@ def main():
     label_coords = [0.5, -0.02, -0.02, 0.5]  # [None, None, -0.1, 0.5] for "Data_zoomed_x0875y00625T"
 
     # # Zoomed in Picture
-    # general_dict_file = "Data_zoomed_x075y000T"
+    # general_dict_file = "Data_zoomed_x025y075T"
     # exon_dict_file = f"Exon{general_dict_file}"
     # intron_dict_file = f"Intron{general_dict_file}"
     # x_lim = [0.109375, 0.125]
     # y_lim = [0.875, 0.890625]
-    # y_ticks = {0.0: 0.0, 0.25: 0.25}
-    # x_ticks = {0.75: 0.75, 1.0: 1.0}
+    # y_ticks = {0.75: 0.75, 1.0: 1.0}
+    # x_ticks = {0.25: 0.25, 0.5: 0.5}
     # border = 8
     # s = 0.5
-    # exon_png_file = "ExonZoomed_x075_100_y000_025"
-    # intron_png_file = "IntronZoomed_x075_100_y000_025"
+    # exon_png_file = "ExonZoomed_x025_050_y075_100"
+    # intron_png_file = "IntronZoomed_x025_050_y075_100"
     # inches = 20
     # textsize = 40
     # n = 100_000
