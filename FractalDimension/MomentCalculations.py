@@ -148,8 +148,8 @@ def moments_v2(file_dir: pathlib.Path,
             uni[k].append(1)
 
     print(f"Finished data, printing to plots")
-
-    plt.rc('axes', linewidth=2)
+    plt.rc("font", size = 20)
+    plt.rc('axes', linewidth = 2)
     for key, value in me.items():
         print(f"plotting for {2*key}-mer")
         fig, axs = plt.subplots()
@@ -160,7 +160,7 @@ def moments_v2(file_dir: pathlib.Path,
         axs.plot(ms, mi[key], label = f"Intron")
         axs.plot(ms, uni[key], linestyle = "dotted")
         axs.set_title(f"{2*key}-mer")
-        axs.set_ylabel(r"$(\sum\rho^{m})^{1/m}$", rotation='horizontal')
+        axs.set_ylabel(r"$(\sum\rho^{m})^{1/m}$") #, rotation='horizontal')
         axs.set_xlabel(r"$m$")
         axs.legend()
 
@@ -175,7 +175,7 @@ def moments_v2(file_dir: pathlib.Path,
         else:
             axs.set_yticks([])
 
-        axs.yaxis.set_label_coords(-0.08, 0.9)
+        # axs.yaxis.set_label_coords(-0.0, 0.5)
 
         axs_pd.plot(ms, pd[key])
         axs_pd.set_title(f"Per Diff for {2*key}-mer")
