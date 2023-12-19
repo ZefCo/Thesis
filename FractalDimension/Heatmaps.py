@@ -152,10 +152,10 @@ def main():
     #         title = f"Master Heatmap {2*k}mer") #vmin = master_rescale[0], vmax = master_rescale[1]) #, file_output = cwd / "TE_Images_ForPaper" / "Heatmaps" / f"Master_DS{data_set}_n{n}_{k*2}mer.png")
     
     heatmapv2(exon, colors = colors, bounds = bounds, 
-    x_title = f"Forward {k}-mer", y_title = f"Backward {k}-mer",
+    x_title = f"Anterior {k}-mer", y_title = f"Posterior {k}-mer",
     title = f"Exon Equal Area Heatmap\n{2*k}mer", fileoutput = cwd / "TE_Images_ForPaper" / "Heatmaps" / "EA" / f"Exon_HEA_DS{data_set}_n{n}_{k*2}mer_{file_details}.png")
     heatmapv2(intron, colors = colors, bounds = bounds, 
-    x_title = f"Forward {k}-mer", y_title = f"Backward {k}-mer",
+    x_title = f"Anterior {k}-mer", y_title = f"Posterior {k}-mer",
     title = f"Intron Equal Area Heatmap\n{2*k}mer", fileoutput = cwd / "TE_Images_ForPaper" / "Heatmaps" / "EA" / f"Intron_HEA_DS{data_set}_n{n}_{k*2}mer_{file_details}.png")
     exit()
 
