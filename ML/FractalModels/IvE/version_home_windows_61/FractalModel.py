@@ -64,7 +64,7 @@ w, h = get_num_pixels(image_dir / "EXON" / "Exon_0.png")  # probably shouldn't h
 seed = random.randint(1000000, 9000000)
 
 
-batch_size = 256
+batch_size = 200
 epochs = 30
 
 pngs = 0
@@ -131,7 +131,6 @@ try:
 except Exception as E:
     print(type(E))
     print(E)
-    exit()
 
 
 history_data = history.history
