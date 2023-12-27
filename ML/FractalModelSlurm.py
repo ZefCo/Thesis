@@ -1,3 +1,4 @@
+print("Starting script")
 # https://towardsdatascience.com/convolutional-neural-networks-understanding-and-organizing-your-data-set-ba3e8b4086cb
 # https://datagy.io/python-decorators/
 # https://gitpython.readthedocs.io/en/stable/intro.html
@@ -12,7 +13,7 @@ import os
 import pandas
 import pathlib
 import shutil
-import re
+# import re
 # from tensorflow.keras.models import Sequential, load_module
 # from tensorflow.keras.layers import Conv1D
 # from sklearn.model_selection import train_test_split
@@ -21,10 +22,10 @@ import tensorflow as tf
 # print(tf.__version__)
 # exit()
 import random
-import numpy as np
-import pandas as pd
+# import numpy as np
+# import pandas as pd
 # import plotly.graph_objects as go
-import datetime
+# import datetime
 from matplotlib import pyplot as plt
 from contextlib import redirect_stdout
 from PIL import Image
@@ -32,9 +33,8 @@ from PIL import Image
 # https://stackoverflow.com/questions/53066762/understanding-1d-convolution-of-dna-sequences-encoded-as-a-one-hot-vector
 # https://stackoverflow.com/questions/53514495/what-does-batch-repeat-and-shuffle-do-with-tensorflow-dataset
 # https://stackoverflow.com/questions/53066762/understanding-1d-convolution-of-dna-sequences-encoded-as-a-one-hot-vector
-
 cwd = pathlib.Path.cwd()
-
+# exit()
 def get_num_pixels(filepath):
     width, height = Image.open(filepath).size
     return width, height
@@ -44,9 +44,9 @@ def get_num_pixels(filepath):
 # branch = report.active_branch
 branch = "slurm"
 
-image_dir = cwd / "Data_Set_2_histogram_6mer_KTA"
+image_dir = cwd / "Data_Set_1_histogram_6mer_KTA"
 ive_dir = cwd / "FractalModels" / "IvE"
-version_num = len(next(os.walk(ive_dir))[1]) + 1
+version_num = len(next(os.walk(ive_dir))[1]) + 60
 version_dir = ive_dir / f"version_{branch}_{version_num}"
 version_dir.mkdir(parents = True, exist_ok = True)
 model_dir = version_dir / "Model"
@@ -64,7 +64,7 @@ w, h = get_num_pixels(image_dir / "EXON" / "Exon_0.png")  # probably shouldn't h
 seed = random.randint(1000000, 9000000)
 
 
-batch_size = 200
+batch_size = 256
 epochs = 50
 
 pngs = 0
@@ -98,13 +98,13 @@ a = tf.keras.layers.BatchNormalization()(a)
 b = tf.keras.layers.Conv2D(h, (6, 6), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(a)
 b = tf.keras.layers.Dropout(.5)(b)
 b = tf.keras.layers.BatchNormalization()(b)
-# c = tf.keras.layers.Conv2D(64, (3, 3), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(b)
-# c = tf.keras.layers.Dropout(.5)(c)
-# c = tf.keras.layers.BatchNormalization()(c)
+c = tf.keras.layers.Conv2D(64, (6, 6), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(b)
+c = tf.keras.layers.Dropout(.5)(c)
+c = tf.keras.layers.BatchNormalization()(c)
 # d = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(c)
 # d = tf.keras.layers.Dropout(.5)(d)
 # d = tf.keras.layers.BatchNormalization()(d)
-flatten = tf.keras.layers.Flatten()(b)
+flatten = tf.keras.layers.Flatten()(c)
 final = tf.keras.layers.Dropout(.5)(flatten)
 output_layer = tf.keras.layers.Dense(output_classes, activation = "softmax")(final)
 model = tf.keras.Model(inputs = input_layer, outputs = output_layer)
@@ -129,8 +129,9 @@ try:
                         validation_data = valid_set,
                         callbacks = [cp_callback])
 except Exception as E:
-    print(type(E))
     print(E)
+    print(f"Error type {type(E)}")
+    exit()
 
 
 history_data = history.history
