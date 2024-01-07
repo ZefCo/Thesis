@@ -7,6 +7,26 @@ import RQuery
 from typing import Tuple
 
 
+def main():
+    '''
+    For playing around with different tracks and urls
+    '''
+    # # url_gen = UCSCURLGenerator()
+
+    # # ensURL = url_gen.ens_tracks(chrom="chr15", start=65849223, end = 65849223 + 18)
+    # # print(ensURL)
+
+    # # _, seqURL = ens_tracks(chrom = "chr1", start = 94140169, end = 94140169 + 317)
+    # # print(seqURL)
+
+    baseURL, trackURL, *_ = base_urls()
+    trackURL = f"{baseURL}{trackURL}?genome=m39"
+    print(trackURL)
+
+    # geneid_url = geneid_track(chrom = "chr1", start = 94140169, end = 94140169 + 317)
+    # print(geneid_url)
+
+
 def base_urls():
     '''
     '''
@@ -200,7 +220,10 @@ def convertRequest(query: requests.Response) -> pandas.DataFrame or str:
     '''
     try:
         track: dict = json.loads(query.text)
+    except ValueError as e:
+        return None
     except Exception as e:
+        print("New Unhandeled error")
         print(type(e))
         print(e)
         exit()
@@ -234,18 +257,6 @@ def convertRequest(query: requests.Response) -> pandas.DataFrame or str:
 
 
 if __name__ in '__main__':
-    # url_gen = UCSCURLGenerator()
+    main()
 
-    # ensURL = url_gen.ens_tracks(chrom="chr15", start=65849223, end = 65849223 + 18)
-    # print(ensURL)
-
-    # _, seqURL = ens_tracks(chrom = "chr1", start = 94140169, end = 94140169 + 317)
-    # print(seqURL)
-
-    baseURL, trackURL, *_ = base_urls()
-    trackURL = f"{baseURL}{trackURL}?genome=hg19"
-    print(trackURL)
-
-    geneid_url = geneid_track(chrom = "chr1", start = 94140169, end = 94140169 + 317)
-    print(geneid_url)
 

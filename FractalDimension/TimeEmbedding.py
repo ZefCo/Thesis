@@ -52,6 +52,8 @@ def main():
     '''
     # score_keys(k = 6)
     # exit()
+    species = "Mouse"
+    # species = "Fly"
 
     linux_path = f"/media/ethanspeakman/Elements/"
     windows_path = f"F:/"
@@ -59,8 +61,8 @@ def main():
     data_path = windows_path
 
     # Non Zoomed Picture
-    exon_dict_file = "ExonData_n100000_DS1_kp6_km6"
-    intron_dict_file = "IntronData_n100000_DS1_kp6_km6"
+    exon_dict_file = f"{species}_ExonData_n100000_DS1_kp6_km6"
+    intron_dict_file = f"{species}_IntronData_n100000_DS1_kp6_km6"
     x_lim = None
     y_lim = None
     x_ticks = {0.0: 0.0, 1.0: 1.0}
@@ -68,8 +70,8 @@ def main():
     s = 0.01
     bfa = None
     inches = 20
-    exon_png_file = "Exon_KT"
-    intron_png_file = "Intron_KT"
+    exon_png_file = f"{species}_Exon_KT"
+    intron_png_file = f"{species}_Intron_KT"
     box_1 = [0.75, 0.00, 0.25, 0.25, "red", 4, True, 0.2]
     bfa = [box_1]
     bfa = None
@@ -109,10 +111,11 @@ def main():
     # bfa = None
 
     # time_embedding_v2(pathlib.Path(f"{data_path}/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl"), 
-    #                   n = n, 
-    #                   x_lim = x_lim, y_lim = y_lim, 
-    #                   exon_outfile = cwd / "TE_Images_ForPaper" / "Dict" / f"{exon_dict_file}.pkl",
-    #                   intron_outfile = cwd / "TE_Images_ForPaper" / "Dict" / f"{intron_dict_file}.pkl")
+    time_embedding_v2(pathlib.Path(f"D:\Downloads\GeneData\{species}\Selected{species}Dict/Data_Set_{data_set}_histogram.pkl"), 
+                      n = n, 
+                      x_lim = x_lim, y_lim = y_lim, 
+                      exon_outfile = cwd / "TE_Images_ForPaper" / "Dict" / f"{exon_dict_file}.pkl",
+                      intron_outfile = cwd / "TE_Images_ForPaper" / "Dict" / f"{intron_dict_file}.pkl")
     
     matplotfigure(cwd / "TE_Images_ForPaper" / "Dict" / f"{exon_dict_file}.pkl",
                   cwd / "TE_Images_ForPaper" / "Exon",
@@ -124,7 +127,7 @@ def main():
                   border= border,
                   x_tick_marks=x_ticks, y_tick_marks=y_ticks,
                   inches = inches,
-                  title = "Exon",
+                  title = f"{species} Exon",
                   box_fill_arrow = bfa,
                   textsize = textsize,
                   dot_size = s, label_coords = label_coords)
@@ -139,7 +142,7 @@ def main():
                   border= border,
                   x_tick_marks=x_ticks, y_tick_marks=y_ticks,
                   inches = inches,
-                  title = "Intron",
+                  title = f"{species} Intron",
                   box_fill_arrow = bfa,
                   textsize = textsize,
                   dot_size = s, label_coords = label_coords)

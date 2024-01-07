@@ -23,6 +23,8 @@ def main():
     '''
     Create a heat map: X = past, Y = future, Z = count. So count the occurences of a k-mer - to k-mer +.
     '''
+    # fly bounds
+    # 
 
     linux_path = f"/media/ethanspeakman/Elements/"
     windows_path = f"F:/"
@@ -30,6 +32,7 @@ def main():
     data_set = 2
     n = 100_000
     transform = np.log2
+    # transform = None
     colors_map = "hot"
     nucsequence: str = "AGTC"
     cbins = 10
@@ -37,7 +40,7 @@ def main():
     # title_details = f"Independent Scaling Log2 Transform {nucsequence} Order Cbins = {cbins}"
     # file_details = title_details.replace(" ", "")
 
-    # k = 1
+    k = 1
     # colors: list = ['black', 'darkred', 'red', 'orange', 'gold', 'yellow'] 
     # bounds: list = [0, 0.7, 0.8, 1.0, 1.1, 1.2] # 0.98
     # # # bounds: list = [0, 0.8, 1.0, 1.1, 2.0] # OG - so I tried being slick and finding various points, but the problem is that these spacing are way to close together. I'm going back to eyeballing it, which gives a better color distribution
@@ -81,8 +84,8 @@ def main():
     # # # bounds: list = [0, 0.15, 0.45, 0.85, 1.26, 1.96] # 0.95
     # # # bounds: list = [0, 0.15, 0.45, 0.85, 1.26, 1.7] # 0.92
 
-    k = 6
-    measure_target = 0.01
+    # k = 6
+    # measure_target = 0.01
     colors: list = ['black', 'darkred', 'firebrick', 'red', 'orange', 'gold', 'yellow']
     bounds: list = [0, 0.452, 0.85, 1.45, 1.85, 2.36, 3.2] # 0.98
     # # # bounds: list = [0, 0.75, 1.05, 1.45, 1.859, 2.462, 3.165]
@@ -104,28 +107,33 @@ def main():
 
     output_files = [cwd / "TE_Images_ForPaper" / "Dict" / f"Heat_DS{data_set}_Master.pkl", cwd / "TE_Images_ForPaper" / "Dict" / f"Heat_DS{data_set}_Exon.pkl", cwd / "TE_Images_ForPaper" / "Dict" / f"Heat_DS{data_set}_Intron.pkl"]
 
-    # _, exon, intron, _, _, exon_max, exon_min, intron_max, intron_min = heat_embedding(cwd / "TE_Images_ForPaper" / "Dict" / "Seq_For_Images_n100000_minLength12.pkl",
-    #                                                                                    n = n,
-    #                                                                                    k_m = k, k_p = k,
-    #                                                                                    just_import = True,
-    #                                                                                    log_transform = transform, 
-    #                                                                                    nucsequence = nucsequence)  # Just import is turned on because I have one dictionary with all the data. I'll use that one set for all the images from now on. Just makes things a little faster and easier.
+    # data_file = cwd / "TE_Images_ForPaper" / "Dict" / "Seq_For_Images_n100000_minLength12.pkl"
+    data_file = cwd / "TE_Images_ForPaper" / "Dict" / "Fly_Seq_For_Images.pkl"
 
-    exon = _import_data(exon_file, just_import=True)
-    intron = _import_data(intron_file, just_import=True)
+    _, exon, intron, _, _, exon_max, exon_min, intron_max, intron_min = heat_embedding(data_file,
+                                                                                       n = n,
+                                                                                       k_m = k, k_p = k,
+                                                                                       just_import = True,
+                                                                                       log_transform = transform, 
+                                                                                       nucsequence = nucsequence)  # Just import is turned on because I have one dictionary with all the data. I'll use that one set for all the images from now on. Just makes things a little faster and easier.
+
+    # exon = _import_data(exon_file, just_import=True)
+    # intron = _import_data(intron_file, just_import=True)
     # intron_max, intron_min = min_max(intron)
 
     # cticks = [((intron_max - 0) / cbins)*i for i in range(cbins)]
     # title_details = f"Independent Scaling Log2 Transform {nucsequence} Order Cbins = {len(bounds)}"
     title_details = f"EAH_vF"
     file_details = title_details.replace(" ", "")
+    # print(exon)
 
-
-    # pdf_cdf(exon_file, intron_file,
-    #         measure_target = measure_target, 
-    #         pdf_title = f"PDF for {2*k}mer", pdf_outpath = cwd / "TE_Images_ForPaper" / "Histograms" / f"PDF_{2*k}mer_JT_001.png",
-    #         cdf_title = f"CDF for {2*k}mer", cdf_outpath = cwd / "TE_Images_ForPaper" / "Histograms" / f"CDF_{2*k}mer_JT_001.png")
-    # exit()
+    measure_target = [0.2, 0.4, 0.6, 0.8, 0.9, 0.92, 0.95, 0.98, 0.99]
+    pdf_cdf(exon, intron,
+            measure_target = measure_target,
+            transpose = True,
+            pdf_title = f"Fly PDF for {2*k}mer", pdf_outpath = cwd / "TE_Images_ForPaper" / "Histograms" / f"Fly_PDF_{2*k}mer_JT_001.png",
+            cdf_title = f"Fly CDF for {2*k}mer", cdf_outpath = cwd / "TE_Images_ForPaper" / "Histograms" / f"Fly_CDF_{2*k}mer_JT_001.png")
+    exit()
 
     # # master_max, master_min = min_max(master)
     # print(f"Master Max = {minmax[0]}\tMaster Min = {minmax[1]}")
@@ -231,7 +239,7 @@ def pdf_cdf(data1: dict or pathlib.Path, data2: dict or pandas.DataFrame,
     bar_chart(cdf, title = cdf_title, outpath = cdf_outpath, xticks = set_xticks)
 
 
-def _jumps(data: np.ndarray, xticks: list, threshold: float = 0.05):
+def _jumps(data: np.ndarray, xticks: list, threshold: float = 0.05, *args, **kwargs):
     '''
     Looks for high "jumps" in the cdf. Probably better for the 2-mer and 12-mers as they have a wicked discontinuous CDF curve. If the adjacent y positions are above a certain threshold it marks it in the set_xticks 
     (the second one: you can then set the color on the heatmap just below this value)

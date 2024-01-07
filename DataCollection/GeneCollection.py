@@ -23,14 +23,26 @@ def main():
 
     Stopped at 40587 at school. Stopped at a different number at home. Both from a json decode error.
     '''
-    start_gene = 0
+    start_gene = 20083
+    genome = "mm39"
+    species = "Mouse"
+
+    # start_gene = 16761
+    # genome = "dm6"
+    # species = "Fly"
+
     # dict_screwup()
     # pickle_file, csv_file = getKnownGene()
-    hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19.csv",
-                   pathlib.Path(f"D:/Downloads/GeneData/Known_Genes_hg19_NCBIGene_DICT_{start_gene}.pkl"), 
-                   ref_track="ncib",
-                   gene_start = start_gene)
+    # hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19.csv",
+    #                pathlib.Path(f"D:/Downloads/GeneData/Known_Genes_hg19_NCBIGene_DICT_{start_gene}.pkl"), 
+    #                ref_track="ncib",
+    #                gene_start = start_gene)
     # hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19_ncbiRefSeqCurated.pkl")
+    hg19_sequences(cwd.parent / "Data_Files" / species / f"Known_Genes_{genome}.csv",
+                   pathlib.Path(f"D:/Downloads/GeneData/{species}/Known_Genes_{genome}_DICT_{start_gene}.pkl"), 
+                   ref_track="ncib",
+                   gene_start = start_gene,
+                   species = species)
 
 
 def dict_screwup():
@@ -66,15 +78,16 @@ def dict_screwup():
 
 
 
-def getKnownGene(genome = "hg19", track = "ncbiRefSeqCurated"):
+def getKnownGene(genome = "hg19", track = "ncbiRefSeqCurated", chroms: list = None):
     '''
     This will get all the known gene data and load it to a pkl file for later use.
 
     It will return the names of the files that it outputs, so I can be lazy and use one script to do two things. THAT'S HOW YOU DO IT BENDER!
     '''
-    chroms = [f'chr{i}' for i in range(1, 23)]
-    chroms.append('chrX')
-    chroms.append('chrY')
+    if chroms is None:
+        chroms = [f'chr{i}' for i in range(1, 23)]
+        chroms.append('chrX')
+        chroms.append('chrY')
 
     if genome in "hg38":
         colnames = ['chrom', 'chromStart', 'chromEnd', 'name', 'score', 'strand', 'thickStart', 'thickEnd', 'reserved', 'blockCount', 'blockSizes', 'chromStarts', 'name2', 'cdsStartStat', 'cdsEndStat', 'exonFrames', 'type', 'geneName', 'geneName2', 'geneType', 'transcriptClass', 'source', 'transcriptType', 'tag', 'level', 'tier']
@@ -116,7 +129,7 @@ def getKnownGene(genome = "hg19", track = "ncbiRefSeqCurated"):
 
 
 
-def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track = "ncib", gene_start = 0):
+def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track = "ncib", gene_start = 0, species: str = "human"):
     '''
     This will go to UCSC Genome Browser and grab all HG19 genes, then save them in a pickle file. They will not be chopped up, but instead will
     be preserved in all their glory for chopping up later.
@@ -182,7 +195,7 @@ def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track
 
     unique_index = 0
     for row in range(gene_start, rows):
-        print(f"Working on row {row} / {rows}")
+        print(f"Working on row {row} / {rows} - {species}")
         row_of_interest = known_genes.iloc[row, :]
 
         gene_of_interest: Gene = Gene.Gene(name = row_of_interest["name"],
@@ -199,8 +212,13 @@ def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track
                                            exonStarts = row_of_interest["exonStarts"],
                                            exonEnds = row_of_interest["exonEnds"],
                                            exonFrames = row_of_interest["exonFrames"])
-        
-        gene_of_interest.sequence_breakdown()
+        try:
+            gene_of_interest.sequence_breakdown()
+        except Exception as e:
+            print(type(e))
+            print(e)
+            # exit()
+            continue
 
         # try:
         #     gene_of_interest.sequence_breakdown()
