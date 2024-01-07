@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH -J fractal_6x6v3
-#SBATCH -o fractal_6x6v3.out
+#SBATCH -J fractal_4Lv4
+#SBATCH -o fractal_4Lv4.out
 #SBATCH --time=72:00:00
 #SBATCH --ntasks-per-node=10 -N 1
 #SBATCH --mem-per-cpu=5GB

@@ -1,0 +1,50 @@
+Seed: 5034283
+
+Model: "model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ input_1 (InputLayer)        [(None, 64, 64, 1)]       0         
+                                                                 
+ conv2d (Conv2D)             (None, 64, 64, 64)        128       
+                                                                 
+ dropout (Dropout)           (None, 64, 64, 64)        0         
+                                                                 
+ batch_normalization (BatchN  (None, 64, 64, 64)       256       
+ ormalization)                                                   
+                                                                 
+ conv2d_1 (Conv2D)           (None, 59, 59, 64)        147520    
+                                                                 
+ dropout_1 (Dropout)         (None, 59, 59, 64)        0         
+                                                                 
+ batch_normalization_1 (Batc  (None, 59, 59, 64)       256       
+ hNormalization)                                                 
+                                                                 
+ max_pooling2d (MaxPooling2D  (None, 58, 58, 64)       0         
+ )                                                               
+                                                                 
+ conv2d_2 (Conv2D)           (None, 58, 58, 32)        2080      
+                                                                 
+ dropout_2 (Dropout)         (None, 58, 58, 32)        0         
+                                                                 
+ batch_normalization_2 (Batc  (None, 58, 58, 32)       128       
+ hNormalization)                                                 
+                                                                 
+ conv2d_3 (Conv2D)           (None, 53, 53, 32)        36896     
+                                                                 
+ dropout_3 (Dropout)         (None, 53, 53, 32)        0         
+                                                                 
+ batch_normalization_3 (Batc  (None, 53, 53, 32)       128       
+ hNormalization)                                                 
+                                                                 
+ flatten (Flatten)           (None, 89888)             0         
+                                                                 
+ dropout_4 (Dropout)         (None, 89888)             0         
+                                                                 
+ dense (Dense)               (None, 2)                 179778    
+                                                                 
+=================================================================
+Total params: 367,170
+Trainable params: 366,786
+Non-trainable params: 384
+_________________________________________________________________
