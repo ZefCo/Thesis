@@ -13,15 +13,89 @@ import os
 def main():
     '''
     '''
-    # with open(pathlib.Path(f"/media/ethanspeakman/Elements/GeneData/Known_Genes_hg19_NCBIGene_DICT.pkl"), "rb") as p:
+
+    mouse = "Mouse"
+    fly = "Fly"
+    n = 10_000
+
+    # species = "Mouse"
+    # genome = "mm39"
+
+    species = "Fly"
+    genome = "dm6"
+
+    # redo(f"D:\Downloads\GeneData\{species}\Master{species}Dict.pkl", genome, f"D:\Downloads\GeneData\{species}\Fixed_Master{species}Dict.pkl")
+    # with open(pathlib.Path(f"D:\Downloads\GeneData\Fly/MasterflyDict.pkl"), "rb") as p:
     #     data = pickle.load(p)
+
+    # print(type(data))
+    # print(len(data))
+    # first_key = tuple(data.keys())[0]
+    # print(first_key)
+    # print(data[first_key].exon_seq)
+    # print(type(data[first_key]))
 
     # print(data["NM_001351428.2"])
     # print(data["NM_001351428.2"].full_seq)
-    stitch_frame("/media/ethanspeakman/Elements/Gene_Data_Sets/Combined/", "/media/ethanspeakman/Elements/Gene_Data_Sets/Combined/Combined_Hist.pkl")
+    # stitch_frame("/media/ethanspeakman/Elements/Gene_Data_Sets/Combined/", "/media/ethanspeakman/Elements/Gene_Data_Sets/Combined/Combined_Hist.pkl")
     # select_data("G:/Known_Genes_Master.pkl", "G:/Gene_Data_Sets", n = 40_000)
-    # test_dict(pathlib.Path("G:\Gene_Data_Sets\Data_set_1_cleaned_dict.pkl"))
+    # test_dict(pathlib.Path("D:\Downloads\GeneData\Fly\SelectedFlyDict\Data_set_1_cleaned_dict.pkl"))
     # test_dict(pathlib.Path("G:\Gene_Data_Sets\Data_set_2_cleaned_dict.pkl"))
+
+    # stitch_dict(f"D:\Downloads\GeneData\{fly}", f"D:\Downloads\GeneData\{fly}\Master{fly}Dict.pkl")
+    # stitch_dict(f"D:\Downloads\GeneData\{mouse}", f"D:\Downloads\GeneData\{mouse}\Master{mouse}Dict.pkl")
+    select_data(f"D:\Downloads\GeneData\{fly}\Fixed_Master{fly}Dict.pkl", f"D:\Downloads\GeneData\{fly}\Selected{fly}Dict", n  = n)
+    select_data(f"D:\Downloads\GeneData\{mouse}\Fixed_Master{mouse}Dict.pkl", f"D:\Downloads\GeneData\{mouse}\Selected{mouse}Dict", n  = n)
+
+
+def redo(file_path: pathlib.Path, genome: str, new_file_path: pathlib.Path):
+    '''
+    So when I first did this I didn't include the genome. The problem with that is the EVERYTHING was done via hg19. hg19 has no mouse or fly data, meaning everything was blank.
+
+    So this just takes the dictionary that was already done and redoes all the stuff with the proper genome.
+    '''
+    name: str
+    gene_data: Gene.Gene
+    with open(file_path, "rb") as pkl_file:
+        gene_dict: dict = pickle.load(pkl_file)
+
+    new_gene_data = dict()
+
+    for name, gene_data in gene_dict.items():
+        gene_of_interest: Gene.Gene = Gene.Gene(name = gene_data.name,
+                                           ncibname = gene_data.ncibname,
+                                           ename = gene_data.ename,
+                                           gname = gene_data.gname, 
+                                           chrm = gene_data.chrm, 
+                                           strand = gene_data.strand, 
+                                           txStart = gene_data.txStart,
+                                           txEnd = gene_data.txEnd,
+                                           cdsStart = gene_data.cdsStart,
+                                           cdsEnd = gene_data.cdsEnd,
+                                           exonCount = gene_data.exonCount,
+                                           exonStarts = gene_data.exonStarts,
+                                           exonEnds = gene_data.exonEnds,
+                                           exonFrames = gene_data.exonFrames,
+                                           genome = genome)
+        
+        try:
+            gene_of_interest.sequence_breakdown()
+        except Exception as e:
+            print(type(e))
+            print(e)
+            # exit()
+            continue
+
+        new_gene_data[name] = gene_of_interest
+
+        try:
+            with open(new_file_path, 'wb') as p:
+                pickle.dump(new_gene_data, p)
+        except Exception as e:
+            print(type(e))
+            print(f"Unable to write to file at this time: please check location can be written to")
+            exit()
+
 
 
 def test_dict(file_path: pathlib.Path, test_key = None):

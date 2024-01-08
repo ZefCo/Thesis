@@ -1,6 +1,7 @@
 import os
 # os.environ["GET_PYTHON_REFRESH"] = "quiet"
 # import git
+import shutil
 import pandas
 import pathlib
 import shutil
@@ -13,8 +14,8 @@ import re
 # print(tf.__version__)
 # exit()
 import random
-import numpy as np
-import pandas as pd
+# import numpy as np
+# import pandas as pd
 # import plotly.graph_objects as go
 import datetime
 from matplotlib import pyplot as plt
@@ -22,3 +23,4 @@ from contextlib import redirect_stdout
 from PIL import Image
 
 print("Env Test complete: passed")
+print(tf.__version__)
