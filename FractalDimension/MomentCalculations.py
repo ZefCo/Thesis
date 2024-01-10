@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import GeneClass as Gene
 import random
 import Heatmaps as hm
+from typing import Tuple
 plt.rcParams['text.usetex'] = True
 
 
@@ -55,12 +56,92 @@ def main():
     # print(f"k = {k}\te value = {evalue}\ti = value = {ivalue}")
 
 
+def moments_v3(file_dir: pathlib.Path, 
+               ms: list, 
+               min_k: int = 1, max_k: int = 6, 
+               unlog: bool = False, logy: bool = False, N_value: bool = False, 
+               *args, **kwargs) -> Tuple[dict, dict, dict, dict]:
+    '''
+    Does all the moment calculations, then returns them to be plotted speretly. Probably should have done this much earlier but... oh well.
+
+    Returns a tuple of 4 dictionaries.
+    '''
+    me = {}
+    mi = {}
+    pd = {}
+
+    uni = {}
+
+    for k in range(min_k, max_k + 1):
+        print(f"K = {k}")
+
+        me[k]: list = []
+        mi[k]: list = []
+        pd[k]: list = []
+        uni[k]: list = []
+
+        exon_file = file_dir / f"Exon_{k}mer.pkl"
+        intron_file = file_dir / f"Intron_{k}mer.pkl"
+
+        exon_data = hm._import_data(exon_file, just_import = True)
+        exon_data = pandas.DataFrame(exon_data)
+        if unlog:
+            exon_data = _unrenormalize(exon_data, 2*k)
+        print(f"\tImported Exon File")
+
+        intron_data = hm._import_data(intron_file, just_import = True)
+        intron_data = pandas.DataFrame(intron_data)
+        if unlog:
+            intron_data = _unrenormalize(intron_data, 2*k)
+        print(f"\tImported Intron File")
+
+        for m in ms:
+
+            if N_value:
+                N = 4**(2*k)
+                N = N**((1/m) - 1)
+                print(f"\t\tm = {m}\tN = {N}")
+            else:
+                N = 1
+                print(f"\t\tm = {m}")
+
+            exon_v = moment(exon_data, m = m, unlog = False, N = N, *args, **kwargs)
+            # exon_u = uniform_density(exon_data, m = m, N = N)
+            intron_v = moment(intron_data, m = m, unlog = False, N = N, *args, **kwargs)
+            # intron_u = uniform_density(intron_data, m = m, N = N, *args, **kwargs)
+
+            # if N_value:
+            #     N = 4**(2*k)
+            #     N = N**((1/m) - 1)
+            #     exon_v = N * exon_v
+            #     intron_v = N * intron_v
+
+            if logy:
+                exon_v = np.log2(exon_v)
+                intron_v = np.log2(intron_v)
+            
+            try:
+                per_diff = _percent_difference(exon_v, intron_v)
+            except ZeroDivisionError:
+                per_diff = 0
+            
+            me[k].append(exon_v)
+            mi[k].append(intron_v)
+            pd[k].append(per_diff)
+
+            uni[k].append(1)
+
+    return me, mi, uni, pd
+
+
 def moments_v2(file_dir: pathlib.Path, 
                ms: list, 
                min_k: int = 1, max_k: int = 6, 
                unlog: bool = False, convergence: bool = False, logy: bool = False, N_value: bool = False, 
                title: str = None, 
                x_ticks: dict = None, y_ticks: dict = None,
+               error_bars: list = None,
+               mer_out: pathlib.Path = None, pd_out: pathlib.Path = None, 
                *args, **kwargs):
     '''
     Moment calculations do NOT need the 4**s part multiplied, everything just needs to be scaled from 0 to 1 in a traditional normalization.*
@@ -76,6 +157,11 @@ def moments_v2(file_dir: pathlib.Path,
 
     *Do this as well with a N**(1/m - 1) term where N = 4**k (or in this case 4**2k) which should set all moment calculations for an evenly distributed heatmap to 1 (no matter what the moment is) and will
     adjust the other moment calculations to be either above or below 1. Sort of like subtracting the mean.
+
+    For error bars: input a list of Dataframes, each Dataframe should have a column titled Exon_Mean, Exon_STD, Intron_Mean, Intron_STD, and the index is the moments.
+    It will then place error bars at x, y, where x and y are the moments and mean respectivly, and xerr and yerr is +- the STD. The length of the list should be the same as the 
+    number of s being used (so if you only want to output s = 12, the length is 1, if s = 8, 10, 12, then the length should be 3). If you only have error bars for some, not others,
+    put None. The script checks the instance and if it's not a DataFrame then it continues.
     '''
 
     if convergence and (max_k - min_k) < 1:
@@ -150,7 +236,7 @@ def moments_v2(file_dir: pathlib.Path,
     print(f"Finished data, printing to plots")
     plt.rc("font", size = 20)
     plt.rc('axes', linewidth = 2)
-    for key, value in me.items():
+    for i, (key, value) in enumerate(me.items()):
         print(f"plotting for {2*key}-mer")
         fig, axs = plt.subplots()
         fig.set_size_inches(8, 8)
@@ -163,6 +249,25 @@ def moments_v2(file_dir: pathlib.Path,
         axs.set_ylabel(r"$(\sum\rho^{m})^{1/m}$") #, rotation='horizontal')
         axs.set_xlabel(r"$m$")
         axs.legend()
+
+        if isinstance(error_bars, list):
+            errors: pandas.DataFrame = error_bars[i]
+
+            if isinstance(errors, pandas.DataFrame):
+                xs = list(errors.index)
+                ye, yi = list(), list()
+
+                for x in xs:
+                    j = ms.index(x)
+                    ye.append(value[j])
+                    yi.append(mi[key][j])
+
+                ye_err = list(errors["Exon_STD"])
+                yi_err = list(errors["Intron_STD"])
+                axs.errorbar(x=xs, y=ye, yerr=ye_err, fmt = "none")
+                axs.errorbar(x=xs, y=yi, yerr=yi_err, fmt = "none")
+            else:
+                continue
 
         if isinstance(x_ticks, dict):
             axs.set_xticks(list(x_ticks.keys()))
@@ -181,8 +286,15 @@ def moments_v2(file_dir: pathlib.Path,
         axs_pd.set_title(f"Per Diff for {2*key}-mer")
         axs_pd.set_xlabel("m")
 
-        fig.savefig(cwd / "TE_Images_ForPaper" / "Moments" / f"{2*key}-mer")
-        fig_pd.savefig(cwd / "TE_Images_ForPaper" / "Moments" / f"{2*key}-mer_PD")
+        if isinstance(mer_out, pathlib.Path):
+            fig.savefig(mer_out)
+        else:
+            fig.savefig(cwd / "TE_Images_ForPaper" / "Moments" / f"{2*key}-mer")
+
+        if isinstance(pd_out, pathlib.Path):
+            fig_pd.savefig(pd_out)
+        else:
+            fig_pd.savefig(cwd / "TE_Images_ForPaper" / "Moments" / f"{2*key}-mer_PD")
 
 
 def moments(file_dir: pathlib.Path, ms: list, min_k: int = 1, max_k: int = 6, unlog: bool = False, convergence: bool = False, logy: bool = False, N_value: bool = False, title: str = None, *args, **kwargs):
@@ -394,28 +506,41 @@ def moment(data: pandas.DataFrame or dict or pathlib, m: float = 1, N: float = 1
     return values
 
 
-def _unrenormalize(data: pandas.DataFrame, k: int, *args, **kwargs):
+def _unrenormalize(data: pandas.DataFrame, s: int, log2: bool = True, *args, **kwargs):
     '''
     Yes, that says un-re-normalize. This is because I saved only the log2(x + 1) data where x = 4**2 * (y/sum(y)). This undoes that
     because I'm lazy.
 
-    log2( (4**s * x) + 1) = y
-    4**s * x + 1 = 2**y
-    4**s * x = 2**y - 1
-    x = ((2**y) - 1) / 4**s
+    if log2:
+        log2( (4**s * x) + 1) = y
+        4**s * x + 1 = 2**y
+        4**s * x = 2**y - 1
+        x = ((2**y) - 1) / 4**s
+    
+    if not log2:
+        4**s * x = 2**y
+        y / 4**s = x
 
     s = 2*k -> I've always done this as k forward = k backward even though the scripts can handle the two being different.
     '''
 
     rows, cols = data.shape
-    k = 4**k
+    s = 4**s
 
-    for row in range(rows):
-        for col in range(cols):
-            y = data.iloc[row, col]
+    if log2:
+        for row in range(rows):
+            for col in range(cols):
+                y = data.iloc[row, col]
 
-            x = ((2**y) - 1) / k
-            data.iloc[row, col] = x
+                x = ((2**y) - 1) / s
+                data.iloc[row, col] = x
+    else:
+        for row in range(rows):
+            for col in range(cols):
+                y = data.iloc[row, col]
+
+                x = y / s
+                data.iloc[row, col] = x
 
     return data
 
@@ -477,6 +602,53 @@ def uniform_density(data: pandas.DataFrame, m: int = 1, *args, **kwargs):
     uoment = moment(data, m = m, *args, **kwargs)
 
     return uoment
+
+
+def multiple_species_plots(ms: list, me: dict, mi: dict, uni: dict, output_dir: pathlib.Path,
+                           x_ticks: dict = None, y_ticks: dict = None):
+    '''
+    Because I just want to do it over here, I'm going to dump the script to do multiple species plots here.
+    ms should be a list of the moments used, which will in turn become the x axis.
+
+    me and mi should be a dictionary of dictionaries of lists:
+    m = {species: {k-mer: [points]}}
+
+    uni should be another dict, but in the form similar to other plots. I'm lazy so... deal with it.
+    '''
+    subdict: dict
+    plt.rc("font", size = 20)
+    plt.rc('axes', linewidth = 2)
+
+    fig, axs = plt.subplots()
+    fig.set_size_inches(8, 8)
+
+    for species, subdict in me.items():
+        print(f"Species = {species}")
+        for key, value in subdict.items():
+            print(f"plotting for {2*key}-mer")
+
+
+            axs.plot(ms, value, label = f"Exon - {species}")
+            axs.plot(ms, mi[species][key], label = f"Intron - {species}")
+            axs.plot(ms, uni[key], linestyle = "dotted")
+        
+            axs.set_title(f"{2*key}-mer")
+            axs.set_ylabel(r"$(\sum\rho^{m})^{1/m}$") #, rotation='horizontal')
+            axs.set_xlabel(r"$m$")
+            axs.legend()
+
+            if isinstance(x_ticks, dict):
+                axs.set_xticks(list(x_ticks.keys()))
+                axs.set_xticklabels(list(x_ticks.values()))
+            else:
+                axs.set_xticks([])
+            if isinstance(y_ticks, dict):
+                axs.set_yticks(list(y_ticks.keys()))
+                axs.set_yticklabels(list(y_ticks.values()))
+            else:
+                axs.set_yticks([])
+
+            fig.savefig(output_dir / f"{2*key}-mer")
 
 
 

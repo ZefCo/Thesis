@@ -6,6 +6,7 @@ import pandas
 import pathlib
 import shutil
 import re
+import sys
 # from tensorflow.keras.models import Sequential, load_module
 # from tensorflow.keras.layers import Conv1D
 # from sklearn.model_selection import train_test_split
@@ -23,4 +24,7 @@ from contextlib import redirect_stdout
 from PIL import Image
 
 print("Env Test complete: passed")
-print(tf.__version__)
+# if "tf" not in sys.modules:
+#     print("TensorFlow not loaded")
+# else:
+#     print(tf.__version__)

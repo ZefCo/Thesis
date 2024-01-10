@@ -17,6 +17,7 @@ import GeneClass as Gene
 import random
 from icecream import ic
 from typing import Callable
+from typing import Tuple
 
 
 def main():
@@ -541,7 +542,7 @@ def heat_embedding(data: pandas.DataFrame,
                    backwards: bool = True, # I'm leaving this in here in case I want to use it later. Probably not though
                    nucsequence: str = "AGTC", sequence_name: str = "Seq", classification_name: str = "Classificaion",
                    dict_output_files: list = None,
-                   *args, **kwargs):
+                   *args, **kwargs) -> Tuple[dict, dict, dict, int, int, int, int, int, int]:
     '''
     Somewhat similar to the time embedding, this looks at the past and the future and creates a heatmap.
 

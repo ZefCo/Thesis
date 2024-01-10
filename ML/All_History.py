@@ -47,6 +47,13 @@ def main():
                     new_80 = cwd / "FractalModels" / "IvE" / "version_slurm_80",
                     new_81 = cwd / "FractalModels" / "IvE" / "version_slurm_81",
                     new_82 = cwd / "FractalModels" / "IvE" / "version_slurm_82",
+                    new_83 = cwd / "FractalModels" / "IvE" / "version_slurm_83",
+                    new_85 = cwd / "FractalModels" / "IvE" / "version_slurm_85",
+                    new_86 = cwd / "FractalModels" / "IvE" / "version_slurm_86",
+                    new_87 = cwd / "FractalModels" / "IvE" / "version_slurm_87",
+                    new_88 = cwd / "FractalModels" / "IvE" / "version_slurm_88",
+                    new_89 = cwd / "FractalModels" / "IvE" / "version_slurm_89",
+
                     line_of_best_epochs = epochs)
 
 
