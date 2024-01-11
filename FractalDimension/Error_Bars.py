@@ -12,9 +12,10 @@ import re
 def main():
     '''
     '''
+    # collect_data(cwd / "TE_Images_ForPaper" / "Error_Data", cwd / "TE_Images_ForPaper" / "Dict" / "Seq_For_Images_n100000_minLength12.pkl", n = 50_000)
     
-    sub_moments = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
-    sub_data_dir = cwd / "ErrorBars"
+    sub_moments = [0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4, 1.45, 1.5, 1.55, 1.6, 1.65, 1.7, 1.75, 1.8, 1.85, 1.9, 1.95, 2.0]
+    sub_data_dir = cwd / "TE_Images_ForPaper" / "Error_Data"
     sub_stats = error_data(sub_data_dir, sub_moments, pickle_save = cwd / "TE_Images_ForPaper" / "Dict" / "SubStatsFrame.pkl")
     plot_with_error([sub_stats])
 
@@ -27,7 +28,7 @@ def plot_with_error(errors: list):
     '''
     ms = [n / 100 for n in range(int(100*(0.5)), int(100*2) + 1)]
 
-    MC.moments_v2(cwd / "Dicts", ms, min_k = 6, max_k = 6, N_value = True, x_ticks = {0.5: 0.5, 1.0: 1.0, 1.5: 1.5, 2.0: 2.0}, error_bars = errors)
+    MC.moments_v2(cwd / "Dicts", ms, min_k = 6, max_k = 6, N_value = True, x_ticks = {0.5: 0.5, 1.0: 1.0, 1.5: 1.5, 2.0: 2.0}, error_bars = errors, )
 
 
 def error_data(sub_data_dir: pathlib.Path, sub_moments: list, k: int = 6, pickle_save: pathlib.Path = None) -> pandas.DataFrame:
@@ -89,10 +90,11 @@ def collect_data(file_dir: pathlib.Path, source_data: pathlib.Path, n: int = 10_
 
     A temp file is saved so the script can be run parallel to others, saving time instead of doing it one at a time.
     '''
+    # file_dir.mkdir(parents = True, exist_ok = True)
     files = int(len(list(file_dir.iterdir())) / 2)
 
-    MC.write_pickel(pandas.DataFrame({"Nothing": [0]}), cwd / "ErrorBars" / f"Exon_EB_{files}.pkl")
-    MC.write_pickel(pandas.DataFrame({"Nothing": [0]}), cwd / "ErrorBars" / f"Intron_EB_{files}.pkl")
+    MC.write_pickel(pandas.DataFrame({"Nothing": [0]}), file_dir / f"Exon_EB_{files}.pkl")
+    MC.write_pickel(pandas.DataFrame({"Nothing": [0]}), file_dir / f"Intron_EB_{files}.pkl")
 
     _, exon, intron, _, _, _, _, _, _ = heat.heat_embedding(source_data,
                                                             n = n,
@@ -102,12 +104,12 @@ def collect_data(file_dir: pathlib.Path, source_data: pathlib.Path, n: int = 10_
     exon = pandas.DataFrame(exon)
     exon = heat._reorder_frame(exon)
     exon = MC._unrenormalize(exon, 2*k, log2=False)
-    MC.write_pickel(exon, cwd / "ErrorBars" / f"Exon_EB_{files}.pkl")
+    MC.write_pickel(exon, file_dir / f"Exon_EB_{files}.pkl")
 
     intron = pandas.DataFrame(intron)
     intron = heat._reorder_frame(intron)
     intron = MC._unrenormalize(intron, 2*k, log2=False)
-    MC.write_pickel(intron, cwd / "ErrorBars" / f"Intron_EB_{files}.pkl")
+    MC.write_pickel(intron, file_dir / f"Intron_EB_{files}.pkl")
 
 
 if __name__ in "__main__":

@@ -242,8 +242,8 @@ def moments_v2(file_dir: pathlib.Path,
         fig.set_size_inches(8, 8)
         fig_pd, axs_pd = plt.subplots()
 
-        axs.plot(ms, value, label = f"Exon")
-        axs.plot(ms, mi[key], label = f"Intron")
+        axs.plot(ms, value, label = f"Exon", linestyle = "dashed")
+        axs.plot(ms, mi[key], label = f"Intron", linestyle = "dashdot")
         axs.plot(ms, uni[key], linestyle = "dotted")
         axs.set_title(f"{2*key}-mer")
         axs.set_ylabel(r"$(\sum\rho^{m})^{1/m}$") #, rotation='horizontal')
@@ -264,8 +264,8 @@ def moments_v2(file_dir: pathlib.Path,
 
                 ye_err = list(errors["Exon_STD"])
                 yi_err = list(errors["Intron_STD"])
-                axs.errorbar(x=xs, y=ye, yerr=ye_err, fmt = "none")
-                axs.errorbar(x=xs, y=yi, yerr=yi_err, fmt = "none")
+                axs.errorbar(x=xs, y=ye, yerr=ye_err, fmt = "none", ecolor = "k")
+                axs.errorbar(x=xs, y=yi, yerr=yi_err, fmt = "none", ecolor = "k")
             else:
                 continue
 

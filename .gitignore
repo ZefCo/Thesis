@@ -41,6 +41,7 @@ Thesis.Rproj
 /FractalDimension/Distance_Dict_KTA
 /DataCollection/*.txt
 /ML/Data_Set_1_histogram_6mer_KTA
+/FractalDimension\TE_Images_ForPaper\Error_Data
 
 !/ML/FractalModels/IvE/version_school_linux_*/*
 !/ML/FractalModels/IvE/version_home_windows_*/*
