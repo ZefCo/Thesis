@@ -14,15 +14,25 @@ def main():
     '''
     '''
 
-    mouse = "Mouse"
-    fly = "Fly"
+    # mouse = "Mouse"
+    # fly = "Fly"
     n = 10_000
 
     # species = "Mouse"
     # genome = "mm39"
 
-    species = "Fly"
-    genome = "dm6"
+    # species = "Yeast"
+    # genome = "sacCer3"
+
+    # species = "Frog"
+    # genome = "xenTro9"  # Both Yeast and the Frog data have None in the intron section, and I'm not sure why. Will need to investigate further
+
+    # species = "Chimp"
+    # genome = "panTro6"
+
+    species = "Rat"
+    genome = "rn7"
+
 
     # redo(f"D:\Downloads\GeneData\{species}\Master{species}Dict.pkl", genome, f"D:\Downloads\GeneData\{species}\Fixed_Master{species}Dict.pkl")
     # with open(pathlib.Path(f"D:\Downloads\GeneData\Fly/MasterflyDict.pkl"), "rb") as p:
@@ -44,8 +54,9 @@ def main():
 
     # stitch_dict(f"D:\Downloads\GeneData\{fly}", f"D:\Downloads\GeneData\{fly}\Master{fly}Dict.pkl")
     # stitch_dict(f"D:\Downloads\GeneData\{mouse}", f"D:\Downloads\GeneData\{mouse}\Master{mouse}Dict.pkl")
-    select_data(f"D:\Downloads\GeneData\{fly}\Fixed_Master{fly}Dict.pkl", f"D:\Downloads\GeneData\{fly}\Selected{fly}Dict", n  = n)
-    select_data(f"D:\Downloads\GeneData\{mouse}\Fixed_Master{mouse}Dict.pkl", f"D:\Downloads\GeneData\{mouse}\Selected{mouse}Dict", n  = n)
+    # select_data(f"D:\Downloads\GeneData\{fly}\Fixed_Master{fly}Dict.pkl", f"D:\Downloads\GeneData\{fly}\Selected{fly}Dict", n  = n)
+    # select_data(f"D:\Downloads\GeneData\{mouse}\Fixed_Master{mouse}Dict.pkl", f"D:\Downloads\GeneData\{mouse}\Selected{mouse}Dict", n  = n)
+    select_data(f"D:\Downloads\GeneData\{species}\Known_Genes_{genome}_DICT_0.pkl", f"D:\Downloads\GeneData\{species}\Selected{species}Dict", n  = n)
 
 
 def redo(file_path: pathlib.Path, genome: str, new_file_path: pathlib.Path):
@@ -134,12 +145,12 @@ def convert2dataframe(dictionary: dict, report_file: pathlib.Path, min_length: i
 
     You can pre-apply the histogram method if you want.
     '''
+    # print("~~~ Convert 2 Frame method ~~~")
     gene: Gene.Gene
 
     genetic: pandas.DataFrame = pandas.DataFrame(columns = columns)
     with open(report_file, "w+") as txtf:  # I want a report of what I am generating.
         for ncib, gene in dictionary.items():
-            max_length = 0
 
             if isinstance(gene.exon_seq, list) and isinstance(gene.intron_seq, list):
 
@@ -147,24 +158,40 @@ def convert2dataframe(dictionary: dict, report_file: pathlib.Path, min_length: i
                 txtf.write(gene_data_line)
                 exon_count, intron_count = 0, 0
 
-                for e in gene.exon_seq:
-                    if isinstance(e, str):
-                        exon_count += 1
+                # for e in gene.exon_seq:
+                #     if isinstance(e, str):
+                #         exon_count += 1
 
-                        exon_len = len(e)
-                        if exon_len >= min_length:
-                            exon_data_line = f"Exon {exon_count}: {exon_len}\n"
-                            txtf.write(exon_data_line)
+                #         exon_len = len(e)
+                #         if exon_len >= min_length:
+                #             exon_data_line = f"Exon {exon_count}: {exon_len}\n"
+                #             txtf.write(exon_data_line)
 
-                            if exon_len >= max_length:
-                                max_length = exon_len
+                #             if exon_len <= max_length:
+                #                 max_length = exon_len
 
-                            new_row = {f"{columns[0]}": [ncib], f"{columns[1]}": ["exon"], f"{columns[2]}": [e]}
-                            new_row = pandas.DataFrame(new_row)
-                            genetic = pandas.concat([genetic, new_row], axis = 0, ignore_index = True)
+                #             new_row = {f"{columns[0]}": [ncib], f"{columns[1]}": ["exon"], f"{columns[2]}": [e]}
+                #             new_row = pandas.DataFrame(new_row)
+                #             genetic = pandas.concat([genetic, new_row], axis = 0, ignore_index = True)
 
                 
                 if histogram:
+                    # print("!!! Histogram !!!")
+                    max_length = longest(gene.exon_seq, gene.intron_seq)
+
+                    for e in gene.exon_seq:
+                        if isinstance(e, str):
+                            exon_count += 1
+                            exon_len = len(e)
+
+                            if (max_length >= exon_len) and (exon_len >= min_length):
+                                exon_data_line = f"Exon {exon_count}: {exon_len}\n"
+                                txtf.write(exon_data_line)
+
+                                new_row = {f"{columns[0]}": [ncib], f"{columns[1]}": ["exon"], f"{columns[2]}": [e]}
+                                new_row = pandas.DataFrame(new_row)
+                                genetic = pandas.concat([genetic, new_row], axis = 0, ignore_index = True)
+
                     for i in gene.intron_seq:
                         if isinstance(i, str):
                             intron_count += 1
@@ -177,7 +204,22 @@ def convert2dataframe(dictionary: dict, report_file: pathlib.Path, min_length: i
                                 new_row = {f"{columns[0]}": [ncib], f"{columns[1]}": ["intron"], f"{columns[2]}": [e]}
                                 new_row = pandas.DataFrame(new_row)
                                 genetic = pandas.concat([genetic, new_row], axis = 0, ignore_index = True)
+
                 else:
+                    # print("### Not Histogram ###")
+                    for e in gene.exon_seq:
+                        if isinstance(e, str):
+                            exon_count += 1
+                            exon_len = len(e)
+
+                            if exon_len >= min_length:
+                                exon_data_line = f"Exon {exon_count}: {exon_len}\n"
+                                txtf.write(exon_data_line)
+
+                                new_row = {f"{columns[0]}": [ncib], f"{columns[1]}": ["exon"], f"{columns[2]}": [e]}
+                                new_row = pandas.DataFrame(new_row)
+                                genetic = pandas.concat([genetic, new_row], axis = 0, ignore_index = True)
+
                     for i in gene.intron_seq:
                         if isinstance(i, str):
                             intron_count += 1
@@ -190,7 +232,6 @@ def convert2dataframe(dictionary: dict, report_file: pathlib.Path, min_length: i
                                 new_row = {f"{columns[0]}": [ncib], f"{columns[1]}": ["intron"], f"{columns[2]}": [e]}
                                 new_row = pandas.DataFrame(new_row)
                                 genetic = pandas.concat([genetic, new_row], axis = 0, ignore_index = True)
-
 
     return genetic
 
@@ -233,6 +274,26 @@ def clean_dict(dictionary: dict, report_file: pathlib.Path, min_length: int = 10
                 clean_dictionary[ncib] = gene
     
     return clean_dictionary
+
+
+
+def longest(exon_list: list, intron_list: list) -> int:
+    '''
+    Finds the longest sequence, be it exon or intron. This is then used to limit which sequences are filtered.
+    '''
+    long_seq = 0
+    exon_list = tuple(exon_list)
+    intron_list = tuple(intron_list)
+
+    for exon in exon_list:
+        if len(exon) > long_seq:
+            long_seq = len(exon)
+
+    for intron in intron_list:
+        if len(intron) > long_seq:
+            long_seq = len(intron)
+
+    return long_seq
 
 
 

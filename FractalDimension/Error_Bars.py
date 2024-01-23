@@ -28,7 +28,7 @@ def plot_with_error(errors: list):
     '''
     ms = [n / 100 for n in range(int(100*(0.5)), int(100*2) + 1)]
 
-    MC.moments_v2(cwd / "Dicts", ms, min_k = 6, max_k = 6, N_value = True, x_ticks = {0.5: 0.5, 1.0: 1.0, 1.5: 1.5, 2.0: 2.0}, error_bars = errors, )
+    MC.moments_v2(cwd / "Dicts", ms, min_k = 6, max_k = 6, N_value = True, x_ticks = {0.5: 0.5, 1.0: 1.0, 1.5: 1.5, 2.0: 2.0}, error_bars = errors, y_ticks={0: 0, 5: 5})
 
 
 def error_data(sub_data_dir: pathlib.Path, sub_moments: list, k: int = 6, pickle_save: pathlib.Path = None) -> pandas.DataFrame:

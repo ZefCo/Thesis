@@ -52,7 +52,9 @@ def main():
     '''
     # score_keys(k = 6)
     # exit()
-    species = "Mouse"
+    # species = "Mouse"
+    # species = "Chimp"
+    species = "Rat"
     # species = "Fly"
 
     linux_path = f"/media/ethanspeakman/Elements/"

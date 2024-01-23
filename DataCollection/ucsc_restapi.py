@@ -5,11 +5,15 @@ import requests
 import pandas
 import RQuery
 from typing import Tuple
+import pathlib
+cwd = pathlib.Path.cwd()
 
 
 def main():
     '''
     For playing around with different tracks and urls
+
+    https://genome.ucsc.edu/goldenPath/help/api.html
     '''
     # # url_gen = UCSCURLGenerator()
 
@@ -19,24 +23,75 @@ def main():
     # # _, seqURL = ens_tracks(chrom = "chr1", start = 94140169, end = 94140169 + 317)
     # # print(seqURL)
 
-    baseURL, trackURL, *_ = base_urls()
-    trackURL = f"{baseURL}{trackURL}?genome=m39"
-    print(trackURL)
+
 
     # geneid_url = geneid_track(chrom = "chr1", start = 94140169, end = 94140169 + 317)
     # print(geneid_url)
+    # print_genomes(cwd / "Genome_list.csv")
+    print_chromes("sacCer3")
+    
 
-
-def base_urls():
+def print_chromes(genome: str):
     '''
+    Prints to console the avalible chromosome
+    '''
+    baseURL, _, _, list_chromes, *_ = base_urls()
+    chromURL = f"{baseURL}{list_chromes}?genome={genome}"
+
+    chromes = RQuery.query(chromURL)
+    chromes = convertRequest(chromes, dict_return=True)
+    chromes = chromes["chromosomes"]
+    chromes_List = list(chromes.keys())
+    print(f"All avalible chromosomes for {genome}:")
+    for chrom in chromes_List:
+        print(f"\t{chrom}")
+    
+    print(f"URL Used:\n{chromURL}")
+
+
+def print_genomes(file_path: pathlib.Path):
+    '''
+    Outputs all avalible genomes into a csv file
+    '''
+    baseURL, _, list_genomes, *_ = base_urls()
+    listURL = f"{baseURL}{list_genomes}"
+    genomes = RQuery.query(listURL)
+    genomes = convertRequest(genomes, dict_return=True)
+    genomes = genomes["ucscGenomes"]
+    # print(type(genomes))
+    col_names = ["Organism", "Genome", "Scientific Name"]
+    Genomes = pandas.DataFrame("None", columns = col_names, index = list(genomes.keys()))
+
+    for key, subdict in genomes.items():
+        org = subdict["organism"]
+        gen = subdict["genome"]
+        sci = subdict["scientificName"]
+
+        Genomes.loc[key, col_names[0]] = org
+        Genomes.loc[key, col_names[1]] = gen
+        Genomes.loc[key, col_names[2]] = sci
+
+    Genomes.to_csv(file_path)
+
+
+def base_urls() -> Tuple[str, str, str, str, str, str]:
+    '''
+    Lists out the endpoint function URLs
+
+    Order is: base, list of tracks, list of genomes, list of chromes, get data track, get data sequence
     '''
 
     base_url = f'https://api.genome.ucsc.edu/'
+
     list_tracks = "list/tracks"
+    list_genomes = "/list/ucscGenomes"
+    list_chroms = "/list/chromosomes"
+
     get_track = "getData/track"
     get_sequence = "getData/sequence"
 
-    return base_url, list_tracks, get_track, get_sequence
+
+    return base_url, list_tracks, list_genomes, list_chroms, get_track, get_sequence
 
 
 def compliment_strand(sequence: str) -> str:
@@ -101,7 +156,7 @@ def enst_tracks_url(genome: str = "hg19", chrom: str = None, start: int = None, 
     '''
     '''
     # can't really partial unpack here because of it's position
-    base_url, _, get_track, _ = base_urls()
+    base_url, _, _, _, get_track, _ = base_urls()
     ens_url = "track=ensGene"
 
     genome = f"genome={genome}"
@@ -122,7 +177,7 @@ def geneid_track(genome: str = "hg19", chrom: str = None, start: int = None, end
     '''
     '''
 
-    base_url, _, get_track, _ = base_urls()
+    base_url, _, _, _, get_track, _ = base_urls()
     geneid_url = "track=geneid"
 
     genome = f"genome={genome}"
@@ -215,8 +270,9 @@ def convert2frame(track: list) -> pandas.DataFrame:
     return track_frame
 
 
-def convertRequest(query: requests.Response) -> pandas.DataFrame or str:
+def convertRequest(query: requests.Response, dict_return: bool = False) -> pandas.DataFrame or str:
     '''
+    Converts the query reponse to a dataframe, or a dict if that's more convinent, but you have to tell it to do that.
     '''
     try:
         track: dict = json.loads(query.text)
@@ -228,6 +284,8 @@ def convertRequest(query: requests.Response) -> pandas.DataFrame or str:
         print(e)
         exit()
 
+    if dict_return:
+        return track
     # print("No error, exiting")
     # exit()
 

@@ -246,9 +246,9 @@ def moments_v2(file_dir: pathlib.Path,
         axs.plot(ms, mi[key], label = f"Intron", linestyle = "dashdot")
         axs.plot(ms, uni[key], linestyle = "dotted")
         axs.set_title(f"{2*key}-mer")
-        axs.set_ylabel(r"$(\sum\rho^{m})^{1/m}$") #, rotation='horizontal')
-        axs.set_xlabel(r"$m$")
-        axs.legend()
+        axs.set_ylabel(r"$\gamma(m)$", fontsize = 30) #, rotation='horizontal')
+        axs.set_xlabel(r"$m$", fontsize = 30)
+        axs.legend(prop = {"size": 30})
 
         if isinstance(error_bars, list):
             errors: pandas.DataFrame = error_bars[i]
@@ -277,8 +277,8 @@ def moments_v2(file_dir: pathlib.Path,
         if isinstance(y_ticks, dict):
             axs.set_yticks(list(y_ticks.keys()))
             axs.set_yticklabels(list(y_ticks.values()))
-        else:
-            axs.set_yticks([])
+        # else:
+        #     axs.set_yticks([])
 
         # axs.yaxis.set_label_coords(-0.0, 0.5)
 
@@ -615,40 +615,44 @@ def multiple_species_plots(ms: list, me: dict, mi: dict, uni: dict, output_dir: 
 
     uni should be another dict, but in the form similar to other plots. I'm lazy so... deal with it.
     '''
-    subdict: dict
     plt.rc("font", size = 20)
     plt.rc('axes', linewidth = 2)
 
     fig, axs = plt.subplots()
     fig.set_size_inches(8, 8)
 
-    for species, subdict in me.items():
+    for species, items in me.items():
         print(f"Species = {species}")
+        subdict: dict = items["data"]
         for key, value in subdict.items():
-            print(f"plotting for {2*key}-mer")
+            ms_markers = ms[::5]
+            me_markers = value[::5]
+            mi_markers = mi[species]["data"][key][::5]
 
-
-            axs.plot(ms, value, label = f"Exon - {species}")
-            axs.plot(ms, mi[species][key], label = f"Intron - {species}")
+            # axs.plot(ms, value)
+            axs.plot(ms_markers, me_markers, label = f"Exon - {species}", marker = items["marker"], markersize = 5)
+            # axs.plot(ms, mi[species]["data"][key])
+            axs.plot(ms_markers, mi_markers, label = f"Intron - {species}", marker = mi[species]["marker"], markersize = 5)
             axs.plot(ms, uni[key], linestyle = "dotted")
         
-            axs.set_title(f"{2*key}-mer")
-            axs.set_ylabel(r"$(\sum\rho^{m})^{1/m}$") #, rotation='horizontal')
-            axs.set_xlabel(r"$m$")
-            axs.legend()
+        print(f"plotting for {2*key}-mer")
+        axs.set_title(f"{2*key}-mer")
+        axs.set_ylabel(r"$\gamma(m)$", fontsize = 30) #, rotation='horizontal')
+        axs.set_xlabel(r"$m$", fontsize = 30)
+        axs.legend()
+        
+        if isinstance(x_ticks, dict):
+            axs.set_xticks(list(x_ticks.keys()))
+            axs.set_xticklabels(list(x_ticks.values()))
+        else:
+            axs.set_xticks([])
+        if isinstance(y_ticks, dict):
+            axs.set_yticks(list(y_ticks.keys()))
+            axs.set_yticklabels(list(y_ticks.values()))
+        else:
+            axs.set_yticks([])
 
-            if isinstance(x_ticks, dict):
-                axs.set_xticks(list(x_ticks.keys()))
-                axs.set_xticklabels(list(x_ticks.values()))
-            else:
-                axs.set_xticks([])
-            if isinstance(y_ticks, dict):
-                axs.set_yticks(list(y_ticks.keys()))
-                axs.set_yticklabels(list(y_ticks.values()))
-            else:
-                axs.set_yticks([])
-
-            fig.savefig(output_dir / f"{2*key}-mer")
+        fig.savefig(output_dir / f"{2*key}-mer")
 
 
 
