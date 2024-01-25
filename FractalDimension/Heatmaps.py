@@ -22,6 +22,8 @@ from typing import Tuple
 
 def main():
     '''
+    Note to self: re do this main section so that it's not utter chaos+
+
     Create a heat map: X = past, Y = future, Z = count. So count the occurences of a k-mer - to k-mer +.
     '''
     # fly bounds
@@ -85,10 +87,14 @@ def main():
     # # # bounds: list = [0, 0.15, 0.45, 0.85, 1.26, 1.96] # 0.95
     # # # bounds: list = [0, 0.15, 0.45, 0.85, 1.26, 1.7] # 0.92
 
-    # k = 6
+    k = 6
+    # colors: list = ['darkred', 'orangered', 'green', 'lime']
+    colors: list = ['green', 'orange', 'orangered', 'red']
+    bounds: list = [0, 0.452, 1.45, 2.36, 3.2] # 0.98
+
     # measure_target = 0.01
-    colors: list = ['black', 'darkred', 'firebrick', 'red', 'orange', 'gold', 'yellow']
-    bounds: list = [0, 0.452, 0.85, 1.45, 1.85, 2.36, 3.2] # 0.98
+    # colors: list = ['black', 'darkred', 'firebrick', 'red', 'orange', 'gold', 'yellow']
+    # bounds: list = [0, 0.452, 0.85, 1.45, 1.85, 2.36, 3.2] # 0.98
     # # # bounds: list = [0, 0.75, 1.05, 1.45, 1.859, 2.462, 3.165]
     # # # bounds: list = [0, 0.754, 1.056, 1.457, 1.859, 2.462, 3.165] # 0.95
     # # # bounds: list = [0, 0.754, 1.056, 1.457, 1.859, 2.462, 3.165] # 0.92
@@ -111,15 +117,15 @@ def main():
     # data_file = cwd / "TE_Images_ForPaper" / "Dict" / "Seq_For_Images_n100000_minLength12.pkl"
     data_file = cwd / "TE_Images_ForPaper" / "Dict" / "Fly_Seq_For_Images.pkl"
 
-    _, exon, intron, _, _, exon_max, exon_min, intron_max, intron_min = heat_embedding(data_file,
-                                                                                       n = n,
-                                                                                       k_m = k, k_p = k,
-                                                                                       just_import = True,
-                                                                                       log_transform = transform, 
-                                                                                       nucsequence = nucsequence)  # Just import is turned on because I have one dictionary with all the data. I'll use that one set for all the images from now on. Just makes things a little faster and easier.
+    # _, exon, intron, _, _, exon_max, exon_min, intron_max, intron_min = heat_embedding(data_file,
+    #                                                                                    n = n,
+    #                                                                                    k_m = k, k_p = k,
+    #                                                                                    just_import = True,
+    #                                                                                    log_transform = transform, 
+    #                                                                                    nucsequence = nucsequence)  # Just import is turned on because I have one dictionary with all the data. I'll use that one set for all the images from now on. Just makes things a little faster and easier.
 
-    # exon = _import_data(exon_file, just_import=True)
-    # intron = _import_data(intron_file, just_import=True)
+    exon = _import_data(exon_file, just_import=True)
+    intron = _import_data(intron_file, just_import=True)
     # intron_max, intron_min = min_max(intron)
 
     # cticks = [((intron_max - 0) / cbins)*i for i in range(cbins)]
@@ -128,13 +134,13 @@ def main():
     file_details = title_details.replace(" ", "")
     # print(exon)
 
-    measure_target = [0.2, 0.4, 0.6, 0.8, 0.9, 0.92, 0.95, 0.98, 0.99]
-    pdf_cdf(exon, intron,
-            measure_target = measure_target,
-            transpose = True,
-            pdf_title = f"Fly PDF for {2*k}mer", pdf_outpath = cwd / "TE_Images_ForPaper" / "Histograms" / f"Fly_PDF_{2*k}mer_JT_001.png",
-            cdf_title = f"Fly CDF for {2*k}mer", cdf_outpath = cwd / "TE_Images_ForPaper" / "Histograms" / f"Fly_CDF_{2*k}mer_JT_001.png")
-    exit()
+    # measure_target = [0.2, 0.4, 0.6, 0.8, 0.9, 0.92, 0.95, 0.98, 0.99]
+    # pdf_cdf(exon, intron,
+    #         measure_target = measure_target,
+    #         transpose = True,
+    #         pdf_title = f"Fly PDF for {2*k}mer", pdf_outpath = cwd / "TE_Images_ForPaper" / "Histograms" / f"Fly_PDF_{2*k}mer_JT_001.png",
+    #         cdf_title = f"Fly CDF for {2*k}mer", cdf_outpath = cwd / "TE_Images_ForPaper" / "Histograms" / f"Fly_CDF_{2*k}mer_JT_001.png")
+    # exit()
 
     # # master_max, master_min = min_max(master)
     # print(f"Master Max = {minmax[0]}\tMaster Min = {minmax[1]}")
@@ -162,10 +168,10 @@ def main():
     
     heatmapv2(exon, colors = colors, bounds = bounds, 
     x_title = f"Anterior {k}-mer", y_title = f"Posterior {k}-mer",
-    title = f"Exon Equal Area Heatmap\n{2*k}mer", fileoutput = cwd / "TE_Images_ForPaper" / "Heatmaps" / "EA" / f"Exon_HEA_DS{data_set}_n{n}_{k*2}mer_{file_details}.png")
+    title = f"Exon Equal Area Heatmap\n{2*k}mer", fileoutput = cwd / "TE_Images_ForPaper" / "Heatmaps" / "EA" / f"Exon_HEA_DS{data_set}_n{n}_{k*2}mer_{file_details}_FDG_v2.png")
     heatmapv2(intron, colors = colors, bounds = bounds, 
     x_title = f"Anterior {k}-mer", y_title = f"Posterior {k}-mer",
-    title = f"Intron Equal Area Heatmap\n{2*k}mer", fileoutput = cwd / "TE_Images_ForPaper" / "Heatmaps" / "EA" / f"Intron_HEA_DS{data_set}_n{n}_{k*2}mer_{file_details}.png")
+    title = f"Intron Equal Area Heatmap\n{2*k}mer", fileoutput = cwd / "TE_Images_ForPaper" / "Heatmaps" / "EA" / f"Intron_HEA_DS{data_set}_n{n}_{k*2}mer_{file_details}_FDG_v2.png")
     exit()
 
 

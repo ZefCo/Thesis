@@ -23,13 +23,25 @@ def main():
 
     Stopped at 40587 at school. Stopped at a different number at home. Both from a json decode error.
     '''
-    start_gene = 20083
-    genome = "mm39"
-    species = "Mouse"
+    # start_gene = 20083
+    # genome = "mm39"
+    # species = "Mouse"
+
+    # start_gene = 0
+    # genome = "xenTro9"
+    # species = "Frog"
 
     # start_gene = 16761
     # genome = "dm6"
     # species = "Fly"
+
+    # start_gene = 0
+    # genome = "rn7"
+    # species = "Rat"
+
+    start_gene = 0
+    genome = "sacCer3"
+    species = "Yeast"
 
     # dict_screwup()
     # pickle_file, csv_file = getKnownGene()
@@ -42,7 +54,8 @@ def main():
                    pathlib.Path(f"D:/Downloads/GeneData/{species}/Known_Genes_{genome}_DICT_{start_gene}.pkl"), 
                    ref_track="ncib",
                    gene_start = start_gene,
-                   species = species)
+                   species = species,
+                   genome = genome)
 
 
 def dict_screwup():
@@ -129,7 +142,7 @@ def getKnownGene(genome = "hg19", track = "ncbiRefSeqCurated", chroms: list = No
 
 
 
-def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track = "ncib", gene_start = 0, species: str = "human"):
+def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track = "ncib", gene_start = 0, species: str = "human", genome: str = "hg19"):
     '''
     This will go to UCSC Genome Browser and grab all HG19 genes, then save them in a pickle file. They will not be chopped up, but instead will
     be preserved in all their glory for chopping up later.
@@ -211,7 +224,8 @@ def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track
                                            exonCount = row_of_interest["exonCount"],
                                            exonStarts = row_of_interest["exonStarts"],
                                            exonEnds = row_of_interest["exonEnds"],
-                                           exonFrames = row_of_interest["exonFrames"])
+                                           exonFrames = row_of_interest["exonFrames"],
+                                           genome=genome)
         try:
             gene_of_interest.sequence_breakdown()
         except Exception as e:
