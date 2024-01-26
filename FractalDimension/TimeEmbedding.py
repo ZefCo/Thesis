@@ -464,10 +464,10 @@ def time_embedding(sequence: str,
         w_p.reverse()
 
 
-    xy = np.zeros(shape=(seq_length - (k_p + k_m + gap), 2))
+    xy = np.zeros(shape=(seq_length - (k_p + k_m + gap) + 1, 2))
 
-    k_minus = [sequence[k_prime:k_prime + k_m] for k_prime in range(0, seq_length - (k_p + k_m + gap))]
-    k_plus = [sequence[k_prime:k_prime + k_p] for k_prime in range(gap + k_m, seq_length - k_p)]
+    k_minus = [sequence[k_prime:k_prime + k_m] for k_prime in range(0, seq_length - (k_p + k_m + gap) + 1)]
+    k_plus = [sequence[k_prime:k_prime + k_p] for k_prime in range(gap + k_m, seq_length - k_p + 1)]
 
     # if compliment:  # probably should never be used.
     #     for i, k_prime in enumerate(k_minus):

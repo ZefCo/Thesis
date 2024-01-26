@@ -154,7 +154,7 @@ def convert2dataframe(dictionary: dict, report_file: pathlib.Path, min_length: i
 
             if isinstance(gene.exon_seq, list) and isinstance(gene.intron_seq, list):
 
-                gene_data_line = f"{gene.name}\t{gene.ename}\t{gene.gname}\t{gene.ncibname}\nChrome: {gene.chrm}\tStrand: {gene.strand}\nReminder: Index here starts at 1\n\n"
+                gene_data_line = f"---\n{gene.name}\t{gene.ename}\t{gene.gname}\t{gene.ncibname}\nChrome: {gene.chrm}\tStrand: {gene.strand}\nReminder: Index here starts at 1\n\n"
                 txtf.write(gene_data_line)
                 exon_count, intron_count = 0, 0
 
