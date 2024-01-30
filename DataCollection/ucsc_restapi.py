@@ -27,8 +27,8 @@ def main():
 
     # geneid_url = geneid_track(chrom = "chr1", start = 94140169, end = 94140169 + 317)
     # print(geneid_url)
-    # print_genomes(cwd / "Genome_list.csv")
-    print_chromes("sacCer3")
+    print_genomes(cwd / "Genome_list.csv", cwd / "Detailed_Genome.csv")
+    # print_chromes("sacCer3")
     
 
 def print_chromes(genome: str):
@@ -49,7 +49,7 @@ def print_chromes(genome: str):
     print(f"URL Used:\n{chromURL}")
 
 
-def print_genomes(file_path: pathlib.Path):
+def print_genomes(file_path_1: pathlib.Path, file_path_2: pathlib.Path):
     '''
     Outputs all avalible genomes into a csv file
     '''
@@ -58,7 +58,7 @@ def print_genomes(file_path: pathlib.Path):
     genomes = RQuery.query(listURL)
     genomes = convertRequest(genomes, dict_return=True)
     genomes = genomes["ucscGenomes"]
-    # print(type(genomes))
+
     col_names = ["Organism", "Genome", "Scientific Name"]
     Genomes = pandas.DataFrame("None", columns = col_names, index = list(genomes.keys()))
 
@@ -71,7 +71,20 @@ def print_genomes(file_path: pathlib.Path):
         Genomes.loc[key, col_names[1]] = gen
         Genomes.loc[key, col_names[2]] = sci
 
-    Genomes.to_csv(file_path)
+    unqiue_species = tuple(Genomes["Scientific Name"].unique())
+    col_names = ["Scientific Name", "Domain", "Kingdom", "Phylum", "Class", "Order", "Family", "Genius", "Common Name", "Latest Genome", "Wiki"]
+    Detailed_Genome = pandas.DataFrame("None", columns = col_names, index = unqiue_species)
+
+    for s, species in enumerate(unqiue_species):
+        subGenomes: pandas.DataFrame = Genomes[Genomes["Scientific Name"] == species]
+        subGenomes = subGenomes.reset_index()
+        subrow, subcol = subGenomes.shape
+
+        Detailed_Genome.loc[species, "Common Name"] = subGenomes.loc[subrow - 1, "Organism"]
+        Detailed_Genome.loc[species, "Latest Genome"] = subGenomes.loc[subrow - 1, "index"]
+
+    Genomes.to_csv(file_path_1)
+    Detailed_Genome.to_csv(file_path_2)
 
 
 def base_urls() -> Tuple[str, str, str, str, str, str]:
