@@ -39,10 +39,47 @@ def main():
     # genome = "rn7"
     # species = "Rat"
 
-    start_gene = 0
-    genome = "sacCer3"
-    species = "Yeast"
+    # start_gene = 0
+    # genome = "sacCer3"
+    # species = "Yeast"
 
+    # start_gene = 0
+    # genome = "calJac4"
+    # species = "Callithrix_jacchus"
+
+    # start_gene = 0
+    # genome = "gorGor6"
+    # species = "Gorilla_gorilla_gorilla"
+
+    # start_gene = 0
+    # genome = "macFas5"
+    # species = "Macaca_fascicularis"
+
+    # start_gene = 0
+    # genome = "rheMac8"
+    # species = "Macaca_mulatta"
+
+    # start_gene = 0
+    # genome = "nomLeu3"
+    # species = "Nomascus_leucogenys"
+
+    # start_gene = 0
+    # genome = "panPan3"
+    # species = "Pan_paniscus"
+
+    # start_gene = 0
+    # genome = "panTro6"
+    # species = "Pan_troglodytes"
+
+    # start_gene = 0
+    # genome = "papAnu4"
+    # species = "Papio_anubis"
+
+    start_gene = 0
+    genome = "ponAbe3"
+    species = "Pongo_pygmaeus_abelii"
+
+    output_file = cwd.parent / "Data_Files" / "Primates" / "Genetics" / f"{species}" / f"Known_Genes_{genome}_DICT_{start_gene}.pkl"
     # dict_screwup()
     # pickle_file, csv_file = getKnownGene()
     # hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19.csv",
@@ -50,8 +87,9 @@ def main():
     #                ref_track="ncib",
     #                gene_start = start_gene)
     # hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19_ncbiRefSeqCurated.pkl")
-    hg19_sequences(cwd.parent / "Data_Files" / species / f"Known_Genes_{genome}.csv",
-                   pathlib.Path(f"D:/Downloads/GeneData/{species}/Known_Genes_{genome}_DICT_{start_gene}.pkl"), 
+
+    hg19_sequences(cwd.parent / "Data_Files" / "Primates" / "Known_Genes" / species / f"Known_Genes_{genome}.csv",
+                   output_file, 
                    ref_track="ncib",
                    gene_start = start_gene,
                    species = species,
@@ -194,7 +232,9 @@ def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track
     known_genes["exonCount"] = known_genes["exonCount"].fillna(0)
 
     known_genes = known_genes[known_genes["cdsStartStat"] == "cmpl"]
+    known_genes = known_genes[known_genes["cdsEndStat"] == "cmpl"]
     known_genes = known_genes[known_genes["exonCount"] >= 1]
+    known_genes = known_genes[known_genes["strand"] == "+"]
 
     # print(known_genes)
     # exit()
