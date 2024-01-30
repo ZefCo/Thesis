@@ -1,0 +1,3 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=ochPri3
+Species: Ochotona princeps

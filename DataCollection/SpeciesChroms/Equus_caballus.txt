@@ -1,0 +1,35 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=equCab3
+Species: Equus caballus
+	chr1
+	chr31
+	chr30
+	chr29
+	chr12
+	chr27
+	chr25
+	chr26
+	chr13
+	chr28
+	chr24
+	chr22
+	chr23
+	chr21
+	chr11
+	chr19
+	chr20
+	chr17
+	chr18
+	chr10
+	chr9
+	chr6
+	chr16
+	chr15
+	chr14
+	chr5
+	chr8
+	chr7
+	chr4
+	chr2
+	chr3
+	chrX

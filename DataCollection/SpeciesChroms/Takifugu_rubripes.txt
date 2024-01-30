@@ -1,0 +1,25 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=fr3
+Species: Takifugu rubripes
+	chr1
+	chr18
+	chr10
+	chr6
+	chr16
+	chr12
+	chr17
+	chr11
+	chr2
+	chr15
+	chr22
+	chr5
+	chr14
+	chr3
+	chr20
+	chr4
+	chr9
+	chr19
+	chr7
+	chr8
+	chr21
+	chr13

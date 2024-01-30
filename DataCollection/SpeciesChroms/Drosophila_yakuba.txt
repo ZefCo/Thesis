@@ -1,0 +1,15 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=droYak2
+Species: Drosophila yakuba
+	chr4
+	chrYh
+	chrXh
+	chr3h
+	chrUh
+	chr2h
+	chr2R
+	chrX
+	chr2L
+	chr3L
+	chrU
+	chr3R

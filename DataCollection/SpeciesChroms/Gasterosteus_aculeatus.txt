@@ -1,0 +1,24 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=gasAcu1
+Species: Gasterosteus aculeatus
+	chrI
+	chrXXI
+	chrV
+	chrXVII
+	chrXIV
+	chrX
+	chrXV
+	chrXVIII
+	chrXI
+	chrIII
+	chrVI
+	chrXVI
+	chrXII
+	chrVIII
+	chrXX
+	chrXIII
+	chrXIX
+	chrIX
+	chrII
+	chrVII
+	chrIV

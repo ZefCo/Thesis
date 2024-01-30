@@ -1,0 +1,20 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=dp3
+Species: Drosophila pseudoobscura
+	chr2
+	chrXL_group3b
+	chrXR_group5
+	chr4_group2
+	chrXR_group3a
+	chr4_group5
+	chrXL_group3a
+	chr4_group1
+	chr4_group4
+	chrXR_group6
+	chrXR_group9
+	chrXL_group1a
+	chrXR_group8
+	chr4_group3
+	chrXL_group1e
+	chrU
+	chr3

@@ -1,0 +1,28 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=panTro6
+Species: Pan troglodytes
+	chr1
+	chrY
+	chr21
+	chr22
+	chr19
+	chr20
+	chr18
+	chr16
+	chr17
+	chr15
+	chr14
+	chr13
+	chr2A
+	chr9
+	chr2B
+	chr10
+	chr11
+	chr12
+	chr8
+	chrX
+	chr7
+	chr5
+	chr6
+	chr4
+	chr3

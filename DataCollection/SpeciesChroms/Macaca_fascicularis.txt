@@ -1,0 +1,24 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=macFas5
+Species: Macaca fascicularis
+	chr1
+	chr19
+	chr18
+	chr20
+	chr16
+	chr10
+	chr17
+	chr13
+	chr15
+	chr14
+	chr12
+	chr9
+	chr11
+	chr8
+	chrX
+	chr4
+	chr7
+	chr6
+	chr5
+	chr3
+	chr2

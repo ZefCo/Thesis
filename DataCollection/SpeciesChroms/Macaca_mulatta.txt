@@ -1,0 +1,25 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=rheMac8
+Species: Macaca mulatta
+	chr1
+	chrY
+	chr19
+	chr18
+	chr20
+	chr16
+	chr10
+	chr17
+	chr13
+	chr15
+	chr12
+	chr14
+	chr9
+	chr11
+	chr8
+	chrX
+	chr7
+	chr4
+	chr6
+	chr3
+	chr5
+	chr2

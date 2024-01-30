@@ -1,0 +1,3 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=droSec1
+Species: Drosophila sechellia

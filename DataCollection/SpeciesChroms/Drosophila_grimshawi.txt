@@ -1,0 +1,3 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=droGri1
+Species: Drosophila grimshawi

@@ -1,0 +1,35 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=melGal5
+Species: Meleagris gallopavo
+	chr1
+	chrW
+	chr18
+	chr27
+	chr24
+	chr29
+	chr30
+	chr28
+	chr25
+	chr26
+	chr23
+	chr21
+	chr19
+	chr20
+	chr17
+	chr22
+	chr16
+	chr15
+	chr9
+	chr13
+	chr14
+	chr12
+	chr11
+	chr10
+	chr8
+	chr7
+	chr6
+	chr5
+	chrZ
+	chr4
+	chr3
+	chr2
