@@ -1,0 +1,21 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=xenLae2
+Species: Xenopus laevis
+	chr1L
+	chr7S
+	chr8S
+	chr9_10S
+	chr9_10L
+	chr8L
+	chr3S
+	chr4S
+	chr7L
+	chr6S
+	chr5S
+	chr4L
+	chr3L
+	chr6L
+	chr5L
+	chr2S
+	chr1S
+	chr2L

@@ -1,0 +1,12 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=monDom5
+Species: Monodelphis domestica
+	chr1
+	chrX
+	chr7
+	chr6
+	chr5
+	chr8
+	chr4
+	chr3
+	chr2

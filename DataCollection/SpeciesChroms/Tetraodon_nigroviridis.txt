@@ -1,0 +1,24 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=tetNig2
+Species: Tetraodon nigroviridis
+	chr20
+	chr21
+	chr6
+	chr19
+	chr15
+	chr16
+	chr4
+	chr14
+	chr8
+	chr9
+	chr18
+	chr7
+	chr11
+	chr17
+	chr12
+	chr10
+	chr13
+	chr5
+	chr3
+	chr2
+	chr1

@@ -1,0 +1,37 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=galGal6
+Species: Gallus gallus
+	chr1
+	chr32
+	chr30
+	chr16
+	chr25
+	chr28
+	chr22
+	chr26
+	chr23
+	chr31
+	chr24
+	chrW
+	chr21
+	chr33
+	chr27
+	chr19
+	chr17
+	chr18
+	chr15
+	chr20
+	chr14
+	chr13
+	chr11
+	chr12
+	chr10
+	chr9
+	chr8
+	chr6
+	chr7
+	chr5
+	chrZ
+	chr4
+	chr3
+	chr2

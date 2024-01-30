@@ -1,0 +1,22 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=ornAna2
+Species: Ornithorhynchus anatinus
+	chr3
+	chr17
+	chr20
+	chr14
+	chr15
+	chrX2
+	chrX3
+	chr18
+	chr11
+	chr10
+	chr12
+	chr6
+	chr5
+	chrX5
+	chr7
+	chrX1
+	chr1
+	chr2
+	chr4

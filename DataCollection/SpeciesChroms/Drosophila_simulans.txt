@@ -1,0 +1,10 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=droSim1
+Species: Drosophila simulans
+	chr2L
+	chr4
+	chrU
+	chrX
+	chr2R
+	chr3L
+	chr3R

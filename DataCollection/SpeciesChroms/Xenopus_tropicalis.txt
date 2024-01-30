@@ -1,0 +1,13 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=xenTro9
+Species: Xenopus tropicalis
+	chr1
+	chr10
+	chr9
+	chr7
+	chr8
+	chr4
+	chr6
+	chr3
+	chr5
+	chr2

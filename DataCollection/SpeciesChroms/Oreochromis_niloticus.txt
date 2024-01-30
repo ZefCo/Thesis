@@ -1,0 +1,25 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=oreNil2
+Species: Oreochromis niloticus
+	chrLG7
+	chrLG10
+	chrLG3
+	chrLG23
+	chrLG9
+	chrLG2
+	chrLG18
+	chrLG22
+	chrLG15
+	chrLG19
+	chrLG4
+	chrLG8-24
+	chrLG1
+	chrLG20
+	chrLG17
+	chrLG13
+	chrLG11
+	chrLG14
+	chrLG12
+	chrLG16-21
+	chrLG6
+	chrLG5

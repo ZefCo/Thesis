@@ -1,0 +1,16 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=anoCar2
+Species: Anolis carolinensis
+	chr1
+	chrLGh
+	chrLGg
+	chrLGd
+	chrLGb
+	chrLGf
+	chrLGa
+	chrLGc
+	chr6
+	chr5
+	chr4
+	chr2
+	chr3

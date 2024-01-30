@@ -1,0 +1,24 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=nasLar1
+Species: Nasalis larvatus
+	chr1
+	chr19
+	chr18
+	chr16
+	chr20
+	chr10
+	chr17
+	chr12
+	chr15
+	chr11
+	chr9
+	chr14
+	chr13
+	chr8
+	chrX
+	chr7
+	chr4
+	chr6
+	chr5
+	chr3
+	chr2

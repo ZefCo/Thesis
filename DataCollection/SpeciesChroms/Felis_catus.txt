@@ -1,0 +1,22 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=felCat9
+Species: Felis catus
+	chrA1
+	chrE3
+	chrE1
+	chrE2
+	chrF1
+	chrF2
+	chrD2
+	chrD4
+	chrD3
+	chrD1
+	chrX
+	chrA3
+	chrB4
+	chrB3
+	chrB2
+	chrC2
+	chrA2
+	chrB1
+	chrC1

@@ -1,0 +1,29 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=nomLeu3
+Species: Nomascus leucogenys
+	chr2
+	chr24
+	chr25
+	chr23
+	chr19
+	chr20
+	chr21
+	chr14
+	chr17
+	chr16
+	chr18
+	chr10
+	chr12
+	chr13
+	chr15
+	chr7b
+	chr8
+	chr9
+	chr6
+	chr1a
+	chr11
+	chr22a
+	chrX
+	chr5
+	chr4
+	chr3
