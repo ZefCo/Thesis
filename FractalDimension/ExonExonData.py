@@ -7,6 +7,11 @@ import random
 import numpy as np
 from matplotlib import pyplot as plt
 from TimeEmbedding import time_embedding as te
+from Heatmaps import _heat_data as he
+from Heatmaps import _dict_deep_merge as merge
+from Heatmaps import _reorder_frame as reorder
+from Heatmaps import _init_dict as initD
+from Heatmaps import _undigitize_seq as undigit
 
 
 def main():
@@ -22,7 +27,7 @@ def main():
     folder_path = pathlib.Path("F:\Gene_Data_Sets")
     data: pathlib.Path = folder_path / "Data_Set_1_cleaned_dict.pkl"
     save_file_path = folder_path / "E2E_DS1_k6.pkl"
-    master_data: pandas.DataFrame = gen_points(data = data, n = 1_000)
+    master_data: pandas.DataFrame = gen_te_points(data = data, n = 1_000)
     # print(master_data)
     master_data.to_pickle(save_file_path)  # saves the data
 
@@ -85,9 +90,41 @@ def gen_plot(data: pandas.DataFrame, file_name: pathlib.Path = None, inches: int
         plt.show()
 
 
-
-def gen_points(*args, **kwargs) -> pandas.DataFrame:
+def gen_he_points(str_names: bool = False, *args, **kwargs) -> pandas.DataFrame:
     '''
+    Generates a heatmap
+
+    Takes 
+    '''
+    genes = collect_genes(*args, **kwargs)
+    _, blank_dict, master_dict = initD(*args, **kwargs)  # the blank dict is to be used in the heat2heat thing, while the master_dict gets updated with all the data
+
+    for g, gene in enumerate(genes):
+        gene_he = heat2heat(gene, blank_dict, *args, **kwargs)
+        if isinstance(gene_he, dict):
+            master_dict = merge(master_dict, gene_he)
+
+    master_data: pandas.DataFrame = pandas.DataFrame(master_dict)
+    master_data = reorder(master_data, *args, **kwargs)
+
+    # This part converts the sequences, which are in a numberical form - I call it digital - into a string form.
+    digital_seqs = tuple(master_data.index)
+    new_seq = dict()
+    for dig_seq in digital_seqs:
+        str_seq = undigit(dig_seq)
+        new_seq[dig_seq] = str_seq
+
+    if str_names:
+        master_data = master_data.rename(columns=new_seq, index=new_seq)
+        
+
+    return master_data
+    
+
+
+def gen_te_points(*args, **kwargs) -> pandas.DataFrame:
+    '''
+    Generates a series of points.
     '''
     genes = collect_genes(*args, **kwargs)  # I'm trying something
     master_data = pandas.DataFrame()
@@ -102,12 +139,48 @@ def gen_points(*args, **kwargs) -> pandas.DataFrame:
     return master_data
 
 
+def heat2heat(gene: Gene.Gene, local_xy: dict, k: int = 6, *args, **kwargs) -> dict:
+    '''
+    Takes in a gene and looks at the exons, then gets a heatmap dataset for beginning and end of the exons.
+
+    Returns this dictionary. If any of the exons are not long enough, it discards the whole gene.
+
+    Local_xy is because I need to init the dictionary with all possible permuations. Instead of doing that over and over again, you need
+    to init that dictionary twice before calling this function: one is to be used as the blank local_xy, while the other is the master_xy you add too.
+    '''
+    exons: list = gene.exon_seq
+    index: int = len(exons)
+    # xy_points: pandas.DataFrame = pandas.DataFrame(None, index = [i for i in range(index - 1)], columns = ["X", "Y", "Chrm"])
+
+    for i in range(1, index):
+        # we're just going to look at exons and introns that are at minimum len >= 6
+        try:
+            len_x = len(exons[i])
+            len_y = len(exons[i - 1])
+        except Exception as e:
+            return None
+
+        if (len_x >= k) and (len_y >= k):
+
+            exon_x = exons[i][:k]  # each entry in the list is a string, this grabs the first k nucleotides
+            exon_y = exons[i - 1][-k:]  # this grabs the last k nucleotides
+
+            small_xy: dict = he(f"{exon_y}{exon_x}", k_p = k, k_m = k)  # I should have stayed in Burbank.
+
+            local_xy = merge(local_xy, small_xy)        
+        else:
+            return None
+
+    return local_xy
+
 
 def exon2exon(gene: Gene.Gene, k: int = 6, *args, **kwargs) -> pandas.DataFrame:
     '''
     Takes a gene class. Iterates over the exon list and grabs the last k-mer of the previous exon and the first k-mer of the next exon
 
     Returns an dataframe with "X", "Y", "Chrm"
+
+    Uses the time embedding method. Can't really think of a way to put the heat embedding in this one since they return fundamentally different things.
     '''
     exons: list = gene.exon_seq
     index: int = len(exons)
@@ -147,6 +220,8 @@ def exon2exon(gene: Gene.Gene, k: int = 6, *args, **kwargs) -> pandas.DataFrame:
     # print(xy_points)
 
     return xy_points
+
+
 
 
 def collect_genes(data: pathlib.Path or dict, n: int = 1_000, *args, **kwargs) -> tuple:

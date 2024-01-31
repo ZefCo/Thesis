@@ -3,8 +3,46 @@ import pathlib
 cwd = pathlib.Path.cwd()
 import pandas
 import pickle
+from Heatmaps import heatmapv2 as heatmap
+
 
 def main():
+    '''
+    These are not going to be one size fits all scripts. I want to start doing a file with all my functions and then other files that call those functions. Those other files will be easier to manipulate.
+    '''
+    heatmaps()
+
+
+def heatmaps():
+    '''
+    Generates a 'raw' heatmap, just the data, in a csv/xlsx file for Dr. G.
+    '''
+    data_set = 2
+    k = 6
+    folder_path = pathlib.Path("F:\Gene_Data_Sets")
+    save_file_path = folder_path / f"E2E_DS{data_set}_k{k}.pkl"
+    data: pathlib.Path = folder_path / f"Data_Set_{data_set}_cleaned_dict.pkl"
+    data: pandas.DataFrame = eed.gen_he_points(data = data, k = k, n = 10_000)
+
+    # data = pandas.read_csv(cwd / "RawExon2Exon.csv", index_col="Unnamed: 0")
+    # print(data)
+
+    heatmap(data, colors=["green", "darkred"], bounds = [0, 0.1, 0.2], fileoutput=cwd / "Sanity.png")
+
+    data.to_csv(cwd / "Raw_Exon2Exon.csv")
+
+
+
+    # with open(data, "rb") as file:
+    #     data: pandas.DataFrame = pickle.load(file)
+
+    # data = eed.collect_genes(data)
+
+    # print(data)
+
+
+
+def plots():
     '''
     redo this with 4-mers and 5-mers. Adjust box size as appropriate.
     '''
