@@ -678,6 +678,18 @@ def _digitize_seq(seq: str, nucseq = "AGTC", *args, **kwargs):
     return digital_version
 
 
+def _undigitize_seq(digital_seq: str, nucseq = "0123", *args, **kwargs):
+    '''
+    Does the opposite of the digitize sequence.
+    '''
+    undigital_seq = ""
+    for d in digital_seq:
+        sn = "A" if d in nucseq[0] else "G" if d in nucseq[1] else "T" if d in nucseq[2] else "C" if d in nucseq[3] else "N"
+        undigital_seq = f"{undigital_seq}{sn}"
+
+    return undigital_seq
+
+
 def _dict_deep_merge(dict_to_merge: dict, dict_to_add: dict):
     '''
     dict_to_add copies the data into dict_to_merge
@@ -750,8 +762,8 @@ def _heat_data(sequence: str,
         print("Cannont find Trajectory for this gene: to small")
         return None
 
-    k_minus = [sequence[k_prime:k_prime + k_m] for k_prime in range(0, seq_length - (k_p + k_m))]
-    k_plus = [sequence[k_prime:k_prime + k_p] for k_prime in range(k_m, seq_length - k_p)]
+    k_minus = [sequence[k_prime:k_prime + k_m] for k_prime in range(0, seq_length - (k_p + k_m) + 1)]
+    k_plus = [sequence[k_prime:k_prime + k_p] for k_prime in range(k_m, seq_length - k_p + 1)]
 
     for i, k_prime in enumerate(k_minus):
         k_prime = k_prime[::-1]
@@ -808,7 +820,7 @@ def _import_data(data: pathlib.Path,
     return data
 
 
-def _init_dict(k: int, nucsequence = "AGTC"):
+def _init_dict(k: int, nucsequence = "AGTC", *args, **kwargs):
     '''
     '''
     master, exon, intron = dict(), dict(), dict()
