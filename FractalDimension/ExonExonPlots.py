@@ -19,7 +19,9 @@ def heatmaps():
     '''
     data_set = 2
     k = 6
-    folder_path = pathlib.Path("F:\Gene_Data_Sets")
+    # folder_path = pathlib.Path("F:\Gene_Data_Sets")  # windows path
+    folder_path = cwd.parent.parent / "Thesis_Data" / "Gene_Data_Sets"  #Linux path
+
     save_file_path = folder_path / f"E2E_DS{data_set}_k{k}.pkl"
     data: pathlib.Path = folder_path / f"Data_Set_{data_set}_cleaned_dict.pkl"
     data: pandas.DataFrame = eed.gen_he_points(data = data, k = k, n = 10_000)
