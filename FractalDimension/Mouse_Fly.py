@@ -5,6 +5,9 @@ import pathlib
 cwd = pathlib.Path.cwd()
 import MomentCalculations as MC
 import Heatmaps as heat
+import TimeEmbedding as TE
+import pickle
+import GeneClass as Gene
 from typing import Tuple
 
 
@@ -12,6 +15,21 @@ def main():
     '''
     Does the Moment calculations for the fly and Mouse.
     '''
+    species = "Callithrix_jacchus"
+    genome = "calJac4"
+    species_TE(cwd.parent / "Data_Files" / "Primates" /"Genetics" / species / f"{species}_{genome}_Frame.pkl",
+               exon_outfile = cwd.parent / "Data_Files" / "Primates" /"Genetics" / species / "Exons.pkl",
+               intron_outfile = cwd.parent / "Data_Files" / "Primates" /"Genetics" / species / "Introns.pkl")
+    
+
+    TE.matplotfigure(frame = cwd.parent / "Data_Files" / "Primates" /"Genetics" / species / "Exons.pkl",
+                     dir = cwd.parent / "Data_Files" / "Primates" /"Genetics" / species,
+                     file_name = f"{species}_Exons.png")
+
+    TE.matplotfigure(frame = cwd.parent / "Data_Files" / "Primates" /"Genetics" / species / "Introns.pkl",
+                     dir = cwd.parent / "Data_Files" / "Primates" /"Genetics" / species,
+                     file_name = f"{species}_Introns.png")
+
     # _, _ = gen_heat_data(cwd / "TE_Images_ForPaper" / "Dict" / "Mouse_Seq_For_Images.pkl", 
     #                      cwd / "Mouse_Dicts_EF" / "Exon_6mer.pkl", cwd / "Mouse_Dicts_EF" / "Intron_6mer.pkl", just_import = False, n = 20_000)
     # _, _ = gen_heat_data(cwd / "TE_Images_ForPaper" / "Dict" / "Fly_Seq_For_Images.pkl", 
@@ -22,7 +40,19 @@ def main():
 
     # gen_moments(cwd / "Mouse_Dicts", mer_out = cwd / "TE_Images_ForPaper" / "Moments" / "Mouse_Moments.png", pd_out = None)
     # gen_moments(cwd / "Fly_Dicts", mer_out = cwd / "TE_Images_ForPaper" / "Moments" / "Fly_Moments.png", pd_out = None)
-    all_species_plots()
+    # all_species_plots()
+
+
+def species_TE(data: pathlib.Path, *args, **kwargs):
+    '''
+    Since we're doing Phylogenetic trees, this is a more generalized version of the all speices plots.
+    '''
+    if isinstance(data, pathlib.Path):
+        with open(data, "rb") as file:
+            data = pickle.load(file)
+
+
+    TE.time_embedding_v2(data, n = 10_000, *args, **kwargs)
 
 
 def all_species_plots():
