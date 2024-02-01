@@ -99,10 +99,12 @@ def gen_he_points(str_names: bool = False, *args, **kwargs) -> pandas.DataFrame:
     genes = collect_genes(*args, **kwargs)
     _, blank_dict, master_dict = initD(*args, **kwargs)  # the blank dict is to be used in the heat2heat thing, while the master_dict gets updated with all the data
 
+    total_genes = 0
     for g, gene in enumerate(genes):
         gene_he = heat2heat(gene, blank_dict, *args, **kwargs)
         if isinstance(gene_he, dict):
             master_dict = merge(master_dict, gene_he)
+            total_genes += 1
 
     master_data: pandas.DataFrame = pandas.DataFrame(master_dict)
     master_data = reorder(master_data, *args, **kwargs)
@@ -116,6 +118,8 @@ def gen_he_points(str_names: bool = False, *args, **kwargs) -> pandas.DataFrame:
 
     if str_names:
         master_data = master_data.rename(columns=new_seq, index=new_seq)
+
+    print(f"Total genes used: {total_genes}")
         
 
     return master_data
@@ -170,7 +174,7 @@ def heat2heat(gene: Gene.Gene, local_xy: dict, k: int = 6, *args, **kwargs) -> d
             local_xy = merge(local_xy, small_xy)        
         else:
             return None
-
+        
     return local_xy
 
 

@@ -14,9 +14,31 @@ def main():
     '''
     '''
 
+    # for the following primates, where I only used the + strand, because there are so few genes I just use them all.
+    species = "Callithrix_jacchus"
+    genome = "calJac4"
+
+    in_file_path = cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / f"Known_Genes_{genome}_DICT_0.pkl"
+    out_dict_path = cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / f"{species}_{genome}_Dict.pkl"
+    out_frame_path = cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / f"{species}_{genome}_Frame.pkl"
+
+    print(f"Loading data from {in_file_path}")
+    with open(in_file_path, "rb") as p:
+        data: dict = pickle.load(p)
+
+    cleaned_data = clean_dict(data, cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / "CleaningReport.txt", min_length = 6)
+    with open(out_dict_path, "wb") as out_file:
+        pickle.dump(cleaned_data, out_file)
+    print(f"Wrote dict to {out_dict_path}")
+
+    frame_data = convert2dataframe(cleaned_data, cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / "DataFrameReport.txt", min_length = 6, histogram = False)
+    with open(out_frame_path, "wb") as out_file:
+        pickle.dump(frame_data, out_file)
+    print(f"Wrote frame to {out_frame_path}")
+
     # mouse = "Mouse"
     # fly = "Fly"
-    n = 10_000
+    # n = 10_000
 
     # species = "Mouse"
     # genome = "mm39"
@@ -30,8 +52,8 @@ def main():
     # species = "Chimp"
     # genome = "panTro6"
 
-    species = "Rat"
-    genome = "rn7"
+    # species = "Rat"
+    # genome = "rn7"
 
 
     # redo(f"D:\Downloads\GeneData\{species}\Master{species}Dict.pkl", genome, f"D:\Downloads\GeneData\{species}\Fixed_Master{species}Dict.pkl")
@@ -56,7 +78,7 @@ def main():
     # stitch_dict(f"D:\Downloads\GeneData\{mouse}", f"D:\Downloads\GeneData\{mouse}\Master{mouse}Dict.pkl")
     # select_data(f"D:\Downloads\GeneData\{fly}\Fixed_Master{fly}Dict.pkl", f"D:\Downloads\GeneData\{fly}\Selected{fly}Dict", n  = n)
     # select_data(f"D:\Downloads\GeneData\{mouse}\Fixed_Master{mouse}Dict.pkl", f"D:\Downloads\GeneData\{mouse}\Selected{mouse}Dict", n  = n)
-    select_data(f"D:\Downloads\GeneData\{species}\Known_Genes_{genome}_DICT_0.pkl", f"D:\Downloads\GeneData\{species}\Selected{species}Dict", n  = n)
+    # select_data(f"D:\Downloads\GeneData\{species}\Known_Genes_{genome}_DICT_0.pkl", f"D:\Downloads\GeneData\{species}\Selected{species}Dict", n  = n)
 
 
 def redo(file_path: pathlib.Path, genome: str, new_file_path: pathlib.Path):
