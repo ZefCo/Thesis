@@ -745,6 +745,33 @@ def _dict_normalize(dictionary: dict):
     return dictionary
 
 
+def _heat_data_v2(sequence:str, dataframe: pandas.DataFrame, 
+                  k_p: int = 6, k_m: int = 6, 
+                  nucsequence: str = "AGTC") -> pandas.DataFrame:
+    '''
+    Because something looks weird in the heat data, I'm doing it this way with empty dataframes.
+
+    The input dataframe needs to have columns and rows with names that are all possible permutations of the k-mer length.
+    The backwards is on the y axis and the forwards is on the x axis
+    '''
+    sequence = sequence.upper()
+    nucsequence = nucsequence.upper()
+    seq_length = len(sequence)
+
+    if seq_length < (k_m + k_p):
+        print("Cannont find Trajectory for this gene: to small")
+        return dataframe
+
+    k_minus = [sequence[k_prime:k_prime + k_m] for k_prime in range(0, seq_length - (k_p + k_m) + 1)]
+    k_plus = [sequence[k_prime:k_prime + k_p] for k_prime in range(k_m, seq_length - k_p + 1)]
+
+    for i, k_prime in enumerate(k_minus):
+        k_prime = k_prime[::-1]
+
+        dataframe.loc[k_plus[i], k_prime] = dataframe.loc[k_plus[i], k_prime] + 1
+
+    return dataframe
+
 
 def _heat_data(sequence: str, 
               k_p: int = 6, k_m: int = 6, 
