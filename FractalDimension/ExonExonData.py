@@ -8,6 +8,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from TimeEmbedding import time_embedding as te
 from Heatmaps import _heat_data as he
+from Heatmaps import _heat_data_v2 as he2
 from Heatmaps import _dict_deep_merge as merge
 from Heatmaps import _reorder_frame as reorder
 from Heatmaps import _init_dict as initD
@@ -90,57 +91,94 @@ def gen_plot(data: pandas.DataFrame, file_name: pathlib.Path = None, inches: int
         plt.show()
 
 
-def gen_he_points(str_names: bool = False, *args, **kwargs) -> pandas.DataFrame:
+def gen_he_points(genes, str_names: bool = False, *args, **kwargs) -> pandas.DataFrame:
     '''
     Generates a heatmap
 
     Takes 
     '''
-    genes = collect_genes(*args, **kwargs)
-    _, blank_dict, master_dict = initD(*args, **kwargs)  # the blank dict is to be used in the heat2heat thing, while the master_dict gets updated with all the data
+    _, _, master_dict = initD(*args, **kwargs)  # really just need the permutations
+    heat_data = pandas.DataFrame(0, columns = tuple(master_dict.keys()), index = tuple(master_dict.keys()))
 
     total_genes = 0
     for g, gene in enumerate(genes):
-        gene_he = heat2heat(gene, blank_dict, *args, **kwargs)
-        if isinstance(gene_he, dict):
-            master_dict = merge(master_dict, gene_he)
-            total_genes += 1
+        heat_data = heat2heat_v2(gene, heat_data, *args, **kwargs)
+        total_genes += 1
+        # if isinstance(heat_data, pandas.DataFrame):
+            #     master_dict = merge(master_dict, gene_he)
 
-    master_data: pandas.DataFrame = pandas.DataFrame(master_dict)
-    master_data = reorder(master_data, *args, **kwargs)
+    # master_data: pandas.DataFrame = pandas.DataFrame(master_dict)
+    heat_data = reorder(heat_data, *args, **kwargs)
 
     # This part converts the sequences, which are in a numberical form - I call it digital - into a string form.
-    digital_seqs = tuple(master_data.index)
-    new_seq = dict()
-    for dig_seq in digital_seqs:
-        str_seq = undigit(dig_seq)
-        new_seq[dig_seq] = str_seq
 
     if str_names:
-        master_data = master_data.rename(columns=new_seq, index=new_seq)
+        digital_seqs = tuple(heat_data.index)
+        new_seq = dict()
+        for dig_seq in digital_seqs:
+            str_seq = undigit(dig_seq)
+            new_seq[dig_seq] = str_seq
+        
+        heat_data = heat_data.rename(columns=new_seq, index=new_seq)
 
     print(f"Total genes used: {total_genes}")
-        
 
-    return master_data
+    return heat_data
     
 
 
-def gen_te_points(*args, **kwargs) -> pandas.DataFrame:
+def gen_te_points(genes, *args, **kwargs) -> pandas.DataFrame:
     '''
     Generates a series of points.
     '''
-    genes = collect_genes(*args, **kwargs)  # I'm trying something
     master_data = pandas.DataFrame()
 
+    total_genes = 0
     for g, gene in enumerate(genes):
         local_xy = exon2exon(gene, *args, **kwargs)
 
         if isinstance(local_xy, pandas.DataFrame):
             local_xy["Gndex"] = g
             master_data = pandas.concat([master_data, local_xy])  # joins them by rows
+            total_genes += 1
+
+
+    print(f"Total genes used: {total_genes}")
 
     return master_data
+
+
+
+def heat2heat_v2(gene: Gene.Gene, dataframe: pandas.DataFrame, k: int = 6, *args, **kwargs):
+    '''
+    this works soley with dataframse.
+    '''
+    exons: list = gene.exon_seq
+    index: int = len(exons)
+    
+    for i in range(1, index):
+        # we're just going to look at exons and introns that are at minimum len >= 6
+        try:
+            len_x = len(exons[i])
+            len_y = len(exons[i - 1])
+        except Exception as e:
+            return dataframe
+            continue
+
+        if (len_x >= k) and (len_y >= k):
+
+            exon_x = exons[i][:k]  # each entry in the list is a string, this grabs the first k nucleotides
+            exon_y = exons[i - 1][-k:]  # this grabs the last k nucleotides
+
+            dataframe = he2(f"{exon_y}{exon_x}", dataframe, k_p = k, k_m = k)  # I should have stayed in Burbank.
+
+        else:
+            # return None
+            continue
+        
+    return dataframe
+
+
 
 
 def heat2heat(gene: Gene.Gene, local_xy: dict, k: int = 6, *args, **kwargs) -> dict:
