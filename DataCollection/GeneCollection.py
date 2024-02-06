@@ -43,9 +43,9 @@ def main():
     # genome = "sacCer3"
     # species = "Yeast"
 
-    # start_gene = 0
-    # genome = "calJac4"
-    # species = "Callithrix_jacchus"
+    start_gene = 0
+    genome = "calJac4"
+    species = "Callithrix_jacchus"
 
     # start_gene = 0
     # genome = "gorGor6"
@@ -75,9 +75,9 @@ def main():
     # genome = "papAnu4"
     # species = "Papio_anubis"
 
-    start_gene = 0
-    genome = "ponAbe3"
-    species = "Pongo_pygmaeus_abelii"
+    # start_gene = 0
+    # genome = "ponAbe3"
+    # species = "Pongo_pygmaeus_abelii"
 
     output_file = cwd.parent / "Data_Files" / "Primates" / "Genetics" / f"{species}" / f"Known_Genes_{genome}_DICT_{start_gene}.pkl"
     # dict_screwup()
@@ -234,7 +234,6 @@ def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track
     known_genes = known_genes[known_genes["cdsStartStat"] == "cmpl"]
     known_genes = known_genes[known_genes["cdsEndStat"] == "cmpl"]
     known_genes = known_genes[known_genes["exonCount"] >= 1]
-    known_genes = known_genes[known_genes["strand"] == "+"]
 
     # print(known_genes)
     # exit()
