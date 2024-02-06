@@ -13,35 +13,81 @@ from typing import Tuple
 
 def main():
     '''
+    This does more then just mouse and fly data. Now it looks at all different speiceis. I wont change the name, but it is supposed to be for the phylogenetic trees.
+    
     Does the Moment calculations for the fly and Mouse.
+
     '''
-    species = "Callithrix_jacchus"
-    genome = "calJac4"
-    species_TE(cwd.parent / "Data_Files" / "Primates" /"Genetics" / species / f"{species}_{genome}_Frame.pkl",
-               exon_outfile = cwd.parent / "Data_Files" / "Primates" /"Genetics" / species / "Exons.pkl",
-               intron_outfile = cwd.parent / "Data_Files" / "Primates" /"Genetics" / species / "Introns.pkl")
+    primates(log_transform = np.log2, just_import = False, n = 20_000)
+
+
+
+
+    # species_TE(cwd.parent / "Data_Files" / "Primates" /"Genetics" / species / f"{species}_{genome}_Frame.pkl",
+    #            exon_outfile = cwd.parent / "Data_Files" / "Primates" /"Genetics" / species / "Exons.pkl",
+    #            intron_outfile = cwd.parent / "Data_Files" / "Primates" /"Genetics" / species / "Introns.pkl")
     
 
-    TE.matplotfigure(frame = cwd.parent / "Data_Files" / "Primates" /"Genetics" / species / "Exons.pkl",
-                     dir = cwd.parent / "Data_Files" / "Primates" /"Genetics" / species,
-                     file_name = f"{species}_Exons.png")
+    # TE.matplotfigure(frame = cwd.parent / "Data_Files" / "Primates" /"Genetics" / species / "Exons.pkl",
+    #                  dir = cwd.parent / "Data_Files" / "Primates" /"Genetics" / species,
+    #                  file_name = f"{species}_Exons.png")
 
-    TE.matplotfigure(frame = cwd.parent / "Data_Files" / "Primates" /"Genetics" / species / "Introns.pkl",
-                     dir = cwd.parent / "Data_Files" / "Primates" /"Genetics" / species,
-                     file_name = f"{species}_Introns.png")
+    # TE.matplotfigure(frame = cwd.parent / "Data_Files" / "Primates" /"Genetics" / species / "Introns.pkl",
+    #                  dir = cwd.parent / "Data_Files" / "Primates" /"Genetics" / species,
+    #                  file_name = f"{species}_Introns.png")
 
-    # _, _ = gen_heat_data(cwd / "TE_Images_ForPaper" / "Dict" / "Mouse_Seq_For_Images.pkl", 
-    #                      cwd / "Mouse_Dicts_EF" / "Exon_6mer.pkl", cwd / "Mouse_Dicts_EF" / "Intron_6mer.pkl", just_import = False, n = 20_000)
-    # _, _ = gen_heat_data(cwd / "TE_Images_ForPaper" / "Dict" / "Fly_Seq_For_Images.pkl", 
-    #                      cwd / "Fly_Dicts_EF" / "Exon_6mer.pkl", cwd / "Fly_Dicts_EF" / "Intron_6mer.pkl", just_import = False, n = 20_000)
-    # _, _ = gen_heat_data(cwd / "TE_Images_ForPaper" / "Dict" / "Seq_For_Images_n100000_minLength12.pkl", 
-    #                      cwd / "HS_Dicts_EF" / "Exon_6mer.pkl", cwd / "HS_Dicts_EF" / "Intron_6mer.pkl", just_import = False, n = 20_000)
+    # # _, _ = gen_heat_data(cwd / "TE_Images_ForPaper" / "Dict" / "Mouse_Seq_For_Images.pkl", 
+    # #                      cwd / "Mouse_Dicts_EF" / "Exon_6mer.pkl", cwd / "Mouse_Dicts_EF" / "Intron_6mer.pkl", just_import = False, n = 20_000)
+    # # _, _ = gen_heat_data(cwd / "TE_Images_ForPaper" / "Dict" / "Fly_Seq_For_Images.pkl", 
+    # #                      cwd / "Fly_Dicts_EF" / "Exon_6mer.pkl", cwd / "Fly_Dicts_EF" / "Intron_6mer.pkl", just_import = False, n = 20_000)
+    # # _, _ = gen_heat_data(cwd / "TE_Images_ForPaper" / "Dict" / "Seq_For_Images_n100000_minLength12.pkl", 
+    # #                      cwd / "HS_Dicts_EF" / "Exon_6mer.pkl", cwd / "HS_Dicts_EF" / "Intron_6mer.pkl", just_import = False, n = 20_000)
 
 
-    # gen_moments(cwd / "Mouse_Dicts", mer_out = cwd / "TE_Images_ForPaper" / "Moments" / "Mouse_Moments.png", pd_out = None)
-    # gen_moments(cwd / "Fly_Dicts", mer_out = cwd / "TE_Images_ForPaper" / "Moments" / "Fly_Moments.png", pd_out = None)
-    # all_species_plots()
+    # # gen_moments(cwd / "Mouse_Dicts", mer_out = cwd / "TE_Images_ForPaper" / "Moments" / "Mouse_Moments.png", pd_out = None)
+    # # gen_moments(cwd / "Fly_Dicts", mer_out = cwd / "TE_Images_ForPaper" / "Moments" / "Fly_Moments.png", pd_out = None)
+    # # all_species_plots()
 
+
+def primates(*args, **kwargs):
+    '''
+    This looks at the primates and does a lot.
+    '''
+    primate_filepath = cwd.parent / "Data_Files" / "Primates" / "Genetics" # species / f"{species}_{genome}_Frame.pkl"
+    species = ["Callithrix_jacchus", "Gorilla_gorilla_gorilla" ,"Macaca_fascicularis" ,"Macaca_mulatta" ,"Nomascus_leucogenys" ,"Pan_paniscus" ,"Pan_troglodytes" ,"Papio_anubis" ,"Pongo_pygmaeus_abelii"]
+    genome = ["calJac4", "gorGor6", "macFas5", "rheMac8", "nomLeu3", "panPan3", "panTro6", "papAnu4", "ponAbe3"]
+
+    primate_sg = {s:genome[i] for i, s in enumerate(species)}
+
+    me = dict()
+    mi = dict()
+
+    step = 100
+    max_n = 2
+    min_n = 0.5
+    ms = [n / step for n in range(int(step*(min_n)), int(step*max_n) + 1)]
+
+    for prim, gen in primate_sg.items():
+        local_primate_filepath = primate_filepath / prim
+        exon, intron = gen_heat_data(local_primate_filepath / f"{prim}_{gen}_Frame.pkl", *args, **kwargs)
+
+        local_primate_he: pathlib.Path = local_primate_filepath / "HEData"
+        local_primate_he.mkdir(parents = True, exist_ok = True)
+
+        exon.to_pickle(local_primate_he / "Exon_6mer.pkl")
+        intron.to_pickle(local_primate_he / "Intron_6mer.pkl")
+
+        local_me, local_mi, uni, _ = MC.moments_v3(local_primate_he, ms, 6, 6, N_value = True)
+        me[prim] = {"data": local_me, "maker": None}
+        mi[prim] = {"data": local_mi, "maker": None}
+
+
+    MC.multiple_species_plots(ms, me, mi, uni, cwd / "TE_Images_ForPaper" / "AllSpecies", x_ticks={0.5: 0.5, 1.0: 1.0, 1.5: 1.5, 2.0: 2.0},  y_ticks = {0: 0, 7: 7})
+
+
+    # with open(cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / f"{species}_{genome}_Frame.pkl", "rb") as file:
+    #     data = pickle.load(file)
+    # print(data)
 
 def species_TE(data: pathlib.Path, *args, **kwargs):
     '''
@@ -110,14 +156,14 @@ def gen_heat_data(filepath: pathlib.Path, exon_output: pathlib.Path = None, intr
         intron_dir: pathlib.Path = intron_output.parent
         intron_dir.mkdir(exist_ok = True, parents = True)
 
-    _, exon, intron, _, _, _, _, _, _ = heat.heat_embedding(filepath, *args, **kwargs)
+    _, exon, intron, _, _, _, _, _, _ = heat.heat_embedding_v2(filepath, *args, **kwargs)
 
     exon = pandas.DataFrame(exon)
-    exon = heat._reorder_frame(exon)
+    # exon = heat._reorder_frame(exon)
     exon = MC._unrenormalize(exon, 12, log2 = False)
 
     intron = pandas.DataFrame(intron)
-    intron = heat._reorder_frame(intron)
+    # intron = heat._reorder_frame(intron)
     intron = MC._unrenormalize(intron, 12, log2 = False)
 
     if isinstance(exon_output, pathlib.Path):

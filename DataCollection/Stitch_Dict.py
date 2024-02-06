@@ -14,9 +14,32 @@ def main():
     '''
     '''
 
-    # for the following primates, where I only used the + strand, because there are so few genes I just use them all.
     species = "Callithrix_jacchus"
     genome = "calJac4"
+
+    species = "Gorilla_gorilla_gorilla"
+    genome = "gorGor6"
+
+    species = "Macaca_fascicularis"
+    genome = "macFas5"
+
+    species = "Macaca_mulatta"
+    genome = "rheMac8"
+
+    species = "Nomascus_leucogenys"
+    genome = "nomLeu3"
+
+    species = "Pan_paniscus"
+    genome = "panPan3"
+
+    species = "Pan_troglodytes"
+    genome = "panTro6"
+
+    species = "Papio_anubis"
+    genome = "papAnu4"
+
+    species = "Pongo_pygmaeus_abelii"
+    genome = "ponAbe3"
 
     in_file_path = cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / f"Known_Genes_{genome}_DICT_0.pkl"
     out_dict_path = cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / f"{species}_{genome}_Dict.pkl"

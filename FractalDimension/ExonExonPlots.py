@@ -35,7 +35,7 @@ def main():
 
     
     heatmaps(genes, cwd / "Sanity_HE.png", k = k)
-    plots(genes, cwd / "Dumping.pkl", cwd / "Sanity_TE.png")
+    plots(genes, cwd / "Dumping.pkl", cwd / "Sanity_TE_v2.png")
     # heatmap(data, colors=["white", "black"], bounds = [0, 0.1, 0.2], fileoutput=cwd / "Sanity.png")
 
 

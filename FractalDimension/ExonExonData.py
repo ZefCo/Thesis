@@ -162,7 +162,7 @@ def heat2heat_v2(gene: Gene.Gene, dataframe: pandas.DataFrame, k: int = 6, *args
             len_x = len(exons[i])
             len_y = len(exons[i - 1])
         except Exception as e:
-            return dataframe
+            # return dataframe
             continue
 
         if (len_x >= k) and (len_y >= k):

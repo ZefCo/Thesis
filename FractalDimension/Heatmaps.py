@@ -542,6 +542,92 @@ def heatmap(data: dict or pandas.DataFrame or pathlib.Path,
         plt.show()
 
 
+def heat_embedding_v2(data: pandas.DataFrame,
+                      n: int = 50_000,
+                      k_p: int = 6, k_m: int = 6, 
+                      backwards: bool = True, # I'm leaving this in here in case I want to use it later. Probably not though
+                      nucsequence: str = "AGTC", sequence_name: str = "Seq", classification_name: str = "Classificaion",
+                      dict_output_files: list = None,
+                      *args, **kwargs) -> Tuple[pandas.DataFrame, pandas.DataFrame, pandas.DataFrame, int, int, int, int, int, int]:
+    '''
+    When trying to figure out the differences between the time and heat embedding images, I started using dataframes. The advantage is that it is *much* faster
+
+    Somewhat similar to the time embedding, this looks at the past and the future and creates a heatmap.
+
+    This script will look at the previous nucleotides and counts the occurrences of the next nucleotides, returning a dictionary in the form:
+    return_dict[past_nucleotide] = sub_dict[future_nucleotide]: occurrences
+
+    If the dict_output_files is a list then the paths/strs inside will be used to save the dictionaries to a pickel file. The order of them is [master, exon, intron]. Sorry, I'm not going to think of a way to predict what order you want the files to be saved as, so that's the order.
+    If it's left as None, the dictionaries are returned as a tuple.
+    '''
+    if isinstance(data, str) or isinstance(data, pathlib.Path):
+        data = _import_data(data, n, k_p, k_m, *args, **kwargs)
+
+    rows, _ = data.shape
+
+    master_frame = _init_frame(k_p, nucsequence = nucsequence)
+    exon_frame = _init_frame(k_p, nucsequence = nucsequence)
+    intron_frame = _init_frame(k_p, nucsequence = nucsequence)
+    blank_frame = _init_frame(k_p, nucsequence = nucsequence)  # this one we just dump in as an instance, get the points we need, and move on.
+
+    # ic(exon_dict)
+
+    for row in range(rows):
+        try:
+            sequence = data.loc[row, sequence_name].upper()
+        except Exception as e:
+            print(type(e))
+            print(e)
+            print(row)
+            continue
+
+        region = data.loc[row, classification_name]
+
+        local_frame: pandas.DataFrame = _heat_data_v2(sequence, blank_frame, k_p = k_p, k_m = k_m, nucsequence = nucsequence)
+        master_frame = master_frame + local_frame
+
+        if (region in "Exon") or (region in "exon") or (region in "e"):  # because I realized I was doing this like 3 different ways... I probably should have been more precise.
+            exon_frame = exon_frame + local_frame
+
+        elif (region in "Intron") or (region in "intron") or (region in "i"):
+            intron_frame = intron_frame + local_frame
+
+    master_frame, master_max, master_min = _normalize_frame(master_frame, int(4**(k_p + k_m)), *args, **kwargs)
+    exon_frame, exon_max, exon_min = _normalize_frame(exon_frame, int(4**(k_p + k_m)), *args, **kwargs)
+    intron_frame, intron_max, intron_min = _normalize_frame(intron_frame, int(4**(k_p + k_m)), *args, **kwargs)
+
+    # if k_m + k_p < 5:
+    #     ic(master_dict)
+
+    if isinstance(dict_output_files, list):
+        try:
+            master_filepath: str or pathlib.Path = dict_output_files[0]
+        except IndexError as i:
+            print("Cannot output master dict")
+        else:
+            _write_pickle(master_frame, master_filepath)
+
+        try:
+            exon_filepath: str or pathlib.Path = dict_output_files[1]
+        except IndexError as i:
+            print("Cannot output exon dict")
+        else:
+            _write_pickle(exon_frame, exon_filepath)
+
+        try:
+            intron_filepath: str or pathlib.Path = dict_output_files[2]
+        except IndexError as i:
+            print("Cannot output intron dict")
+        else:
+            _write_pickle(intron_frame, intron_filepath)
+
+    else:
+        return master_frame, exon_frame, intron_frame, master_max, master_min, exon_max, exon_min, intron_max, intron_min
+
+
+
+
+
 def heat_embedding(data: pandas.DataFrame,
                    n: int = 50_000,
                    k_p: int = 6, k_m: int = 6, 
@@ -586,9 +672,9 @@ def heat_embedding(data: pandas.DataFrame,
         elif (region in "Intron") or (region in "intron") or (region in "i"):
             intron_dict = _dict_deep_merge(intron_dict, local_dict)
 
-    master_dict, master_max, master_min = _normalize(master_dict, int(4**(k_p + k_m)), *args, **kwargs)
-    exon_dict, exon_max, exon_min = _normalize(exon_dict, int(4**(k_p + k_m)), *args, **kwargs)
-    intron_dict, intron_max, intron_min = _normalize(intron_dict, int(4**(k_p + k_m)), *args, **kwargs)
+    master_dict, master_max, master_min = _normalize_dict(master_dict, int(4**(k_p + k_m)), *args, **kwargs)
+    exon_dict, exon_max, exon_min = _normalize_dict(exon_dict, int(4**(k_p + k_m)), *args, **kwargs)
+    intron_dict, intron_max, intron_min = _normalize_dict(intron_dict, int(4**(k_p + k_m)), *args, **kwargs)
 
     # if k_m + k_p < 5:
     #     ic(master_dict)
@@ -731,7 +817,7 @@ def _dict_deep_copy(dictionary: dict, *args, **kwargs):
     return dictionary
 
 
-def _dict_normalize(dictionary: dict):
+def _dict_normalize_dict(dictionary: dict):
     '''
     Normalizes the values in the dictionary. No sub dictionaries.
     '''
@@ -847,6 +933,30 @@ def _import_data(data: pathlib.Path,
     return data
 
 
+def _init_frame(k: int, nucsequence = "AGTC", *args, **kwargs):
+    '''
+    Creates a frame with all possible combinations of a k-mer.
+
+    This has several major advantages over the dict version: it's actually faster and easier to organzie.
+
+    OK yes this is a square frame, but deal with it.
+    '''
+    perms = tuple(itertools.product([nucsequence[0], nucsequence[1], nucsequence[2], nucsequence[3]], repeat = k))
+    perm_index = list()
+    for p in perms:
+        perm_index.append("".join(p))
+
+    frame = pandas.DataFrame(0, columns = perm_index, index = perm_index)
+    frame = _reorder_frame(frame)
+
+    dig_names = tuple(frame.columns)
+    new_names = {dig_seq: perm_index[i] for i, dig_seq in enumerate(dig_names)}
+    frame = frame.rename(columns = new_names, index = new_names)
+
+    return frame
+
+
+
 def _init_dict(k: int, nucsequence = "AGTC", *args, **kwargs):
     '''
     '''
@@ -893,8 +1003,27 @@ def min_max(data: dict):
     return max_value, min_value
 
 
+def _normalize_frame(data: pandas.DataFrame, k: int, norm_constant: int = None, log_transform: Callable = None, *args, **kwargs):
+    '''
+    Normalizes the frames similar to how the normalization for the dict is done.
+    '''
+    if norm_constant is None:
+        norm_constant = data.to_numpy().sum()
 
-def _normalize(data: dict, k: int, norm_constant: int = None, log_transform: Callable = None, *args, **kwargs):
+    data = data / norm_constant
+
+    if isinstance(log_transform, np.ufunc):
+        data = log_transform(data + 1)
+
+    max_value = data.to_numpy().max()
+    min_value = data.to_numpy().min()
+
+    return data, max_value, min_value
+
+
+
+
+def _normalize_dict(data: dict, k: int, norm_constant: int = None, log_transform: Callable = None, *args, **kwargs):
     '''
     Normalizes the data by: counting and summing all values for a normalization constant, then doing: value = 4**(kp + km) * value / constant
 
