@@ -605,7 +605,7 @@ def uniform_density(data: pandas.DataFrame, m: int = 1, *args, **kwargs):
 
 
 def multiple_species_plots(ms: list, me: dict, mi: dict, uni: dict, output_dir: pathlib.Path,
-                           x_ticks: dict = None, y_ticks: dict = None):
+                           x_ticks: dict = None, y_ticks: dict = None, legend: bool = True, *args, **kwargs):
     '''
     Because I just want to do it over here, I'm going to dump the script to do multiple species plots here.
     ms should be a list of the moments used, which will in turn become the x axis.
@@ -625,6 +625,7 @@ def multiple_species_plots(ms: list, me: dict, mi: dict, uni: dict, output_dir: 
         print(f"Species = {species}")
         subdict: dict = items["data"]
         for key, value in subdict.items():
+            print(f"plotting for {2*key}-mer")
             ms_markers = ms[::5]
             me_markers = value[::5]
             mi_markers = mi[species]["data"][key][::5]
@@ -635,24 +636,24 @@ def multiple_species_plots(ms: list, me: dict, mi: dict, uni: dict, output_dir: 
             axs.plot(ms_markers, mi_markers, label = f"Intron - {species}", marker = mi[species]["marker"], markersize = 5)
             axs.plot(ms, uni[key], linestyle = "dotted")
         
-        print(f"plotting for {2*key}-mer")
-        axs.set_title(f"{2*key}-mer")
-        axs.set_ylabel(r"$\gamma(m)$", fontsize = 30) #, rotation='horizontal')
-        axs.set_xlabel(r"$m$", fontsize = 30)
+    axs.set_title(f"{2*key}-mer")
+    axs.set_ylabel(r"$\gamma(m)$", fontsize = 30) #, rotation='horizontal')
+    axs.set_xlabel(r"$m$", fontsize = 30)
+    if legend:
         axs.legend()
-        
-        if isinstance(x_ticks, dict):
-            axs.set_xticks(list(x_ticks.keys()))
-            axs.set_xticklabels(list(x_ticks.values()))
-        else:
-            axs.set_xticks([])
-        if isinstance(y_ticks, dict):
-            axs.set_yticks(list(y_ticks.keys()))
-            axs.set_yticklabels(list(y_ticks.values()))
-        else:
-            axs.set_yticks([])
+    
+    if isinstance(x_ticks, dict):
+        axs.set_xticks(list(x_ticks.keys()))
+        axs.set_xticklabels(list(x_ticks.values()))
+    else:
+        axs.set_xticks([])
+    if isinstance(y_ticks, dict):
+        axs.set_yticks(list(y_ticks.keys()))
+        axs.set_yticklabels(list(y_ticks.values()))
+    else:
+        axs.set_yticks([])
 
-        fig.savefig(output_dir / f"{2*key}-mer")
+    fig.savefig(output_dir / f"{2*key}-mer")
 
 
 

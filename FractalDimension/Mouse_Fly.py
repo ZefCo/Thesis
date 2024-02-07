@@ -18,7 +18,28 @@ def main():
     Does the Moment calculations for the fly and Mouse.
 
     '''
-    primates(log_transform = np.log2, just_import = False, n = 20_000)
+    primate_filepath = cwd.parent / "Data_Files" / "Primates" / "Genetics" # species / f"{species}_{genome}_Frame.pkl"
+    species = ["Callithrix_jacchus", "Gorilla_gorilla_gorilla" ,"Macaca_fascicularis" ,"Macaca_mulatta" ,"Nomascus_leucogenys" ,"Pan_paniscus" ,"Pan_troglodytes" ,"Papio_anubis" ,"Pongo_pygmaeus_abelii"]
+    genome = ["calJac4", "gorGor6", "macFas5", "rheMac8", "nomLeu3", "panPan3", "panTro6", "papAnu4", "ponAbe3"]
+
+    primate_sg = {s:genome[i] for i, s in enumerate(species)}
+    for prim, gen in primate_sg.items():
+        local_primate_filepath = primate_filepath / prim
+        local_primate_he: pathlib.Path = local_primate_filepath / "HEData"
+
+    with open(local_primate_he / "Exon_6mer.pkl", "rb") as file:
+        data = pickle.load(file)
+
+    print(data)
+    print("\n\n")
+    with open(local_primate_he / "Intron_6mer.pkl", "rb") as file:
+        data = pickle.load(file)
+
+    print(data)
+
+
+
+    # primates(log_transform = np.log2, just_import = False, n = 20_000, reload = True)
 
 
 
@@ -49,7 +70,7 @@ def main():
     # # all_species_plots()
 
 
-def primates(*args, **kwargs):
+def primates(reload: bool = False, *args, **kwargs):
     '''
     This looks at the primates and does a lot.
     '''
@@ -69,20 +90,28 @@ def primates(*args, **kwargs):
 
     for prim, gen in primate_sg.items():
         local_primate_filepath = primate_filepath / prim
-        exon, intron = gen_heat_data(local_primate_filepath / f"{prim}_{gen}_Frame.pkl", *args, **kwargs)
-
         local_primate_he: pathlib.Path = local_primate_filepath / "HEData"
-        local_primate_he.mkdir(parents = True, exist_ok = True)
 
-        exon.to_pickle(local_primate_he / "Exon_6mer.pkl")
-        intron.to_pickle(local_primate_he / "Intron_6mer.pkl")
+        if reload:
+            pass
+        else:
+            local_primate_he.mkdir(parents = True, exist_ok = True)
 
-        local_me, local_mi, uni, _ = MC.moments_v3(local_primate_he, ms, 6, 6, N_value = True)
-        me[prim] = {"data": local_me, "maker": None}
-        mi[prim] = {"data": local_mi, "maker": None}
+            exon, intron = gen_heat_data(local_primate_filepath / f"{prim}_{gen}_Frame.pkl", *args, **kwargs)
+            exon.to_pickle(local_primate_he / "Exon_6mer.pkl")
+            intron.to_pickle(local_primate_he / "Intron_6mer.pkl")
+
+        local_me, local_mi, _, _ = MC.moments_v3(local_primate_he, ms, 6, 6, N_value = True)
+        me[prim] = {"data": local_me, "marker": None}
+        mi[prim] = {"data": local_mi, "marker": None}
+
+    hs_me, hs_mi, uni, _ = MC.moments_v3(cwd / "HS_Dicts_EF", ms, 6, 6, N_value = True)
+    me["H.S."] = {"data": hs_me, "marker": None}
+    mi["H.S."] = {"data": hs_mi, "marker": None}
 
 
-    MC.multiple_species_plots(ms, me, mi, uni, cwd / "TE_Images_ForPaper" / "AllSpecies", x_ticks={0.5: 0.5, 1.0: 1.0, 1.5: 1.5, 2.0: 2.0},  y_ticks = {0: 0, 7: 7})
+
+    MC.multiple_species_plots(ms, me, mi, uni, cwd / "TE_Images_ForPaper" / "AllSpecies", x_ticks={0.5: 0.5, 1.0: 1.0, 1.5: 1.5, 2.0: 2.0}, legend=False)
 
 
     # with open(cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / f"{species}_{genome}_Frame.pkl", "rb") as file:

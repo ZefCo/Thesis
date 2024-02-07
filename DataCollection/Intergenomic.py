@@ -41,6 +41,8 @@ def select_data(input_file: pathlib.Path, n: int = 250):
     subdata = data.sample(n = n)
     subindex = tuple(subdata.index)
 
+    file_path = cwd.parent / "Data_Files" / "Intergenomic" / "Seq2Check"
+
     # Goes through the lines and grabs the minimum positive distance between txS and txE: txS - txE
     # That becomes the new start and end:
     # txE = txS_inter
@@ -50,13 +52,38 @@ def select_data(input_file: pathlib.Path, n: int = 250):
         dataN: pandas.DataFrame = data.loc[data.index != index, :]
         txStart2 = subdata.loc[index, "txStart"]
         txEnd2 = subdata.loc[index, "txEnd"]
+        chrom = subdata.loc[index, "chrom"]
 
-        dataN["delta_S"] = txStart2 - dataN["txStart"]
-        dataN["delta_E"] = dataN["txEnd"] - txEnd2
+        center_name = subdata.loc[index, "name"]
+
+        dataN["delta_Left"] = txStart2 - dataN["txEnd"]  # looking for the left sided intergenomic data
+        dataN["delta_Right"] = dataN["txStart"] - txEnd2  # looking for the right sided data
 
         # print(dataN)
-        something = min(filter(lambda x: x > 0, dataN["delta_S"]))
-        txStart = min(filter(lambda x: x > 0, dataN["delta_E"]))
+        closest_start = min(filter(lambda x: x > 0, dataN["delta_Left"]))  # this looks for the start position of the left intergenomic region
+        closest_end = min(filter(lambda x: x > 0, dataN["delta_Right"]))  # this look for the end position of the right intergenomic region
+
+        left_start_index = dataN.isin([closest_start]).any(axis=1).idxmax()
+        right_end_index = dataN.isin([closest_end]).any(axis=1).idxmax()
+
+        left_start = dataN.loc[left_start_index, "txEnd"]
+        left_name = dataN.loc[left_start_index, "name"]
+        right_end = dataN.loc[right_end_index, "txStart"]
+        right_name = dataN.loc[right_end_index, "name"]
+
+        print("\tLeft Query")
+        left_query, left_url = API.sequence(chrom = chrom, start = left_start, end = txStart2, strand = "+")
+        print("\tWriting Left Query")
+        with open(file_path / f"{left_name}_{center_name}", "w+") as file:
+            file.write(f"{left_name}_{center_name}\n{chrom}\n\n{left_url}\n\n\n{left_query}")
+
+        print("\tRight Query")
+        right_query, right_url = API.sequence(chrom = chrom, start = txEnd2, end = right_end, strand = "+")
+        print("\tWriting Right Query")
+        with open(file_path / f"{center_name}_{right_name}", "w+") as file:
+            file.write(f"{center_name}_{right_name}\n{chrom}\n\n{right_url}\n\n\n{right_query}")
+
+        # exit()
 
         # need to get the index of these values.
 
