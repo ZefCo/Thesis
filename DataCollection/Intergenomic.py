@@ -13,7 +13,7 @@ def main():
     It will grab about 50 genes from each chromosome. Then it looks at the end of that gene and finds the next closest gene. Hopefully the genes are in positional order, but it does it the long
     way because I'm afriad they might not be.
     '''
-    output_file = cwd.parent / "Data_Files" / "Primates" / "Homo_Sapiens" / "Inter" / "InterData.pkl"
+    output_file = cwd.parent / "Data_Files" / "Primates" / "Homo_Sapiens" / "Inter" / "InterData_NCIB.pkl"
     # known_gene = cwd.parent.parent / "Thesis_Data" / "Known_Genes_hg19.csv"
     # getIntergenomic(known_gene, output_file)
     # with open(output_file, "rb") as file:
@@ -37,11 +37,18 @@ def select_data(input_file: pathlib.Path, n: int = 250):
     '''
     with open(input_file, "rb") as file:
         data: pandas.DataFrame = pickle.load(file)
+        # print(data)
+        # exit()
 
     subdata = data.sample(n = n)
     subindex = tuple(subdata.index)
 
     file_path = cwd.parent / "Data_Files" / "Intergenomic" / "Seq2Check"
+    right_file = file_path / "Right"
+    right_file.mkdir(parents = True, exist_ok = True)
+    left_file = file_path / "Left"
+    left_file.mkdir(parents = True, exist_ok = True)
+    
 
     # Goes through the lines and grabs the minimum positive distance between txS and txE: txS - txE
     # That becomes the new start and end:
@@ -49,38 +56,42 @@ def select_data(input_file: pathlib.Path, n: int = 250):
     # txS = txE_inter
     # and it will be named the genes that it sits between
     for index in subindex:
-        dataN: pandas.DataFrame = data.loc[data.index != index, :]
         txStart2 = subdata.loc[index, "txStart"]
         txEnd2 = subdata.loc[index, "txEnd"]
         chrom = subdata.loc[index, "chrom"]
 
-        center_name = subdata.loc[index, "name"]
+        dataN: pandas.DataFrame = data.loc[data.index != index, :]
+        dataN = dataN[dataN["chrom"] == chrom]
+        center_name = subdata.loc[index, "ncibname"]
 
         dataN["delta_Left"] = txStart2 - dataN["txEnd"]  # looking for the left sided intergenomic data
         dataN["delta_Right"] = dataN["txStart"] - txEnd2  # looking for the right sided data
 
         # print(dataN)
-        closest_start = min(filter(lambda x: x > 0, dataN["delta_Left"]))  # this looks for the start position of the left intergenomic region
-        closest_end = min(filter(lambda x: x > 0, dataN["delta_Right"]))  # this look for the end position of the right intergenomic region
+        try:
+            closest_start = min(filter(lambda x: x > 0, dataN["delta_Left"]))  # this looks for the start position of the left intergenomic region
+            closest_end = min(filter(lambda x: x > 0, dataN["delta_Right"]))  # this look for the end position of the right intergenomic region
+        except Exception as e:
+            continue
 
         left_start_index = dataN.isin([closest_start]).any(axis=1).idxmax()
         right_end_index = dataN.isin([closest_end]).any(axis=1).idxmax()
 
         left_start = dataN.loc[left_start_index, "txEnd"]
-        left_name = dataN.loc[left_start_index, "name"]
+        left_name = dataN.loc[left_start_index, "ncibname"]
         right_end = dataN.loc[right_end_index, "txStart"]
-        right_name = dataN.loc[right_end_index, "name"]
+        right_name = dataN.loc[right_end_index, "ncibname"]
 
         print("\tLeft Query")
         left_query, left_url = API.sequence(chrom = chrom, start = left_start, end = txStart2, strand = "+")
         print("\tWriting Left Query")
-        with open(file_path / f"{left_name}_{center_name}", "w+") as file:
+        with open(left_file / f"{left_name}_{center_name}", "w+") as file:
             file.write(f"{left_name}_{center_name}\n{chrom}\n\n{left_url}\n\n\n{left_query}")
 
-        print("\tRight Query")
+        print("\t\tRight Query")
         right_query, right_url = API.sequence(chrom = chrom, start = txEnd2, end = right_end, strand = "+")
-        print("\tWriting Right Query")
-        with open(file_path / f"{center_name}_{right_name}", "w+") as file:
+        print("\t\tWriting Right Query")
+        with open(right_file / f"{center_name}_{right_name}", "w+") as file:
             file.write(f"{center_name}_{right_name}\n{chrom}\n\n{right_url}\n\n\n{right_query}")
 
         # exit()
@@ -163,10 +174,10 @@ def getIntergenomic(gene_file: pathlib.Path, output_file: pathlib.Path, ref_trac
     errors = 0
     for c, chrom in enumerate(chromes):
         chrom_genes = known_genes[known_genes["chrom"] == chrom]
-        unique_names = tuple(chrom_genes["name"].unique())
+        unique_names = tuple(chrom_genes["ncibname"].unique())
 
         for n, name in enumerate(unique_names):
-            name_genes: pandas.DataFrame = chrom_genes[chrom_genes["name"] == name]
+            name_genes: pandas.DataFrame = chrom_genes[chrom_genes["ncibname"] == name]
             try:
                 txStart = min(tuple(name_genes["txStart"].to_list()))
             except Exception as e:
@@ -217,7 +228,7 @@ def getIntergenomic(gene_file: pathlib.Path, output_file: pathlib.Path, ref_trac
             else:
                 continue
 
-            inter_positions.loc[new_row, "name"] = name
+            inter_positions.loc[new_row, "ncibname"] = name
             inter_positions.loc[new_row, "txStart"] = txStart
             inter_positions.loc[new_row, "txEnd"] = txEnd
             inter_positions.loc[new_row, "chrom"] = chrom
