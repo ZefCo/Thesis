@@ -89,11 +89,16 @@ def moments_v3(file_dir: pathlib.Path,
             exon_data = _unrenormalize(exon_data, 2*k)
         print(f"\tImported Exon File")
 
+        print(exon_data)
+
         intron_data = hm._import_data(intron_file, just_import = True)
         intron_data = pandas.DataFrame(intron_data)
         if unlog:
             intron_data = _unrenormalize(intron_data, 2*k)
         print(f"\tImported Intron File")
+
+        print(intron_data)
+        exit()
 
         for m in ms:
 
@@ -124,7 +129,7 @@ def moments_v3(file_dir: pathlib.Path,
                 per_diff = _percent_difference(exon_v, intron_v)
             except ZeroDivisionError:
                 per_diff = 0
-            
+
             me[k].append(exon_v)
             mi[k].append(intron_v)
             pd[k].append(per_diff)
@@ -524,23 +529,32 @@ def _unrenormalize(data: pandas.DataFrame, s: int, log2: bool = True, *args, **k
     s = 2*k -> I've always done this as k forward = k backward even though the scripts can handle the two being different.
     '''
 
-    rows, cols = data.shape
+    # rows, cols = data.shape
     s = 4**s
 
     if log2:
-        for row in range(rows):
-            for col in range(cols):
-                y = data.iloc[row, col]
+        # for row in range(rows):
+        #     for col in range(cols):
+        #         y = data.iloc[row, col]
 
-                x = ((2**y) - 1) / s
-                data.iloc[row, col] = x
+        #         x = ((2**y) - 1) / s
+        #         data.iloc[row, col] = x
+        fa1 = np.log(2)
+        fa2 = np.dot(fa1, fa1)
+        fa3 = np.dot(fa1, fa2)
+        fa4 = np.dot(fa2, fa2)
+
+        data = (fa1*data + fa2*data.pow(2) + fa3*data.pow(3) + fa4*data.pow(4)) / s  # Taylor expanding out to 4 terms, because hopefully this is faster then doing the above steps via iterations
+        # note there is no -1 because the Taylor expansion picks up a +1 term, so the two will cancel
     else:
-        for row in range(rows):
-            for col in range(cols):
-                y = data.iloc[row, col]
+        # for row in range(rows):
+        #     for col in range(cols):
+        #         y = data.iloc[row, col]
 
-                x = y / s
-                data.iloc[row, col] = x
+        #         x = y / s
+        #         data.iloc[row, col] = x
+
+        data = data / s
 
     return data
 
@@ -605,7 +619,9 @@ def uniform_density(data: pandas.DataFrame, m: int = 1, *args, **kwargs):
 
 
 def multiple_species_plots(ms: list, me: dict, mi: dict, uni: dict, output_dir: pathlib.Path,
-                           x_ticks: dict = None, y_ticks: dict = None, legend: bool = True, *args, **kwargs):
+                           x_ticks: dict = None, y_ticks: dict = None, legend: bool = True,
+                           inches: int = 8, filename: str = None, 
+                           *args, **kwargs):
     '''
     Because I just want to do it over here, I'm going to dump the script to do multiple species plots here.
     ms should be a list of the moments used, which will in turn become the x axis.
@@ -619,7 +635,7 @@ def multiple_species_plots(ms: list, me: dict, mi: dict, uni: dict, output_dir: 
     plt.rc('axes', linewidth = 2)
 
     fig, axs = plt.subplots()
-    fig.set_size_inches(8, 8)
+    fig.set_size_inches(inches, inches)
 
     for species, items in me.items():
         print(f"Species = {species}")
@@ -652,8 +668,11 @@ def multiple_species_plots(ms: list, me: dict, mi: dict, uni: dict, output_dir: 
         axs.set_yticklabels(list(y_ticks.values()))
     else:
         axs.set_yticks([])
-
-    fig.savefig(output_dir / f"{2*key}-mer")
+    
+    if isinstance(filename, str):
+        fig.savefig(output_dir / filename)
+    else:
+        fig.savefig(output_dir / f"{2*key}-mer_idk")
 
 
 

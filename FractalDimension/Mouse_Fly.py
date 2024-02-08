@@ -18,30 +18,31 @@ def main():
     Does the Moment calculations for the fly and Mouse.
 
     '''
-    primate_filepath = cwd.parent / "Data_Files" / "Primates" / "Genetics" # species / f"{species}_{genome}_Frame.pkl"
-    species = ["Callithrix_jacchus", "Gorilla_gorilla_gorilla" ,"Macaca_fascicularis" ,"Macaca_mulatta" ,"Nomascus_leucogenys" ,"Pan_paniscus" ,"Pan_troglodytes" ,"Papio_anubis" ,"Pongo_pygmaeus_abelii"]
-    genome = ["calJac4", "gorGor6", "macFas5", "rheMac8", "nomLeu3", "panPan3", "panTro6", "papAnu4", "ponAbe3"]
+    # primate_filepath = cwd.parent / "Data_Files" / "Primates" / "Genetics" # species / f"{species}_{genome}_Frame.pkl"
+    # species = ["Callithrix_jacchus", "Gorilla_gorilla_gorilla" ,"Macaca_fascicularis" ,"Macaca_mulatta" ,"Nomascus_leucogenys" ,"Pan_paniscus" ,"Pan_troglodytes" ,"Papio_anubis" ,"Pongo_pygmaeus_abelii"]
+    # genome = ["calJac4", "gorGor6", "macFas5", "rheMac8", "nomLeu3", "panPan3", "panTro6", "papAnu4", "ponAbe3"]
 
-    primate_sg = {s:genome[i] for i, s in enumerate(species)}
-    for prim, gen in primate_sg.items():
-        local_primate_filepath = primate_filepath / prim
-        local_primate_he: pathlib.Path = local_primate_filepath / "HEData"
+    # primate_sg = {s:genome[i] for i, s in enumerate(species)}
+    # for prim, gen in primate_sg.items():
+    #     local_primate_filepath = primate_filepath / prim
+    #     local_primate_he: pathlib.Path = local_primate_filepath / "HEData"
 
-    with open(local_primate_he / "Exon_6mer.pkl", "rb") as file:
-        data = pickle.load(file)
+    # # with open(local_primate_he / "Exon_6mer.pkl", "rb") as file:
+    # #     data = pickle.load(file)
 
-    print(data)
-    print("\n\n")
-    with open(local_primate_he / "Intron_6mer.pkl", "rb") as file:
-        data = pickle.load(file)
+    # # print(data)
+    # # print("\n\n")
+    # print(prim, gen)
+    # with open(local_primate_he / "Intron_6mer.pkl", "rb") as file:
+    #     data = pickle.load(file)
 
-    print(data)
+    # print(type(data))
 
+    # print("\n\n\nHumans\n")
+    # with open(cwd / "HS_Dicts_EF" / "Exon_6mer.pkl", "rb") as file:
+    #     data = pickle.load(file)
 
-
-    # primates(log_transform = np.log2, just_import = False, n = 20_000, reload = True)
-
-
+    # print(type(data))
 
 
     # species_TE(cwd.parent / "Data_Files" / "Primates" /"Genetics" / species / f"{species}_{genome}_Frame.pkl",
@@ -67,16 +68,31 @@ def main():
 
     # # gen_moments(cwd / "Mouse_Dicts", mer_out = cwd / "TE_Images_ForPaper" / "Moments" / "Mouse_Moments.png", pd_out = None)
     # # gen_moments(cwd / "Fly_Dicts", mer_out = cwd / "TE_Images_ForPaper" / "Moments" / "Fly_Moments.png", pd_out = None)
-    # # all_species_plots()
+    # all_species_plots()
+
+    primates(just_import = False, n = 10_000, reload = True, N_value = True, great_apes = True, filename = "GreatApesMoments.png")
+    # heat.heatmapv2(cwd.parent / "Data_Files" / "Primates" / "Genetics" / "Homo_sapiens" / "HEData" / "Exon_6mer.pkl", colors = ["white", "black"], bounds = [0, 1e-11, 1e-10], fileoutput=cwd / "TE_Images" / "Sanityv1.png")
+    # heat.heatmapv2(cwd / "HS_Dicts_EF" / "Exon_6mer.pkl", colors = ["white", "black"], bounds = [0, 1e-11, 1e-10], fileoutput=cwd / "TE_Images" / "Sanityv2.png")
+    # with open(cwd / "TE_Images_ForPaper" / "Dict" / "Seq_For_Images_n100000_minLength12.pkl", "rb") as file:
+    #     data = pickle.load(file)
+    #     print(data)
 
 
-def primates(reload: bool = False, *args, **kwargs):
+def primates(reload: bool = False, great_apes: bool = False, *args, **kwargs):
     '''
     This looks at the primates and does a lot.
     '''
+    check_ymax = lambda x, y: x if x > y else y
+    ymax = 1
+
     primate_filepath = cwd.parent / "Data_Files" / "Primates" / "Genetics" # species / f"{species}_{genome}_Frame.pkl"
-    species = ["Callithrix_jacchus", "Gorilla_gorilla_gorilla" ,"Macaca_fascicularis" ,"Macaca_mulatta" ,"Nomascus_leucogenys" ,"Pan_paniscus" ,"Pan_troglodytes" ,"Papio_anubis" ,"Pongo_pygmaeus_abelii"]
-    genome = ["calJac4", "gorGor6", "macFas5", "rheMac8", "nomLeu3", "panPan3", "panTro6", "papAnu4", "ponAbe3"]
+    if great_apes:
+        species = ["Gorilla_gorilla_gorilla","Pan_troglodytes"]
+        genome = ["gorGor6", "panTro6"]
+        ga_markers = [".", "o", "+", "x", "D", "s"]
+    else:
+        species = ["Callithrix_jacchus", "Gorilla_gorilla_gorilla" ,"Macaca_fascicularis" ,"Macaca_mulatta" ,"Nomascus_leucogenys" ,"Pan_paniscus" ,"Pan_troglodytes" ,"Papio_anubis" ,"Pongo_pygmaeus_abelii"]
+        genome = ["calJac4", "gorGor6", "macFas5", "rheMac8", "nomLeu3", "panPan3", "panTro6", "papAnu4", "ponAbe3"]
 
     primate_sg = {s:genome[i] for i, s in enumerate(species)}
 
@@ -88,6 +104,29 @@ def primates(reload: bool = False, *args, **kwargs):
     min_n = 0.5
     ms = [n / step for n in range(int(step*(min_n)), int(step*max_n) + 1)]
 
+    if reload:
+            pass
+    else:
+        print("Data on Homo Sapiens")
+        exon, intron = gen_heat_data(cwd / "TE_Images_ForPaper" / "Dict" / "Seq_For_Images_n100000_minLength12.pkl", *args, **kwargs)
+        exon.to_pickle(primate_filepath / "Homo_sapiens" / "HEData" / "Exon_6mer.pkl")
+        intron.to_pickle(primate_filepath / "Homo_sapiens" / "HEData" / "Intron_6mer.pkl")
+
+    local_primate_he = primate_filepath / "Homo_sapiens" / "HEData"
+    local_me, local_mi, uni, _ = MC.moments_v3(local_primate_he, ms, 6, 6, *args, **kwargs)
+
+    if great_apes:
+        me["H.S."] = {"data": local_me, "marker": ga_markers[0]}
+        mi["H.S."] = {"data": local_mi, "marker": ga_markers[1]}
+    else:
+        me["H.S."] = {"data": local_me, "marker": None}
+        mi["H.S."] = {"data": local_mi, "marker": None}
+
+    ymax = check_ymax(ymax, max(max(tuple(local_me.values()))))
+    ymax = check_ymax(ymax, max(max(tuple(local_mi.values()))))
+
+    print("Finished Homo Sapiens")
+
     for prim, gen in primate_sg.items():
         local_primate_filepath = primate_filepath / prim
         local_primate_he: pathlib.Path = local_primate_filepath / "HEData"
@@ -97,21 +136,39 @@ def primates(reload: bool = False, *args, **kwargs):
         else:
             local_primate_he.mkdir(parents = True, exist_ok = True)
 
+            print(f"Generating Heat Data for {prim}")
             exon, intron = gen_heat_data(local_primate_filepath / f"{prim}_{gen}_Frame.pkl", *args, **kwargs)
+            print("Saving Heat Data")
             exon.to_pickle(local_primate_he / "Exon_6mer.pkl")
             intron.to_pickle(local_primate_he / "Intron_6mer.pkl")
 
-        local_me, local_mi, _, _ = MC.moments_v3(local_primate_he, ms, 6, 6, N_value = True)
-        me[prim] = {"data": local_me, "marker": None}
-        mi[prim] = {"data": local_mi, "marker": None}
+        local_me, local_mi, _, _ = MC.moments_v3(local_primate_he, ms, 6, 6, *args, **kwargs)
+    
+        ymax = check_ymax(ymax, max(max(tuple(local_me.values()))))
+        ymax = check_ymax(ymax, max(max(tuple(local_mi.values()))))
 
-    hs_me, hs_mi, uni, _ = MC.moments_v3(cwd / "HS_Dicts_EF", ms, 6, 6, N_value = True)
-    me["H.S."] = {"data": hs_me, "marker": None}
-    mi["H.S."] = {"data": hs_mi, "marker": None}
+        if great_apes:
+            if prim in "Pan_troglodytes":
+                me[prim] = {"data": local_me, "marker": ga_markers[2]}
+                mi[prim] = {"data": local_mi, "marker": ga_markers[3]}
+            else:
+                me[prim] = {"data": local_me, "marker": ga_markers[4]}
+                mi[prim] = {"data": local_mi, "marker": ga_markers[5]}
+        else:
+            me[prim] = {"data": local_me, "marker": None}
+            mi[prim] = {"data": local_mi, "marker": None}
 
 
 
-    MC.multiple_species_plots(ms, me, mi, uni, cwd / "TE_Images_ForPaper" / "AllSpecies", x_ticks={0.5: 0.5, 1.0: 1.0, 1.5: 1.5, 2.0: 2.0}, legend=False)
+    # hs_me, hs_mi, uni, _ = MC.moments_v3(cwd / "HS_Dicts_EF", ms, 6, 6, N_value = True)
+    # me["H.S."] = {"data": hs_me, "marker": None}
+    # mi["H.S."] = {"data": hs_mi, "marker": None}
+
+    MC.multiple_species_plots(ms, me, mi, uni, cwd / "TE_Images_ForPaper" / "AllSpecies", 
+                              x_ticks={0.5: 0.5, 1.0: 1.0, 1.5: 1.5, 2.0: 2.0}, 
+                              y_ticks={0:0, int(ymax): int(ymax)},
+                              legend = True, inches = 8,
+                              *args, **kwargs)
 
 
     # with open(cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / f"{species}_{genome}_Frame.pkl", "rb") as file:
@@ -187,13 +244,17 @@ def gen_heat_data(filepath: pathlib.Path, exon_output: pathlib.Path = None, intr
 
     _, exon, intron, _, _, _, _, _, _ = heat.heat_embedding_v2(filepath, *args, **kwargs)
 
-    exon = pandas.DataFrame(exon)
+    # exon = pandas.DataFrame(exon)
     # exon = heat._reorder_frame(exon)
-    exon = MC._unrenormalize(exon, 12, log2 = False)
+    # print("un renormalizing Exon")
+    # exon = MC._unrenormalize(exon, 12, log2 = False)
 
-    intron = pandas.DataFrame(intron)
-    # intron = heat._reorder_frame(intron)
-    intron = MC._unrenormalize(intron, 12, log2 = False)
+    # intron = pandas.DataFrame(intron)
+    # # intron = heat._reorder_frame(intron)
+    # print("Un renomalizing intron")
+    # intron = MC._unrenormalize(intron, 12, log2 = False)
+
+    # exit()
 
     if isinstance(exon_output, pathlib.Path):
         exon.to_pickle(exon_output)

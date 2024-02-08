@@ -854,7 +854,7 @@ def _heat_data_v2(sequence:str, dataframe: pandas.DataFrame,
     for i, k_prime in enumerate(k_minus):
         k_prime = k_prime[::-1]
 
-        dataframe.loc[k_plus[i], k_prime] = dataframe.loc[k_plus[i], k_prime] + 1
+        dataframe.loc[k_plus[i], k_prime] += 1
 
     return dataframe
 
