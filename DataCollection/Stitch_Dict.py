@@ -92,8 +92,8 @@ def main():
 
     # print(data["NM_001351428.2"])
     # print(data["NM_001351428.2"].full_seq)
-    # stitch_frame("/media/ethanspeakman/Elements/Gene_Data_Sets/Combined/", "/media/ethanspeakman/Elements/Gene_Data_Sets/Combined/Combined_Hist.pkl")
-    select_data("G:/Known_Genes_Master.pkl", "G:/Gene_Data_Sets", n = 1_000)
+    # stitch_frame("/media/ethanspeakman/Elements/GeneData", "/media/ethanspeakman/Elements/Gene_Data_Sets/Second_ML_Algorithm/ML2.pkl")
+    select_data("/media/ethanspeakman/Elements/Known_Genes_Master.pkl", "/media/ethanspeakman/Elements/Gene_Data_Sets/Second_ML_Algorithm", n = 1_000)
     # test_dict(pathlib.Path("D:\Downloads\GeneData\Fly\SelectedFlyDict\Data_set_1_cleaned_dict.pkl"))
     # test_dict(pathlib.Path("G:\Gene_Data_Sets\Data_set_2_cleaned_dict.pkl"))
 
@@ -331,12 +331,19 @@ def longest(exon_list: list, intron_list: list) -> int:
     intron_list = tuple(intron_list)
 
     for exon in exon_list:
-        if len(exon) > long_seq:
-            long_seq = len(exon)
+        try:
+            if len(exon) > long_seq:
+                long_seq = len(exon)
+        except Exception as e:
+            continue
+    
 
     for intron in intron_list:
-        if len(intron) > long_seq:
-            long_seq = len(intron)
+        try:
+            if len(intron) > long_seq:
+                long_seq = len(intron)
+        except Exception as e:
+            continue
 
     return long_seq
 
