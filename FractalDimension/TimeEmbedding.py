@@ -543,6 +543,7 @@ def time_embedding_v2(data: pandas.DataFrame,
                       y_lim: list = None,
                       exon_outfile: pathlib.Path or str = None,
                       intron_outfile: pathlib.Path or str = None,
+                      inter_outfile: pathlib.Path or str = None,
                       *args, **kwargs):
     '''
     Rewrite this so that it pickles the data. Then we'll save that to a figure seperately.
@@ -590,11 +591,13 @@ def time_embedding_v2(data: pandas.DataFrame,
     exon_dir.mkdir(parents = True, exist_ok = True)
     intron_dir = image_dir / "Intron"
     intron_dir.mkdir(parents = True, exist_ok = True)
-    both_dir = image_dir / "Both"
-    both_dir.mkdir(parents = True, exist_ok = True)
+    inter_dir = image_dir / "InterGenome"
+    inter_dir.mkdir(parents = True, exist_ok = True)
 
     _check_file(exon_outfile)
     _check_file(intron_outfile)
+    _check_file(inter_outfile)
+
 
     # gene: Gene.Gene
     # ncib: str
@@ -607,8 +610,8 @@ def time_embedding_v2(data: pandas.DataFrame,
         data["Length"] = data.Seq.str.len()
         data = data[data["Length"] > (k_m + k_p + gap)]
 
-    e_frame, i_frame = {}, {}  # OK this may seem weird, but hear me out: lists are slow, especially when you have a very large N in a list. But a dictionary is hashable, so I can store the lists in the dictionary, who cares about the key, and it should be faster for large N
-    e_count, i_count = 0, 0
+    e_frame, i_frame, n_frame = {}, {}, {}  # OK this may seem weird, but hear me out: lists are slow, especially when you have a very large N in a list. But a dictionary is hashable, so I can store the lists in the dictionary, who cares about the key, and it should be faster for large N
+    e_count, i_count, n_count = 0, 0, 0
 
 
     for row in range(rows):
@@ -641,6 +644,9 @@ def time_embedding_v2(data: pandas.DataFrame,
         elif (region in "Intron") or (region in "intron") or (region in "i"):
             i_frame[i_count] = xy
             i_count += 1
+        elif (region in "Inter") or (region in "inter") or (region in "n"):
+            n_frame[n_count] = xy
+            n_count += 1
 
         # b_frame[b_count] = xy
         # b_count += 1
@@ -648,12 +654,18 @@ def time_embedding_v2(data: pandas.DataFrame,
         if ((row % 1000) == 0):
             print(f"Finished row {row} of {rows}")
 
-    with open(exon_outfile, "wb") as e_file:
-        print(f"Writing to {exon_outfile}")
-        pickle.dump(e_frame, e_file)
-    with open(intron_outfile, "wb") as i_file:
-        print(f"Writing to {intron_outfile}")
-        pickle.dump(i_frame, i_file)
+    if isinstance(exon_outfile, pathlib.Path):
+        with open(exon_outfile, "wb") as e_file:
+            print(f"Writing to {exon_outfile}")
+            pickle.dump(e_frame, e_file)
+    if isinstance(intron_outfile, pathlib.Path):
+        with open(intron_outfile, "wb") as i_file:
+            print(f"Writing to {intron_outfile}")
+            pickle.dump(i_frame, i_file)
+    if isinstance(inter_outfile, pathlib.Path):
+        with open(inter_outfile, "wb") as n_file:
+            print(f"Writing to {inter_outfile}")
+            pickle.dump(n_frame, n_file)
 
     # save the dictionary here
 
@@ -679,17 +691,18 @@ def _check_file(file_path: pathlib.Path):
     Checks if the file path is free: if it is not it gives the option to abandon the script. If the it is free then a temp empty dictionary is put there
     in case multiple scripts are running at once.
     '''
-    if file_path.is_file():
-        print(f"{file_path} already exists!")
-        overwrite = input(f"Do you wish to continue [y/n]? ")
-        if (overwrite in "n") or (overwrite in "No") or (overwrite in "no") or (overwrite in "NO"):
-            print("Ending script")
-            exit()
-        
-        else:
-            temp = {}
-            with open(file_path, "wb") as file:
-                pickle.dump(temp, file)
+    if isinstance(file_path, pathlib.Path):
+        if file_path.is_file():
+            print(f"{file_path} already exists!")
+            overwrite = input(f"Do you wish to continue [y/n]? ")
+            if (overwrite in "n") or (overwrite in "No") or (overwrite in "no") or (overwrite in "NO"):
+                print("Ending script")
+                exit()
+            
+            else:
+                temp = {}
+                with open(file_path, "wb") as file:
+                    pickle.dump(temp, file)
 
 
 

@@ -639,6 +639,7 @@ def heat_embedding(data: pandas.DataFrame,
                    backwards: bool = True, # I'm leaving this in here in case I want to use it later. Probably not though
                    nucsequence: str = "AGTC", sequence_name: str = "Seq", classification_name: str = "Classificaion",
                    dict_output_files: list = None,
+                   skip_ExonIntron: bool = False,
                    *args, **kwargs) -> Tuple[dict, dict, dict, int, int, int, int, int, int]:
     '''
     Somewhat similar to the time embedding, this looks at the past and the future and creates a heatmap.
@@ -678,8 +679,15 @@ def heat_embedding(data: pandas.DataFrame,
             intron_dict = _dict_deep_merge(intron_dict, local_dict)
 
     master_dict, master_max, master_min = _normalize_dict(master_dict, int(4**(k_p + k_m)), *args, **kwargs)
-    exon_dict, exon_max, exon_min = _normalize_dict(exon_dict, int(4**(k_p + k_m)), *args, **kwargs)
-    intron_dict, intron_max, intron_min = _normalize_dict(intron_dict, int(4**(k_p + k_m)), *args, **kwargs)
+    try:
+        exon_dict, exon_max, exon_min = _normalize_dict(exon_dict, int(4**(k_p + k_m)), *args, **kwargs)
+    except Exception as e:
+        exon_dict, exon_max, exon_min = None, None, None
+
+    try:
+        intron_dict, intron_max, intron_min = _normalize_dict(intron_dict, int(4**(k_p + k_m)), *args, **kwargs)
+    except Exception as e:
+        intron_dict, intron_max, intron_min = None, None, None
 
     # if k_m + k_p < 5:
     #     ic(master_dict)

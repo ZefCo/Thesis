@@ -59,10 +59,12 @@ def main():
     # # gen_moments(cwd / "Fly_Dicts", mer_out = cwd / "TE_Images_ForPaper" / "Moments" / "Fly_Moments.png", pd_out = None)
     # all_species_plots()
 
+
     # Something is *very* fishy with the primate data. Not sure what is going on at all.
     primates(just_import = False, n = 100, reload = False, N_value = True, great_apes = True, filename = "GreatApesMoments.png")
     # heat.heatmapv2(cwd.parent / "Data_Files" / "Primates" / "Genetics" / "Homo_sapiens" / "HEData" / "Exon_6mer.pkl", colors = ["white", "black"], bounds = [0, 1e-11, 1e-10], fileoutput=cwd / "TE_Images" / "SanityExon.png")
     # heat.heatmapv2(cwd.parent / "Data_Files" / "Primates" / "Genetics" / "Homo_sapiens" / "HEData" / "Intron_6mer.pkl", colors = ["white", "black"], bounds = [0, 1e-11, 1e-10], fileoutput=cwd / "TE_Images" / "SanityIntron.png")
+
     # with open(cwd / "TE_Images_ForPaper" / "Dict" / "Seq_For_Images_n100000_minLength12.pkl", "rb") as file:
     #     data = pickle.load(file)
     #     print(data)
