@@ -6,7 +6,7 @@ import pandas
 
 
 class Gene():
-    def __init__(self, name: str, ename: str = None, gname: str = None, ncibname: str = None,
+    def __init__(self, name: str = None, ename: str = None, gname: str = None, ncibname: str = None,
                        chrm: str = None, 
                        strand: str = None, 
                        txStart: int = None, 
@@ -16,7 +16,8 @@ class Gene():
                        exonCount: int = None, 
                        exonStarts: tuple or list = None, 
                        exonEnds: tuple or list = None, 
-                       exonFrames: tuple or list = None) -> None:
+                       exonFrames: tuple or list = None,
+                       genome: str = None) -> None:
 
         '''
         For simplicity this is based on the ENST Track of UCSC genome browser
@@ -31,15 +32,24 @@ class Gene():
         self.utr5_cords, self.cds_cords, self.utr3_cords, self.intron_cords, self.exon_cords = None, None, None, None, None
         self.utr5_seq, self.cds_seq, self.utr3_seq, self.intron_seq, self.exon_seq = None, None, None, None, None
         self.full_seq = None
+        self.urls = []
+
+        if genome is None:
+            self.genome = "hg19"
+        else:
+            self.genome = genome
 
 
 
 
     def sequence_breakdown(self):
         '''
+        Grabs all sequences for the gene based off their positions on the UCSC genome browser. Will do UTR, CDS, Exon, and Intron sequences.
+
+        These are then stored in a series of lists.
         '''
 
-        print(f"Breakdown for {self.name}")
+        print(f"Breakdown for {self.name}\t{self.ncibname}\t{self.ename}\t{self.gname}\t{self.genome}")
         # print(f"\n####\n{self.name}\n####\n")
         # print(f"Chrom: {self.chrm}\tStrand: {self.strand}")
         if (self.utr3_cords is None) or (self.utr5_cords is None) or (self.cds_cords is None) or (self.intron_cords is None):
@@ -49,41 +59,58 @@ class Gene():
             # print(f"UTR Seqs")
             self.utr5_seq = []
             for utr5 in self.utr5_cords:
-                seq, _ = upi.sequence(chrom=self.chrm, start = utr5[0], end = utr5[1], strand = self.strand)
+                seq, url = upi.sequence(chrom=self.chrm, start = utr5[0], end = utr5[1], strand = self.strand, genome = self.genome)
+                if seq is None:
+                    raise Exception("Json Decode Error probably or url redirect. Not sure, don't care")
                 self.utr5_seq.append(seq)
+                self.urls.append(url)
                 # print(url)
 
         if len(self.cds_cords) > 0:
             # print(f"CDS Seqs")
             self.cds_seq = []
             for cds in self.cds_cords:
-                seq, _ = upi.sequence(chrom = self.chrm, start = cds[0], end = cds[1], strand = self.strand)
+                seq, url = upi.sequence(chrom = self.chrm, start = cds[0], end = cds[1], strand = self.strand, genome = self.genome)
+                if seq is None:
+                    raise Exception("Json Decode Error probably or url redirect. Not sure, don't care")
                 self.cds_seq.append(seq)
+                self.urls.append(url)
                 # print(url)
         
         if len(self.utr3_cords) > 0:
             # print(f"UTR Seqs")
             self.utr3_seq = []
             for utr3 in self.utr3_cords:
-                seq, _ = upi.sequence(chrom = self.chrm, start = utr3[0], end = utr3[1], strand = self.strand)
+                seq, url = upi.sequence(chrom = self.chrm, start = utr3[0], end = utr3[1], strand = self.strand, genome = self.genome)
+                if seq is None:
+                    raise Exception("Json Decode Error probably or url redirect. Not sure, don't care")
                 self.utr3_seq.append(seq)
+                self.urls.append(url)
                 # print(url)
 
         if len(self.exon_cords) > 0:
             self.exon_seq = []
             for exon in self.exon_cords:
-                seq, _ = upi.sequence(chrom = self.chrm, start = exon[0], end = exon[1], strand = self.strand)
+                seq, url = upi.sequence(chrom = self.chrm, start = exon[0], end = exon[1], strand = self.strand, genome = self.genome)
+                if seq is None:
+                    raise Exception("Json Decode Error probably or url redirect. Not sure, don't care")
                 self.exon_seq.append(seq)
+                self.urls.append(url)
 
         if len(self.intron_cords) > 0:
             # print(f"Intron Seqs")
             self.intron_seq = []
             for intron in self.intron_cords:
-                seq, _ = upi.sequence(chrom = self.chrm, start = intron[0], end = intron[1], strand = self.strand)
+                seq, url = upi.sequence(chrom = self.chrm, start = intron[0], end = intron[1], strand = self.strand, genome = self.genome)
+                if seq is None:
+                    raise Exception("Json Decode Error probably or url redirect. Not sure, don't care")
                 self.intron_seq.append(seq)
+                self.urls.append(url)
                 # print(url)
 
-        self.full_seq = upi.sequence(chrom = self.chrm, start = self.txStart, end = self.txEnd, strand = self.strand)
+        self.full_seq = upi.sequence(chrom = self.chrm, start = self.txStart, end = self.txEnd, strand = self.strand, genome = self.genome)
+        if self.full_seq is None:
+            raise Exception("Json Decode Error probably or url redirect. Not sure, don't care")
 
 
 

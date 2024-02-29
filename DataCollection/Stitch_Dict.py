@@ -14,50 +14,50 @@ def main():
     '''
     '''
 
-    species = "Callithrix_jacchus"
-    genome = "calJac4"
+    # species = "Callithrix_jacchus"
+    # genome = "calJac4"
 
-    species = "Gorilla_gorilla_gorilla"
-    genome = "gorGor6"
+    # species = "Gorilla_gorilla_gorilla"
+    # genome = "gorGor6"
 
-    species = "Macaca_fascicularis"
-    genome = "macFas5"
+    # species = "Macaca_fascicularis"
+    # genome = "macFas5"
 
-    species = "Macaca_mulatta"
-    genome = "rheMac8"
+    # species = "Macaca_mulatta"
+    # genome = "rheMac8"
 
-    species = "Nomascus_leucogenys"
-    genome = "nomLeu3"
+    # species = "Nomascus_leucogenys"
+    # genome = "nomLeu3"
 
-    species = "Pan_paniscus"
-    genome = "panPan3"
+    # species = "Pan_paniscus"
+    # genome = "panPan3"
 
-    species = "Pan_troglodytes"
-    genome = "panTro6"
+    # species = "Pan_troglodytes"
+    # genome = "panTro6"
 
-    species = "Papio_anubis"
-    genome = "papAnu4"
+    # species = "Papio_anubis"
+    # genome = "papAnu4"
 
-    species = "Pongo_pygmaeus_abelii"
-    genome = "ponAbe3"
+    # species = "Pongo_pygmaeus_abelii"
+    # genome = "ponAbe3"
 
-    in_file_path = cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / f"Known_Genes_{genome}_DICT_0.pkl"
-    out_dict_path = cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / f"{species}_{genome}_Dict.pkl"
-    out_frame_path = cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / f"{species}_{genome}_Frame.pkl"
+    # in_file_path = cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / f"Known_Genes_{genome}_DICT_0.pkl"
+    # out_dict_path = cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / f"{species}_{genome}_Dict.pkl"
+    # out_frame_path = cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / f"{species}_{genome}_Frame.pkl"
 
-    print(f"Loading data from {in_file_path}")
-    with open(in_file_path, "rb") as p:
-        data: dict = pickle.load(p)
+    # print(f"Loading data from {in_file_path}")
+    # with open(in_file_path, "rb") as p:
+    #     data: dict = pickle.load(p)
 
-    cleaned_data = clean_dict(data, cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / "CleaningReport.txt", min_length = 6)
-    with open(out_dict_path, "wb") as out_file:
-        pickle.dump(cleaned_data, out_file)
-    print(f"Wrote dict to {out_dict_path}")
+    # cleaned_data = clean_dict(data, cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / "CleaningReport.txt", min_length = 6)
+    # with open(out_dict_path, "wb") as out_file:
+    #     pickle.dump(cleaned_data, out_file)
+    # print(f"Wrote dict to {out_dict_path}")
 
-    frame_data = convert2dataframe(cleaned_data, cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / "DataFrameReport.txt", min_length = 6, histogram = False)
-    with open(out_frame_path, "wb") as out_file:
-        pickle.dump(frame_data, out_file)
-    print(f"Wrote frame to {out_frame_path}")
+    # frame_data = convert2dataframe(cleaned_data, cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / "DataFrameReport.txt", min_length = 6, histogram = False)
+    # with open(out_frame_path, "wb") as out_file:
+    #     pickle.dump(frame_data, out_file)
+    # print(f"Wrote frame to {out_frame_path}")
 
     # mouse = "Mouse"
     # fly = "Fly"
@@ -93,7 +93,7 @@ def main():
     # print(data["NM_001351428.2"])
     # print(data["NM_001351428.2"].full_seq)
     # stitch_frame("/media/ethanspeakman/Elements/Gene_Data_Sets/Combined/", "/media/ethanspeakman/Elements/Gene_Data_Sets/Combined/Combined_Hist.pkl")
-    # select_data("G:/Known_Genes_Master.pkl", "G:/Gene_Data_Sets", n = 40_000)
+    select_data("G:/Known_Genes_Master.pkl", "G:/Gene_Data_Sets", n = 1_000)
     # test_dict(pathlib.Path("D:\Downloads\GeneData\Fly\SelectedFlyDict\Data_set_1_cleaned_dict.pkl"))
     # test_dict(pathlib.Path("G:\Gene_Data_Sets\Data_set_2_cleaned_dict.pkl"))
 

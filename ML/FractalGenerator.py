@@ -19,15 +19,15 @@ def main():
     '''
 
     kmer = 6
-    min_length = 40
-    method = "KTA"
+    min_length = 12
+    method = "GHM"
     data_set = 2
     ex_col: str = "exon"
     int_col: str = "intron"
     classification_col: str = "Classificaion"
     gene_name_col: str = "NCIBName"
 
-    generator(f"G:/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl", kmer, target_dir = f"G:/Gene_Data_Sets/Data_Set_{data_set}_histogram_{kmer}mer_{method}", ex_col = ex_col, int_col = int_col, classification_col = classification_col, method = method, min_length = min_length, gene_name_col = gene_name_col)
+    generator(f"F:/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl", kmer, target_dir = f"F:/Gene_Data_Sets/Data_Set_{data_set}_histogram_{kmer}mer_{method}", ex_col = ex_col, int_col = int_col, classification_col = classification_col, method = method, min_length = min_length, gene_name_col = gene_name_col)
 
 
 def generator(data_file: pathlib.Path, kmer: int,
@@ -86,11 +86,13 @@ def generator(data_file: pathlib.Path, kmer: int,
     kwargs["meta_data"] = meta_data
 
     if method in "CGR":
+        print("Chaos Game Representation Method")
         kwargs["k"] = kmer
         kwargs["target_dir"] = target_dir
         # print(kwargs)
         cgr_generator(train_data, *args, **kwargs)
     elif method in "KTA":
+        print("Kneading Transform Method")
         # print("Unable to handle time embedding yet, exiting")
         # exit()
         # It's going to take a bit more work. Time Embedding returns a xy vector that needs to be turned into a picture.
@@ -99,6 +101,12 @@ def generator(data_file: pathlib.Path, kmer: int,
         kwargs["target_dir"] = target_dir
         # print(kwargs)
         kta_generator(train_data, *args, **kwargs)
+    elif method in "GHM":
+        print("Gaussian Method")
+        matplotlib.rc('figure', figsize=(1, 1), dpi = np.sqrt(4**kmer))
+        kwargs["k_p"], kwargs["k_m"] = kmer, kmer
+        kwargs["target_dir"] = target_dir
+        gaussian_generator(train_data, *args, **kwargs)
 
 
 
@@ -154,6 +162,71 @@ def nucleotide_counter(sequence: str, window_size: int):
 
     return counter
 
+
+def gaussian_generator(train_data: pandas.DataFrame,
+                       target_dir: pathlib.Path = None,
+                       int_col: str = None, ex_col: str = None,
+                       classification_col: str = None, gene_name_col: str = None,
+                       steps: int = 64,
+                       *args, **kwargs):
+    '''
+    for when the method == gaussian
+    '''
+
+    def plot_gaussmap(data: np.ndarray, file_path: pathlib.Path):
+        '''
+        '''
+        plt.close()
+        plt.imshow(data, cmap='gray_r', interpolation='nearest')
+        plt.axis("off")
+        plt.savefig(file_path)
+        plt.close()
+
+    exon, intron = 0, 0
+    exon_images = target_dir / "EXON"
+    intron_images = target_dir / "INTRON"
+
+    meta_data = target_dir / f"Meta_Data.txt"
+
+    rows, cols = train_data.shape
+    delta = (1 - 0) / steps
+    grid = np.arange(0, 1, delta)
+    
+    for row in range(rows):
+        seq = train_data.loc[row, "Seq"]
+        typ = train_data.loc[row, classification_col]
+        gene_name = train_data.loc[row, gene_name_col]
+        length = len(seq)
+
+        xy = time_embedding(seq, gap = 0, *args, **kwargs)
+        density = gaussian(xy, grid)
+        
+        if typ in int_col:
+            filepath = intron_images / f"Intron_{intron}.png"
+            intron += 1
+            try:
+                plot_gaussmap(density, filepath)
+                with open(meta_data, "at") as mf:
+                    mf.write(f"{filepath.name}\t{gene_name}\Intron {intron}\tLength = {length}\n")
+
+            except Exception as e:
+                print(type(e))
+                print(e)
+
+        if typ in ex_col:
+            filepath = exon_images / f"Exon_{exon}.png"
+            exon += 1
+            try:
+                plot_gaussmap(density, filepath)
+                with open(meta_data, "at") as mf:
+                    mf.write(f"{filepath.name}\t{gene_name}\tExon {intron}\tLength = {length}\n")
+
+            except Exception as e:
+                print(type(e))
+                print(e)
+
+
+
 def kta_generator(train_data: pandas.DataFrame,
                   target_dir: pathlib.Path = None,
                   int_col: str = None, ex_col: str = None,
@@ -161,8 +234,9 @@ def kta_generator(train_data: pandas.DataFrame,
                   *args, **kwargs):
     '''
     for when the method == KTA
-    '''
 
+    Also used for when method is guassian since that starts with the Kneading Transform
+    '''
     exon, intron = 0, 0
     exon_images = target_dir / "EXON"
     intron_images = target_dir / "INTRON"
@@ -397,6 +471,57 @@ def generate_trajectories(data_file: pathlib.Path, choices: int = 5000, kp: int 
 
 
 
+def gaussian(xy: np.ndarray, t: np.ndarray, delta: int = 2, *args, **kwargs) -> np.array:
+    '''
+    Takes in two arrays, a point-set array and a grid array. The xy should be a Nx2 size vector:
+
+    N = number of points
+   means [x, y]
+
+    while the tz one is a 1D vector [t] that represents one column/row. It will iterate across this as such:
+    for tx in t:
+        for ty in t:
+            T = tx X + ty Y
+
+    delta is how many steps to take on the grid. the conversion from delta to sigma is:
+    sigma = delta * (1 - 0) / (grid length)
+
+    Look over the notes you took with Dr G... something is confusing about the normalization
+    '''
+    if isinstance(delta, int):
+        if delta < 1:
+            delta = 1 # in case someone puts in a sigma value of 0
+        sigma = t[delta]  # it actually just pulls from the delta row to get the step size
+    elif isinstance(delta, float):
+        sigma = delta
+
+    sigma_sqr = np.dot(sigma, sigma)
+
+    m = t.shape[0]
+    field = np.zeros((m, m))
+    N = xy.shape[0]
+    # N = m * m
+
+    for x in xy:
+        P = list()
+        Np = 0
+        for ix, tx in enumerate(t):
+            for iy, ty in enumerate(t[::-1]):
+                T = np.array([tx, ty])
+                d = np.linalg.norm(x - T)
+                if d < sigma:
+                    p = np.exp((-1/2) * np.dot(d, d) / sigma_sqr)
+                    Np += p
+                    P.append([p, iy, ix])
+
+        for p in P:
+            field[p[1], p[2]] += p[0] / Np
+
+    field = field / N
+
+    return field
+
+
 
 def time_embedding(sequence: str, 
                       k_p: int = 6, k_m: int = 6, gap: int = 0, 
@@ -439,7 +564,7 @@ def time_embedding(sequence: str,
         n = [0 if n in nucsequence[0] else 1 if n in nucsequence[1] else 2 if n in nucsequence[2] else 3 if n in nucsequence[3] else 100 for n in k_plus[i]]
         k_y = np.dot(w_p, n)
 
-        xy[i][0], xy[i][1] = k_x, k_y
+        xy[i][0], xy[i][1] = k_y, k_x  # yes this is reversed: at some point we decided to flip the anterior and posterior axis, and that was AFTER all of this had been built. There's lots of legacy issues this causes so... good luck
 
     return xy
 
