@@ -65,9 +65,12 @@ def moments_v3(file_dir: pathlib.Path,
     Does all the moment calculations, then returns them to be plotted speretly. Probably should have done this much earlier but... oh well.
 
     Returns a tuple of 4 dictionaries.
+
+    Note, I'll have to modify this to be able to do this with and without the intergenomic data. Right now I'm just hard coding in the inter stuff.
     '''
     me = {}
     mi = {}
+    mn = {}
     pd = {}
 
     uni = {}
@@ -79,26 +82,33 @@ def moments_v3(file_dir: pathlib.Path,
         mi[k]: list = []
         pd[k]: list = []
         uni[k]: list = []
+        mn[k]: list = []
 
         exon_file = file_dir / f"Exon_{k}mer.pkl"
         intron_file = file_dir / f"Intron_{k}mer.pkl"
+        inter_file = file_dir / f"Inter_{6}mer.pkl"
 
         exon_data = hm._import_data(exon_file, just_import = True)
         exon_data = pandas.DataFrame(exon_data)
         if unlog:
             exon_data = _unrenormalize(exon_data, 2*k)
-        print(f"\tImported Exon File")
+        # print(f"\tImported Exon File")
 
-        print(exon_data)
+        # print(exon_data)
 
         intron_data = hm._import_data(intron_file, just_import = True)
         intron_data = pandas.DataFrame(intron_data)
         if unlog:
             intron_data = _unrenormalize(intron_data, 2*k)
-        print(f"\tImported Intron File")
+        # print(f"\tImported Intron File")
+        
+        inter_data = hm._import_data(inter_file, just_import = True)
+        inter_data = pandas.DataFrame(inter_data)
+        if unlog:
+            inter_data = _unrenormalize(inter_data, 2*k)
 
-        print(intron_data)
-        exit()
+        # print(intron_data)
+        # exit()
 
         for m in ms:
 
@@ -114,6 +124,7 @@ def moments_v3(file_dir: pathlib.Path,
             # exon_u = uniform_density(exon_data, m = m, N = N)
             intron_v = moment(intron_data, m = m, unlog = False, N = N, *args, **kwargs)
             # intron_u = uniform_density(intron_data, m = m, N = N, *args, **kwargs)
+            inter_v = moment(inter_data, m = m, unlog = False, N = N, *args, **kwargs)
 
             # if N_value:
             #     N = 4**(2*k)
@@ -124,6 +135,7 @@ def moments_v3(file_dir: pathlib.Path,
             if logy:
                 exon_v = np.log2(exon_v)
                 intron_v = np.log2(intron_v)
+                inter_v = np.log2(inter_v)
             
             try:
                 per_diff = _percent_difference(exon_v, intron_v)
@@ -132,11 +144,12 @@ def moments_v3(file_dir: pathlib.Path,
 
             me[k].append(exon_v)
             mi[k].append(intron_v)
+            mn[k].append(inter_v)
             pd[k].append(per_diff)
 
             uni[k].append(1)
 
-    return me, mi, uni, pd
+    return me, mi, mn, uni, pd
 
 
 def moments_v2(file_dir: pathlib.Path, 
@@ -618,7 +631,7 @@ def uniform_density(data: pandas.DataFrame, m: int = 1, *args, **kwargs):
     return uoment
 
 
-def multiple_species_plots(ms: list, me: dict, mi: dict, uni: dict, output_dir: pathlib.Path,
+def multiple_species_plots(ms: list, me: dict, mi: dict, mn: dict, uni: dict, output_dir: pathlib.Path,
                            x_ticks: dict = None, y_ticks: dict = None, legend: bool = True,
                            inches: int = 8, filename: str = None, 
                            *args, **kwargs):
@@ -630,6 +643,8 @@ def multiple_species_plots(ms: list, me: dict, mi: dict, uni: dict, output_dir: 
     m = {species: {k-mer: [points]}}
 
     uni should be another dict, but in the form similar to other plots. I'm lazy so... deal with it.
+
+    This one will also need to be updated at some point to be able to do this with and without the inter data.
     '''
     plt.rc("font", size = 20)
     plt.rc('axes', linewidth = 2)
@@ -645,11 +660,13 @@ def multiple_species_plots(ms: list, me: dict, mi: dict, uni: dict, output_dir: 
             ms_markers = ms[::5]
             me_markers = value[::5]
             mi_markers = mi[species]["data"][key][::5]
+            mn_markers = mi[species]["data"][key][::5]
 
             # axs.plot(ms, value)
             axs.plot(ms_markers, me_markers, label = f"Exon - {species}", marker = items["marker"], markersize = 5)
             # axs.plot(ms, mi[species]["data"][key])
             axs.plot(ms_markers, mi_markers, label = f"Intron - {species}", marker = mi[species]["marker"], markersize = 5)
+            axs.plot(ms_markers, mn_markers, label = f"Inter - {species}", marker = mn[species]["marker"], markersize = 5)
             axs.plot(ms, uni[key], linestyle = "dotted")
         
     axs.set_title(f"{2*key}-mer")

@@ -70,7 +70,7 @@ def main():
     # # gen_moments(cwd / "Fly_Dicts", mer_out = cwd / "TE_Images_ForPaper" / "Moments" / "Fly_Moments.png", pd_out = None)
     # all_species_plots()
 
-    primates(just_import = False, n = 10_000, reload = True, N_value = True, great_apes = True, filename = "GreatApesMoments.png")
+    primates(just_import = False, n = 10_000, reload = False, N_value = True, great_apes = True, filename = "GreatApesMoments.png")
     # heat.heatmapv2(cwd.parent / "Data_Files" / "Primates" / "Genetics" / "Homo_sapiens" / "HEData" / "Exon_6mer.pkl", colors = ["white", "black"], bounds = [0, 1e-11, 1e-10], fileoutput=cwd / "TE_Images" / "Sanityv1.png")
     # heat.heatmapv2(cwd / "HS_Dicts_EF" / "Exon_6mer.pkl", colors = ["white", "black"], bounds = [0, 1e-11, 1e-10], fileoutput=cwd / "TE_Images" / "Sanityv2.png")
     # with open(cwd / "TE_Images_ForPaper" / "Dict" / "Seq_For_Images_n100000_minLength12.pkl", "rb") as file:
