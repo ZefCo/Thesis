@@ -27,23 +27,12 @@ def main():
     #     local_primate_filepath = primate_filepath / prim
     #     local_primate_he: pathlib.Path = local_primate_filepath / "HEData"
 
-    # # with open(local_primate_he / "Exon_6mer.pkl", "rb") as file:
-    # #     data = pickle.load(file)
-
-    # # print(data)
-    # # print("\n\n")
-    # print(prim, gen)
-    # with open(local_primate_he / "Intron_6mer.pkl", "rb") as file:
-    #     data = pickle.load(file)
-
-    # print(type(data))
-
-    # print("\n\n\nHumans\n")
-    # with open(cwd / "HS_Dicts_EF" / "Exon_6mer.pkl", "rb") as file:
-    #     data = pickle.load(file)
-
-    # print(type(data))
-
+    # species_TE(cwd.parent / "Data_Files" / "Primates" /"Genetics" / "Gorilla_gorilla_gorilla" / f"Gorilla_gorilla_gorilla_gorGor6_Frame.pkl",
+    #            exon_outfile = cwd.parent / "Data_Files" / "Primates" /"Genetics" / "Gorilla_gorilla_gorilla" / "Exons.pkl",
+    #            intron_outfile = cwd.parent / "Data_Files" / "Primates" /"Genetics" / "Gorilla_gorilla_gorilla" / "Introns.pkl")
+    # species_TE(cwd.parent / "Data_Files" / "Primates" /"Genetics" / "Pan_troglodytes" / f"Pan_troglodytes_panTro6_Frame.pkl",
+    #            exon_outfile = cwd.parent / "Data_Files" / "Primates" /"Genetics" / "Pan_troglodytes" / "Exons.pkl",
+    #            intron_outfile = cwd.parent / "Data_Files" / "Primates" /"Genetics" / "Pan_troglodytes" / "Introns.pkl")
 
     # species_TE(cwd.parent / "Data_Files" / "Primates" /"Genetics" / species / f"{species}_{genome}_Frame.pkl",
     #            exon_outfile = cwd.parent / "Data_Files" / "Primates" /"Genetics" / species / "Exons.pkl",
@@ -70,9 +59,12 @@ def main():
     # # gen_moments(cwd / "Fly_Dicts", mer_out = cwd / "TE_Images_ForPaper" / "Moments" / "Fly_Moments.png", pd_out = None)
     # all_species_plots()
 
-    primates(just_import = False, n = 10_000, reload = False, N_value = True, great_apes = True, filename = "GreatApesMoments.png")
-    # heat.heatmapv2(cwd.parent / "Data_Files" / "Primates" / "Genetics" / "Homo_sapiens" / "HEData" / "Exon_6mer.pkl", colors = ["white", "black"], bounds = [0, 1e-11, 1e-10], fileoutput=cwd / "TE_Images" / "Sanityv1.png")
-    # heat.heatmapv2(cwd / "HS_Dicts_EF" / "Exon_6mer.pkl", colors = ["white", "black"], bounds = [0, 1e-11, 1e-10], fileoutput=cwd / "TE_Images" / "Sanityv2.png")
+
+    # Something is *very* fishy with the primate data. Not sure what is going on at all.
+    primates(just_import = False, n = 100, reload = False, N_value = True, great_apes = True, filename = "GreatApesMoments.png")
+    # heat.heatmapv2(cwd.parent / "Data_Files" / "Primates" / "Genetics" / "Homo_sapiens" / "HEData" / "Exon_6mer.pkl", colors = ["white", "black"], bounds = [0, 1e-11, 1e-10], fileoutput=cwd / "TE_Images" / "SanityExon.png")
+    # heat.heatmapv2(cwd.parent / "Data_Files" / "Primates" / "Genetics" / "Homo_sapiens" / "HEData" / "Intron_6mer.pkl", colors = ["white", "black"], bounds = [0, 1e-11, 1e-10], fileoutput=cwd / "TE_Images" / "SanityIntron.png")
+
     # with open(cwd / "TE_Images_ForPaper" / "Dict" / "Seq_For_Images_n100000_minLength12.pkl", "rb") as file:
     #     data = pickle.load(file)
     #     print(data)
@@ -105,12 +97,13 @@ def primates(reload: bool = False, great_apes: bool = False, *args, **kwargs):
     ms = [n / step for n in range(int(step*(min_n)), int(step*max_n) + 1)]
 
     if reload:
-            pass
+        pass
     else:
         print("Data on Homo Sapiens")
-        exon, intron = gen_heat_data(cwd / "TE_Images_ForPaper" / "Dict" / "Seq_For_Images_n100000_minLength12.pkl", *args, **kwargs)
-        exon.to_pickle(primate_filepath / "Homo_sapiens" / "HEData" / "Exon_6mer.pkl")
-        intron.to_pickle(primate_filepath / "Homo_sapiens" / "HEData" / "Intron_6mer.pkl")
+        _, _ = gen_heat_data(cwd / "TE_Images_ForPaper" / "Dict" / "Seq_For_Images_n100000_minLength12.pkl", 
+                             exon_output = primate_filepath / "Homo_sapiens" / "HEData" / "Exon_6mer.pkl",
+                             intron_output = primate_filepath / "Homo_sapiens" / "HEData" / "Intron_6mer.pkl",
+                             *args, **kwargs)
 
     local_primate_he = primate_filepath / "Homo_sapiens" / "HEData"
     local_me, local_mi, uni, _ = MC.moments_v3(local_primate_he, ms, 6, 6, *args, **kwargs)
@@ -137,10 +130,11 @@ def primates(reload: bool = False, great_apes: bool = False, *args, **kwargs):
             local_primate_he.mkdir(parents = True, exist_ok = True)
 
             print(f"Generating Heat Data for {prim}")
-            exon, intron = gen_heat_data(local_primate_filepath / f"{prim}_{gen}_Frame.pkl", *args, **kwargs)
-            print("Saving Heat Data")
-            exon.to_pickle(local_primate_he / "Exon_6mer.pkl")
-            intron.to_pickle(local_primate_he / "Intron_6mer.pkl")
+            _, _ = gen_heat_data(local_primate_filepath / f"{prim}_{gen}_Frame.pkl", 
+                                 exon_output = local_primate_he / "Exon_6mer.pkl",
+                                 intron_output = local_primate_he / "Intron_6mer.pkl",
+                                 *args, **kwargs)
+            print("Saved Heat Data")
 
         local_me, local_mi, _, _ = MC.moments_v3(local_primate_he, ms, 6, 6, *args, **kwargs)
     
@@ -157,8 +151,6 @@ def primates(reload: bool = False, great_apes: bool = False, *args, **kwargs):
         else:
             me[prim] = {"data": local_me, "marker": None}
             mi[prim] = {"data": local_mi, "marker": None}
-
-
 
     # hs_me, hs_mi, uni, _ = MC.moments_v3(cwd / "HS_Dicts_EF", ms, 6, 6, N_value = True)
     # me["H.S."] = {"data": hs_me, "marker": None}
@@ -257,10 +249,17 @@ def gen_heat_data(filepath: pathlib.Path, exon_output: pathlib.Path = None, intr
     # exit()
 
     if isinstance(exon_output, pathlib.Path):
-        exon.to_pickle(exon_output)
+        if isinstance(exon, dict):
+            with open(exon_output, "wb") as file:
+                pickle.dump(exon, file)
+        elif isinstance(exon, pandas.DataFrame):
+            exon.to_pickle(exon_output)
     if isinstance(intron_output, pathlib.Path):
-        intron.to_pickle(intron_output)
-
+        if isinstance(intron, dict):
+            with open(intron_output, "wb") as file:
+                pickle.dump(intron, file)
+        elif isinstance(intron, pandas.DataFrame):
+            intron.to_pickle(intron_output)
     return exon, intron
 
 

@@ -92,6 +92,7 @@ def moments_v3(file_dir: pathlib.Path,
         exon_data = pandas.DataFrame(exon_data)
         if unlog:
             exon_data = _unrenormalize(exon_data, 2*k)
+
         # print(f"\tImported Exon File")
 
         # print(exon_data)
@@ -100,6 +101,7 @@ def moments_v3(file_dir: pathlib.Path,
         intron_data = pandas.DataFrame(intron_data)
         if unlog:
             intron_data = _unrenormalize(intron_data, 2*k)
+
         # print(f"\tImported Intron File")
         
         inter_data = hm._import_data(inter_file, just_import = True)
@@ -109,6 +111,7 @@ def moments_v3(file_dir: pathlib.Path,
 
         # print(intron_data)
         # exit()
+
 
         for m in ms:
 

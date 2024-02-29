@@ -545,7 +545,6 @@ def heatmap(data: dict or pandas.DataFrame or pathlib.Path,
 def heat_embedding_v2(data: pandas.DataFrame,
                       n: int = 50_000,
                       k_p: int = 6, k_m: int = 6, 
-                      backwards: bool = True, # I'm leaving this in here in case I want to use it later. Probably not though
                       nucsequence: str = "AGTC", sequence_name: str = "Seq", classification_name: str = "Classificaion",
                       dict_output_files: list = None,
                       *args, **kwargs) -> Tuple[pandas.DataFrame, pandas.DataFrame, pandas.DataFrame, int, int, int, int, int, int]:
@@ -568,7 +567,6 @@ def heat_embedding_v2(data: pandas.DataFrame,
     master_frame = _init_frame(k_p, nucsequence = nucsequence)
     exon_frame = _init_frame(k_p, nucsequence = nucsequence)
     intron_frame = _init_frame(k_p, nucsequence = nucsequence)
-    blank_frame = _init_frame(k_p, nucsequence = nucsequence)  # this one we just dump in as an instance, get the points we need, and move on.
 
     # ic(exon_dict)
 
@@ -583,18 +581,25 @@ def heat_embedding_v2(data: pandas.DataFrame,
 
         region = data.loc[row, classification_name]
 
-        local_frame: pandas.DataFrame = _heat_data_v2(sequence, blank_frame, k_p = k_p, k_m = k_m, nucsequence = nucsequence)
+        local_frame: pandas.DataFrame = _heat_data_v2(sequence, k_p = k_p, k_m = k_m, nucsequence = nucsequence)
         master_frame = master_frame + local_frame
+        # print(f"\tLocal Frame after ###Master### {row}:\t{local_frame.to_numpy().sum()}")
 
         if (region in "Exon") or (region in "exon") or (region in "e"):  # because I realized I was doing this like 3 different ways... I probably should have been more precise.
             exon_frame = exon_frame + local_frame
+            # print(f"\tLocal Frame after !!!!Exon!!!! {row}:\t\t{local_frame.to_numpy().sum()}")
+
 
         elif (region in "Intron") or (region in "intron") or (region in "i"):
             intron_frame = intron_frame + local_frame
+            # print(f"\tLocal Frame after $$$Intron$$$ {row}:\t\t{local_frame.to_numpy().sum()}")
 
     master_frame, master_max, master_min = _normalize_frame(master_frame, int(4**(k_p + k_m)), *args, **kwargs)
     exon_frame, exon_max, exon_min = _normalize_frame(exon_frame, int(4**(k_p + k_m)), *args, **kwargs)
     intron_frame, intron_max, intron_min = _normalize_frame(intron_frame, int(4**(k_p + k_m)), *args, **kwargs)
+    print(f"Exon frame max = {exon_frame.max().max()}")
+    print(f"Intron frame max = {intron_frame.max().max()}")
+    # exit()
 
     # if k_m + k_p < 5:
     #     ic(master_dict)
@@ -839,15 +844,15 @@ def _dict_normalize_dict(dictionary: dict):
     return dictionary
 
 
-def _heat_data_v2(sequence:str, dataframe: pandas.DataFrame, 
-                  k_p: int = 6, k_m: int = 6, 
-                  nucsequence: str = "AGTC") -> pandas.DataFrame:
+def _heat_data_v2(sequence:str, k_p: int = 6, k_m: int = 6, nucsequence: str = "AGTC", 
+                  *args, **kwargs) -> pandas.DataFrame:
     '''
     Because something looks weird in the heat data, I'm doing it this way with empty dataframes.
 
     The input dataframe needs to have columns and rows with names that are all possible permutations of the k-mer length.
     The backwards is on the y axis and the forwards is on the x axis
     '''
+    dataframe = _init_frame(k_p, nucsequence = nucsequence, *args, **kwargs)
     sequence = sequence.upper()
     nucsequence = nucsequence.upper()
     seq_length = len(sequence)
@@ -862,7 +867,7 @@ def _heat_data_v2(sequence:str, dataframe: pandas.DataFrame,
     for i, k_prime in enumerate(k_minus):
         k_prime = k_prime[::-1]
 
-        dataframe.loc[k_plus[i], k_prime] += 1
+        dataframe.loc[k_prime, k_plus[i]] += 1
 
     return dataframe
 
@@ -871,7 +876,7 @@ def _heat_data(sequence: str,
               k_p: int = 6, k_m: int = 6, 
               nucsequence: str = "AGTC") -> dict:
     '''
-    This part does the actual counting of the occurrences, and will return a local dictionary from teh sequence.
+    This part does the actual counting of the occurrences, and will return a local dictionary from the sequence.
     '''
     local_dict = dict()
 
