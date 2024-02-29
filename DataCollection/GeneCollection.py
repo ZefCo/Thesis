@@ -180,7 +180,7 @@ def getKnownGene(genome = "hg19", track = "ncbiRefSeqCurated", chroms: list = No
 
 
 
-def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track = "ncib", gene_start = 0, species: str = "human", genome: str = "hg19"):
+def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track = "ncib", gene_start = 0, gene_stop: int = None, species: str = "human", genome: str = "hg19"):
     '''
     This will go to UCSC Genome Browser and grab all HG19 genes, then save them in a pickle file. They will not be chopped up, but instead will
     be preserved in all their glory for chopping up later.
@@ -238,7 +238,11 @@ def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track
     # print(known_genes)
     # exit()
 
-    rows, _ = known_genes.shape
+    if isinstance(gene_stop, int):
+        rows = gene_stop
+    else:
+        rows, _ = known_genes.shape
+
 
     pickle_dict = dict()
     # gene_rows = list()
