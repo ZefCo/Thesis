@@ -27,7 +27,7 @@ def main():
     classification_col: str = "Classificaion"
     gene_name_col: str = "NCIBName"
 
-    generator(f"F:/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl", kmer, target_dir = f"F:/Gene_Data_Sets/Data_Set_{data_set}_histogram_{kmer}mer_{method}", ex_col = ex_col, int_col = int_col, classification_col = classification_col, method = method, min_length = min_length, gene_name_col = gene_name_col)
+    generator(f"/media/ethanspeakman/Elements/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl", kmer, target_dir = f"/media/ethanspeakman/Elements/Gene_Data_Sets/Data_Set_{data_set}_histogram_{kmer}mer_{method}", ex_col = ex_col, int_col = int_col, classification_col = classification_col, method = method, min_length = min_length, gene_name_col = gene_name_col)
 
 
 def generator(data_file: pathlib.Path, kmer: int,
@@ -175,12 +175,15 @@ def gaussian_generator(train_data: pandas.DataFrame,
 
     def plot_gaussmap(data: np.ndarray, file_path: pathlib.Path):
         '''
+        This has to do a little trick to get the image to work right.
+        PNG requires the image to be uint8 encoded, which doesn't work with floats, so we have to find the maximum float, then create a scale from that.
+        That is then multipled by the entire dataset and saved.
         '''
-        plt.close()
-        plt.imshow(data, cmap='gray_r', interpolation='nearest')
-        plt.axis("off")
-        plt.savefig(file_path)
-        plt.close()
+        max_norm = data.max()
+        scale = 255 / max_norm
+        data = (data * scale).astype("uint8")
+        image = Image.fromarray(data)
+        image.save(file_path)
 
     exon, intron = 0, 0
     exon_images = target_dir / "EXON"
@@ -199,7 +202,11 @@ def gaussian_generator(train_data: pandas.DataFrame,
         length = len(seq)
 
         xy = time_embedding(seq, gap = 0, *args, **kwargs)
-        density = gaussian(xy, grid)
+        try:
+            density = gaussian(xy, grid)
+        except Exception as exc:
+            print(f"\t\tException\n\t\t{type(exc)}")
+            continue
         
         if typ in int_col:
             filepath = intron_images / f"Intron_{intron}.png"
