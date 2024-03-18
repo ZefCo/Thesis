@@ -44,7 +44,7 @@ def get_num_pixels(filepath):
 # branch = report.active_branch
 branch = "slurm"
 
-image_dir = cwd / "Data_Set_1_histogram_6mer_KTA"
+image_dir = cwd / "GHMSubsample"
 ive_dir = cwd / "FractalModels" / "IvE"
 version_num = len(next(os.walk(ive_dir))[1]) + 60
 version_dir = ive_dir / f"version_{branch}_{version_num}"
@@ -59,13 +59,16 @@ output_classes = 2
 # version_dir = model_dir / f"version_{version_num}"
 # output_classes = 4
 
-w, h = get_num_pixels(image_dir / "EXON" / "Exon_0.png")  # probably shouldn't hard code it to the first image, but I'm feeling lazy this morning
+
+# w, h = get_num_pixels(image_dir / "EXON" / "Exon_0.png")  # probably shouldn't hard code it to the first image, but I'm feeling lazy this morning
+# The reason you don't hard code this is because there might not be an exon_0. Since there might not be you need to grab a random image and check that size.
+w, h = get_num_pixels(image_dir / "EXON" / random.choice(os.listdir(image_dir / "EXON")))
 
 seed = random.randint(1000000, 9000000)
 
 
 batch_size = 256
-epochs = 50
+epochs = 100
 
 pngs = 0
 for folder in os.listdir(image_dir):
@@ -92,24 +95,15 @@ python_script = pathlib.Path(__file__)
 shutil.copy(str(python_script), str(version_dir / python_script.name))
 
 input_layer = tf.keras.Input(shape = (w, h, 1))
-a = tf.keras.layers.Conv2D(w, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(input_layer)
-a = tf.keras.layers.Dropout(.5)(a)
+a = tf.keras.layers.Conv2D(3, (3, 3), padding = "same")(input_layer) #), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(input_layer)
+#a = tf.keras.layers.Dropout(.5)(a)
 a = tf.keras.layers.BatchNormalization()(a)
-b = tf.keras.layers.Conv2D(w, (6, 6), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(a)
-b = tf.keras.layers.Dropout(.5)(b)
+a = tf.keras.layers.MaxPooling2D(pool_size = (2, 2))(a)
+b = tf.keras.layers.Conv2D(6, (3, 3), padding = "same")(a)
 b = tf.keras.layers.BatchNormalization()(b)
-b = tf.keras.layers.MaxPooling2D(pool_size = (2, 2), strides = (1, 1), padding = "valid")(b)
-c = tf.keras.layers.Conv2D(w / 2, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(b)
-c = tf.keras.layers.Dropout(.5)(c)
-c = tf.keras.layers.BatchNormalization()(c)
-d = tf.keras.layers.Conv2D(w / 2, (6, 6), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(c)
-d = tf.keras.layers.Dropout(.5)(d)
-d = tf.keras.layers.BatchNormalization()(d)
-#e = tf.keras.layers.Conv2D(w, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(d)
-#e = tf.keras.layers.Dropout(.5)(e)
-#e = tf.keras.layers.BatchNormalization()(e)
-flatten = tf.keras.layers.Flatten()(d)
-final = tf.keras.layers.Dropout(.5)(flatten)
+flatten = tf.keras.layers.Flatten()(a)
+dense = tf.keras.layers.Dense(1000, activation = "gelu")
+final = tf.keras.layers.Dropout(.25)(flatten)
 output_layer = tf.keras.layers.Dense(output_classes, activation = "softmax")(final)
 model = tf.keras.Model(inputs = input_layer, outputs = output_layer)
 
