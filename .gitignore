@@ -47,3 +47,7 @@ Thesis.Rproj
 !/ML/FractalModels/IvE/version_slurm_*/*
 !/ML/FractalModels/IvE/version_home_fedora_*/*
 !GenePerChrom.pkl
+
+/ML/FractalModels/IvE/version_slurm_100/Model/variables/variables.data-00000-of-00001
+/ML/FractalModels/IvE/version_slurm_101/Model/variables/variables.data-00000-of-00001
+/ML/FractalModels/IvE/version_slurm_102/Model/variables/variables.data-00000-of-00001
