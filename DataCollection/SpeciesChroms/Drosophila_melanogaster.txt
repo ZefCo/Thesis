@@ -1,0 +1,10 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=dm6
+Species: Drosophila melanogaster
+	chr3R
+	chr4
+	chrY
+	chr2L
+	chrX
+	chr2R
+	chr3L

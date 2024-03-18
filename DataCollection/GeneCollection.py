@@ -23,14 +23,77 @@ def main():
 
     Stopped at 40587 at school. Stopped at a different number at home. Both from a json decode error.
     '''
+    # start_gene = 20083
+    # genome = "mm39"
+    # species = "Mouse"
+
+    # start_gene = 0
+    # genome = "xenTro9"
+    # species = "Frog"
+
+    # start_gene = 16761
+    # genome = "dm6"
+    # species = "Fly"
+
+    # start_gene = 0
+    # genome = "rn7"
+    # species = "Rat"
+
+    # start_gene = 0
+    # genome = "sacCer3"
+    # species = "Yeast"
+
     start_gene = 0
+    genome = "calJac4"
+    species = "Callithrix_jacchus"
+
+    # start_gene = 0
+    # genome = "gorGor6"
+    # species = "Gorilla_gorilla_gorilla"
+
+    # start_gene = 0
+    # genome = "macFas5"
+    # species = "Macaca_fascicularis"
+
+    # start_gene = 0
+    # genome = "rheMac8"
+    # species = "Macaca_mulatta"
+
+    # start_gene = 0
+    # genome = "nomLeu3"
+    # species = "Nomascus_leucogenys"
+
+    # start_gene = 0
+    # genome = "panPan3"
+    # species = "Pan_paniscus"
+
+    # start_gene = 0
+    # genome = "panTro6"
+    # species = "Pan_troglodytes"
+
+    # start_gene = 0
+    # genome = "papAnu4"
+    # species = "Papio_anubis"
+
+    # start_gene = 0
+    # genome = "ponAbe3"
+    # species = "Pongo_pygmaeus_abelii"
+
+    output_file = cwd.parent / "Data_Files" / "Primates" / "Genetics" / f"{species}" / f"Known_Genes_{genome}_DICT_{start_gene}.pkl"
     # dict_screwup()
     # pickle_file, csv_file = getKnownGene()
-    hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19.csv",
-                   pathlib.Path(f"D:/Downloads/GeneData/Known_Genes_hg19_NCBIGene_DICT_{start_gene}.pkl"), 
-                   ref_track="ncib",
-                   gene_start = start_gene)
+    # hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19.csv",
+    #                pathlib.Path(f"D:/Downloads/GeneData/Known_Genes_hg19_NCBIGene_DICT_{start_gene}.pkl"), 
+    #                ref_track="ncib",
+    #                gene_start = start_gene)
     # hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19_ncbiRefSeqCurated.pkl")
+
+    hg19_sequences(cwd.parent / "Data_Files" / "Primates" / "Known_Genes" / species / f"Known_Genes_{genome}.csv",
+                   output_file, 
+                   ref_track="ncib",
+                   gene_start = start_gene,
+                   species = species,
+                   genome = genome)
 
 
 def dict_screwup():
@@ -66,15 +129,16 @@ def dict_screwup():
 
 
 
-def getKnownGene(genome = "hg19", track = "ncbiRefSeqCurated"):
+def getKnownGene(genome = "hg19", track = "ncbiRefSeqCurated", chroms: list = None):
     '''
     This will get all the known gene data and load it to a pkl file for later use.
 
     It will return the names of the files that it outputs, so I can be lazy and use one script to do two things. THAT'S HOW YOU DO IT BENDER!
     '''
-    chroms = [f'chr{i}' for i in range(1, 23)]
-    chroms.append('chrX')
-    chroms.append('chrY')
+    if chroms is None:
+        chroms = [f'chr{i}' for i in range(1, 23)]
+        chroms.append('chrX')
+        chroms.append('chrY')
 
     if genome in "hg38":
         colnames = ['chrom', 'chromStart', 'chromEnd', 'name', 'score', 'strand', 'thickStart', 'thickEnd', 'reserved', 'blockCount', 'blockSizes', 'chromStarts', 'name2', 'cdsStartStat', 'cdsEndStat', 'exonFrames', 'type', 'geneName', 'geneName2', 'geneType', 'transcriptClass', 'source', 'transcriptType', 'tag', 'level', 'tier']
@@ -116,7 +180,7 @@ def getKnownGene(genome = "hg19", track = "ncbiRefSeqCurated"):
 
 
 
-def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track = "ncib", gene_start = 0):
+def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track = "ncib", gene_start = 0, gene_stop: int = None, species: str = "human", genome: str = "hg19"):
     '''
     This will go to UCSC Genome Browser and grab all HG19 genes, then save them in a pickle file. They will not be chopped up, but instead will
     be preserved in all their glory for chopping up later.
@@ -168,12 +232,17 @@ def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track
     known_genes["exonCount"] = known_genes["exonCount"].fillna(0)
 
     known_genes = known_genes[known_genes["cdsStartStat"] == "cmpl"]
+    known_genes = known_genes[known_genes["cdsEndStat"] == "cmpl"]
     known_genes = known_genes[known_genes["exonCount"] >= 1]
 
     # print(known_genes)
     # exit()
 
-    rows, _ = known_genes.shape
+    if isinstance(gene_stop, int):
+        rows = gene_stop
+    else:
+        rows, _ = known_genes.shape
+
 
     pickle_dict = dict()
     # gene_rows = list()
@@ -182,7 +251,7 @@ def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track
 
     unique_index = 0
     for row in range(gene_start, rows):
-        print(f"Working on row {row} / {rows}")
+        print(f"Working on row {row} / {rows} - {species}")
         row_of_interest = known_genes.iloc[row, :]
 
         gene_of_interest: Gene = Gene.Gene(name = row_of_interest["name"],
@@ -198,9 +267,15 @@ def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track
                                            exonCount = row_of_interest["exonCount"],
                                            exonStarts = row_of_interest["exonStarts"],
                                            exonEnds = row_of_interest["exonEnds"],
-                                           exonFrames = row_of_interest["exonFrames"])
-        
-        gene_of_interest.sequence_breakdown()
+                                           exonFrames = row_of_interest["exonFrames"],
+                                           genome=genome)
+        try:
+            gene_of_interest.sequence_breakdown()
+        except Exception as e:
+            print(type(e))
+            print(e)
+            # exit()
+            continue
 
         # try:
         #     gene_of_interest.sequence_breakdown()

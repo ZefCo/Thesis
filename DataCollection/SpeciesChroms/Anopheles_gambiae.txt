@@ -1,0 +1,8 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=anoGam3
+Species: Anopheles gambiae
+	chr2R
+	chrX
+	chr3L
+	chr2L
+	chr3R

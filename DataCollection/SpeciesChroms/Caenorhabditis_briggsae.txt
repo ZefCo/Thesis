@@ -1,0 +1,9 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=cb3
+Species: Caenorhabditis briggsae
+	chrI
+	chrIII
+	chrII
+	chrIV
+	chrV
+	chrX

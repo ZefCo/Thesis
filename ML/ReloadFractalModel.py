@@ -37,25 +37,85 @@ from PIL import Image
 
 def main():
     '''
+    https://www.tensorflow.org/tutorials/keras/save_and_load
+
     This isn't going to be a one size fits all kind of script: the model has to be rebuilt. However, having saved the scripts used and the weights from the scripts,
     this shouldn't be to hard, just a bunch of copy and pasting.
 
     I need to think about this. I can't get the history without redoing the model (that data is not saved) but could get it via a custom callback. How much is it
     worth it to actually do all that work?
     '''
-    version_dir: pathlib.Path = cwd / "FractalModels" / "IvE" / "version_slurm_22"  
-    image_dir: pathlib.Path = pathlib.Path("/media/ethanspeakman/Elements/Gene_Data_Sets/FractalImageEvI_DS1_6mer_hist")
-    model_file: pathlib.Path = version_dir / "Model"
-    # reload_model(version_dir, image_dir)
-    reload_saved_model(model_file)
+    # version_dir: pathlib.Path = cwd / "FractalModels" / "IvE" / "version_slurm_22"  
+    # image_dir: pathlib.Path = pathlib.Path("/media/ethanspeakman/Elements/Gene_Data_Sets/FractalImageEvI_DS1_6mer_hist")
+    # model_file: pathlib.Path = version_dir / "Model"
+    # # reload_model(version_dir, image_dir)
+    path_to_model_folder = cwd / "FractalModels" / "IvE" / "version_slurm_24" / "Model"
+    path_to_data_folder = cwd.parent / "Data_Files" / "FuckDrG" / "Data_Set_2_histogram_6mer_KTA"
+    path_to_first_file = path_to_data_folder / "EXON" / "Exon_0.png"
+    w, h = get_num_pixels(path_to_first_file)
+    model = create_model(2, w, h)
+
+    train_set, valid_set = setup_data(path_to_data_folder, w, h)
+
+    print("Loading Untrained model with validation set as test set - model was NOT trained or validated on this set, this set is new to the model")
+    loss, acc = model.evaluate(valid_set)
+    print("Untrained model loaded")
+
+    try:
+        model.load_weights(str(path_to_model_folder)).expect_partial()
+    except Exception as e:
+        print("I hate Dr G")
+        print(type(e))
+        print(e)
+        # print(path_to_model_folder)
+        exit()
+    print("Model Restored")
+
+    print("Evaluating restored model with validation set as a test set\nAgain, this data was NOT used as training or validation on this model, this is new data")
+    loss, acc = model.evaluate(train_set)
+
+    print(f"Model Accuracy of NEW, non-training, non-validated data: {acc * 100}%")
+
+
+
+    # print(type(model))
+
+    # reload_saved_model(path_to_model_folder)
+
+
+def get_num_pixels(filepath):
+    width, height = Image.open(filepath).size
+    return width, height
+
+def normalization(image, label):
+    image = tf.cast(image / 255, tf.float32)
+    return image, label
+
+
+def setup_data(image_dir: pathlib.Path, w: int, h: int, batch_size: int = 200):
+    '''
+    Setup the data for train, validation, and test
+    '''
+    seed = random.randint(1000000, 9000000)
+
+    train_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (w, h), seed = seed, subset = "training", validation_split = 0.2, batch_size = batch_size, label_mode = "categorical", color_mode = "grayscale")
+    valid_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (w, h), seed = seed, subset = "validation", validation_split = 0.2, batch_size = batch_size, label_mode = "categorical", color_mode = "grayscale")
+    # test_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (w, h), seed = seed, subset = "test", validation_split = 0.2, batch_size = batch_size, label_mode = "categorical", color_mode = "grayscale")
+    
+    train_set = train_set.map(normalization)
+    valid_set = valid_set.map(normalization)
+
+    return train_set, valid_set
+
 
 
 def reload_saved_model(model_dir: pathlib.Path):
     '''
     '''
-    imported_model = tf.saved_model.load(str(model_dir))
 
-    print(imported_model.history)
+    # imported_model = tf.saved_model.load(str(model_dir))
+
+    # # print(imported_model.history)
 
     # print(type(imported_model))
 
@@ -82,7 +142,7 @@ def reload_model(version_dir: pathlib.Path, image_dir: pathlib.Path, output_clas
     model.load_weights(latest)
 
 
-def create_model(model_dir: pathlib.Path, version_dir: pathlib.Path, output_classes: int, w: int, h: int):
+def create_model(output_classes: int, w: int, h: int):
     '''
     This should be copy and pasted over from the original model script.
     '''
@@ -104,11 +164,13 @@ def create_model(model_dir: pathlib.Path, version_dir: pathlib.Path, output_clas
     output_layer = tf.keras.layers.Dense(output_classes, activation = "softmax")(final)
     model = tf.keras.Model(inputs = input_layer, outputs = output_layer)
 
-    model.compile(optimizer = 'adam',
+    fuck_dr_G = tf.keras.optimizers.legacy.Adam()
+
+    model.compile(optimizer = fuck_dr_G,
                 loss = 'categorical_crossentropy',
                 #   metrics = ['accuracy'])
                 metrics = [tf.keras.metrics.CategoricalAccuracy()])
-    
+
     return model
 
 if __name__ in "__main__":

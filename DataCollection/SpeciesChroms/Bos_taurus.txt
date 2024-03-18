@@ -1,0 +1,33 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=bosTau9
+Species: Bos taurus
+	chr1
+	chr25
+	chr27
+	chr28
+	chr29
+	chr26
+	chr23
+	chr22
+	chr24
+	chr19
+	chr18
+	chr21
+	chr20
+	chr17
+	chr16
+	chr14
+	chr13
+	chr15
+	chr12
+	chr10
+	chr9
+	chr11
+	chr7
+	chr8
+	chr6
+	chr4
+	chr5
+	chr3
+	chr2
+	chrX

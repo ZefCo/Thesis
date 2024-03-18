@@ -1,0 +1,34 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=chlSab2
+Species: Chlorocebus sabaeus
+	chr8
+	chrY
+	chr28
+	chr29
+	chr19
+	chr27
+	chr6
+	chr26
+	chr17
+	chr18
+	chr16
+	chr5
+	chr23
+	chr24
+	chr25
+	chr2
+	chr4
+	chr15
+	chr3
+	chr13
+	chr22
+	chr14
+	chr12
+	chr9
+	chr1
+	chr21
+	chr11
+	chr10
+	chrX
+	chr20
+	chr7

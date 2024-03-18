@@ -1,0 +1,27 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=panPan3
+Species: Pan paniscus
+	chr1
+	chr22
+	chr21
+	chr19
+	chr20
+	chr16
+	chr18
+	chr17
+	chr15
+	chr14
+	chr13
+	chr2A
+	chr9
+	chr10
+	chr2B
+	chr11
+	chr12
+	chr8
+	chrX
+	chr7
+	chr6
+	chr5
+	chr4
+	chr3

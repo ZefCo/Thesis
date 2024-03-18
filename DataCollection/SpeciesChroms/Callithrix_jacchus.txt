@@ -1,0 +1,27 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=calJac4
+Species: Callithrix jacchus
+	chr1
+	chrY
+	chr20
+	chr18
+	chr21
+	chr22
+	chr19
+	chr17
+	chr16
+	chr15
+	chr14
+	chr13
+	chr12
+	chr8
+	chr11
+	chr9
+	chr10
+	chrX
+	chr7
+	chr6
+	chr5
+	chr4
+	chr3
+	chr2

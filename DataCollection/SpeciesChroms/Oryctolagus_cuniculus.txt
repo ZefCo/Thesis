@@ -1,0 +1,25 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=oryCun2
+Species: Oryctolagus cuniculus
+	chr1
+	chr21
+	chr6
+	chr20
+	chr5
+	chr10
+	chr19
+	chr18
+	chr16
+	chr17
+	chr11
+	chr4
+	chr15
+	chrX
+	chr8
+	chr9
+	chr13
+	chr12
+	chr3
+	chr14
+	chr7
+	chr2

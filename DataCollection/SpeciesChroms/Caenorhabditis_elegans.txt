@@ -1,0 +1,9 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=ce6
+Species: Caenorhabditis elegans
+	chrV
+	chrIII
+	chrI
+	chrII
+	chrIV
+	chrX

@@ -1,0 +1,33 @@
+Seed: 3731859
+
+Model: "model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ input_1 (InputLayer)        [(None, 640, 480, 1)]     0         
+                                                                 
+ conv2d (Conv2D)             (None, 640, 480, 640)     1280      
+                                                                 
+ dropout (Dropout)           (None, 640, 480, 640)     0         
+                                                                 
+ batch_normalization (BatchN  (None, 640, 480, 640)    2560      
+ ormalization)                                                   
+                                                                 
+ conv2d_1 (Conv2D)           (None, 640, 480, 640)     410240    
+                                                                 
+ dropout_1 (Dropout)         (None, 640, 480, 640)     0         
+                                                                 
+ batch_normalization_1 (Batc  (None, 640, 480, 640)    2560      
+ hNormalization)                                                 
+                                                                 
+ flatten (Flatten)           (None, 196608000)         0         
+                                                                 
+ dropout_3 (Dropout)         (None, 196608000)         0         
+                                                                 
+ dense (Dense)               (None, 2)                 393216002 
+                                                                 
+=================================================================
+Total params: 393,632,642
+Trainable params: 393,630,082
+Non-trainable params: 2,560
+_________________________________________________________________

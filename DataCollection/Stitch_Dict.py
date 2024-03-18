@@ -13,15 +13,145 @@ import os
 def main():
     '''
     '''
-    # with open(pathlib.Path(f"/media/ethanspeakman/Elements/GeneData/Known_Genes_hg19_NCBIGene_DICT.pkl"), "rb") as p:
+
+    # species = "Callithrix_jacchus"
+    # genome = "calJac4"
+
+    # species = "Gorilla_gorilla_gorilla"
+    # genome = "gorGor6"
+
+    # species = "Macaca_fascicularis"
+    # genome = "macFas5"
+
+    # species = "Macaca_mulatta"
+    # genome = "rheMac8"
+
+    # species = "Nomascus_leucogenys"
+    # genome = "nomLeu3"
+
+    # species = "Pan_paniscus"
+    # genome = "panPan3"
+
+    # species = "Pan_troglodytes"
+    # genome = "panTro6"
+
+    # species = "Papio_anubis"
+    # genome = "papAnu4"
+
+    # species = "Pongo_pygmaeus_abelii"
+    # genome = "ponAbe3"
+
+    # in_file_path = cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / f"Known_Genes_{genome}_DICT_0.pkl"
+    # out_dict_path = cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / f"{species}_{genome}_Dict.pkl"
+    # out_frame_path = cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / f"{species}_{genome}_Frame.pkl"
+
+    # print(f"Loading data from {in_file_path}")
+    # with open(in_file_path, "rb") as p:
+    #     data: dict = pickle.load(p)
+
+    # cleaned_data = clean_dict(data, cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / "CleaningReport.txt", min_length = 6)
+    # with open(out_dict_path, "wb") as out_file:
+    #     pickle.dump(cleaned_data, out_file)
+    # print(f"Wrote dict to {out_dict_path}")
+
+    # frame_data = convert2dataframe(cleaned_data, cwd.parent / "Data_Files" / "Primates" / "Genetics" / species / "DataFrameReport.txt", min_length = 6, histogram = False)
+    # with open(out_frame_path, "wb") as out_file:
+    #     pickle.dump(frame_data, out_file)
+    # print(f"Wrote frame to {out_frame_path}")
+
+    # mouse = "Mouse"
+    # fly = "Fly"
+    # n = 10_000
+
+    # species = "Mouse"
+    # genome = "mm39"
+
+    # species = "Yeast"
+    # genome = "sacCer3"
+
+    # species = "Frog"
+    # genome = "xenTro9"  # Both Yeast and the Frog data have None in the intron section, and I'm not sure why. Will need to investigate further
+
+    # species = "Chimp"
+    # genome = "panTro6"
+
+    # species = "Rat"
+    # genome = "rn7"
+
+
+    # redo(f"D:\Downloads\GeneData\{species}\Master{species}Dict.pkl", genome, f"D:\Downloads\GeneData\{species}\Fixed_Master{species}Dict.pkl")
+    # with open(pathlib.Path(f"D:\Downloads\GeneData\Fly/MasterflyDict.pkl"), "rb") as p:
     #     data = pickle.load(p)
+
+    # print(type(data))
+    # print(len(data))
+    # first_key = tuple(data.keys())[0]
+    # print(first_key)
+    # print(data[first_key].exon_seq)
+    # print(type(data[first_key]))
 
     # print(data["NM_001351428.2"])
     # print(data["NM_001351428.2"].full_seq)
-    # stitch_dict("G:/GeneData", "G:/Known_Genes_Master.pkl")
-    # select_data("G:/Known_Genes_Master.pkl", "G:/Gene_Data_Sets", n = 40_000)
-    test_dict(pathlib.Path("G:\Gene_Data_Sets\Data_set_1_cleaned_dict.pkl"))
-    test_dict(pathlib.Path("G:\Gene_Data_Sets\Data_set_2_cleaned_dict.pkl"))
+    # stitch_frame("/media/ethanspeakman/Elements/GeneData", "/media/ethanspeakman/Elements/Gene_Data_Sets/Second_ML_Algorithm/ML2.pkl")
+    select_data("/media/ethanspeakman/Elements/Known_Genes_Master.pkl", "/media/ethanspeakman/Elements/Gene_Data_Sets/Second_ML_Algorithm", n = 1_000)
+    # test_dict(pathlib.Path("D:\Downloads\GeneData\Fly\SelectedFlyDict\Data_set_1_cleaned_dict.pkl"))
+    # test_dict(pathlib.Path("G:\Gene_Data_Sets\Data_set_2_cleaned_dict.pkl"))
+
+    # stitch_dict(f"D:\Downloads\GeneData\{fly}", f"D:\Downloads\GeneData\{fly}\Master{fly}Dict.pkl")
+    # stitch_dict(f"D:\Downloads\GeneData\{mouse}", f"D:\Downloads\GeneData\{mouse}\Master{mouse}Dict.pkl")
+    # select_data(f"D:\Downloads\GeneData\{fly}\Fixed_Master{fly}Dict.pkl", f"D:\Downloads\GeneData\{fly}\Selected{fly}Dict", n  = n)
+    # select_data(f"D:\Downloads\GeneData\{mouse}\Fixed_Master{mouse}Dict.pkl", f"D:\Downloads\GeneData\{mouse}\Selected{mouse}Dict", n  = n)
+    # select_data(f"D:\Downloads\GeneData\{species}\Known_Genes_{genome}_DICT_0.pkl", f"D:\Downloads\GeneData\{species}\Selected{species}Dict", n  = n)
+
+
+def redo(file_path: pathlib.Path, genome: str, new_file_path: pathlib.Path):
+    '''
+    So when I first did this I didn't include the genome. The problem with that is the EVERYTHING was done via hg19. hg19 has no mouse or fly data, meaning everything was blank.
+
+    So this just takes the dictionary that was already done and redoes all the stuff with the proper genome.
+    '''
+    name: str
+    gene_data: Gene.Gene
+    with open(file_path, "rb") as pkl_file:
+        gene_dict: dict = pickle.load(pkl_file)
+
+    new_gene_data = dict()
+
+    for name, gene_data in gene_dict.items():
+        gene_of_interest: Gene.Gene = Gene.Gene(name = gene_data.name,
+                                           ncibname = gene_data.ncibname,
+                                           ename = gene_data.ename,
+                                           gname = gene_data.gname, 
+                                           chrm = gene_data.chrm, 
+                                           strand = gene_data.strand, 
+                                           txStart = gene_data.txStart,
+                                           txEnd = gene_data.txEnd,
+                                           cdsStart = gene_data.cdsStart,
+                                           cdsEnd = gene_data.cdsEnd,
+                                           exonCount = gene_data.exonCount,
+                                           exonStarts = gene_data.exonStarts,
+                                           exonEnds = gene_data.exonEnds,
+                                           exonFrames = gene_data.exonFrames,
+                                           genome = genome)
+        
+        try:
+            gene_of_interest.sequence_breakdown()
+        except Exception as e:
+            print(type(e))
+            print(e)
+            # exit()
+            continue
+
+        new_gene_data[name] = gene_of_interest
+
+        try:
+            with open(new_file_path, 'wb') as p:
+                pickle.dump(new_gene_data, p)
+        except Exception as e:
+            print(type(e))
+            print(f"Unable to write to file at this time: please check location can be written to")
+            exit()
+
 
 
 def test_dict(file_path: pathlib.Path, test_key = None):
@@ -60,37 +190,53 @@ def convert2dataframe(dictionary: dict, report_file: pathlib.Path, min_length: i
 
     You can pre-apply the histogram method if you want.
     '''
+    # print("~~~ Convert 2 Frame method ~~~")
     gene: Gene.Gene
 
     genetic: pandas.DataFrame = pandas.DataFrame(columns = columns)
     with open(report_file, "w+") as txtf:  # I want a report of what I am generating.
         for ncib, gene in dictionary.items():
-            max_length = 0
 
             if isinstance(gene.exon_seq, list) and isinstance(gene.intron_seq, list):
 
-                gene_data_line = f"{gene.name}\t{gene.ename}\t{gene.gname}\t{gene.ncibname}\nChrome: {gene.chrm}\tStrand: {gene.strand}\nReminder: Index here starts at 1\n\n"
+                gene_data_line = f"---\n{gene.name}\t{gene.ename}\t{gene.gname}\t{gene.ncibname}\nChrome: {gene.chrm}\tStrand: {gene.strand}\nReminder: Index here starts at 1\n\n"
                 txtf.write(gene_data_line)
                 exon_count, intron_count = 0, 0
 
-                for e in gene.exon_seq:
-                    if isinstance(e, str):
-                        exon_count += 1
+                # for e in gene.exon_seq:
+                #     if isinstance(e, str):
+                #         exon_count += 1
 
-                        exon_len = len(e)
-                        if exon_len >= min_length:
-                            exon_data_line = f"Exon {exon_count}: {exon_len}\n"
-                            txtf.write(exon_data_line)
+                #         exon_len = len(e)
+                #         if exon_len >= min_length:
+                #             exon_data_line = f"Exon {exon_count}: {exon_len}\n"
+                #             txtf.write(exon_data_line)
 
-                            if exon_len >= max_length:
-                                max_length = exon_len
+                #             if exon_len <= max_length:
+                #                 max_length = exon_len
 
-                            new_row = {f"{columns[0]}": [ncib], f"{columns[1]}": ["exon"], f"{columns[2]}": [e]}
-                            new_row = pandas.DataFrame(new_row)
-                            genetic = pandas.concat([genetic, new_row], axis = 0, ignore_index = True)
+                #             new_row = {f"{columns[0]}": [ncib], f"{columns[1]}": ["exon"], f"{columns[2]}": [e]}
+                #             new_row = pandas.DataFrame(new_row)
+                #             genetic = pandas.concat([genetic, new_row], axis = 0, ignore_index = True)
 
                 
                 if histogram:
+                    # print("!!! Histogram !!!")
+                    max_length = longest(gene.exon_seq, gene.intron_seq)
+
+                    for e in gene.exon_seq:
+                        if isinstance(e, str):
+                            exon_count += 1
+                            exon_len = len(e)
+
+                            if (max_length >= exon_len) and (exon_len >= min_length):
+                                exon_data_line = f"Exon {exon_count}: {exon_len}\n"
+                                txtf.write(exon_data_line)
+
+                                new_row = {f"{columns[0]}": [ncib], f"{columns[1]}": ["exon"], f"{columns[2]}": [e]}
+                                new_row = pandas.DataFrame(new_row)
+                                genetic = pandas.concat([genetic, new_row], axis = 0, ignore_index = True)
+
                     for i in gene.intron_seq:
                         if isinstance(i, str):
                             intron_count += 1
@@ -103,7 +249,22 @@ def convert2dataframe(dictionary: dict, report_file: pathlib.Path, min_length: i
                                 new_row = {f"{columns[0]}": [ncib], f"{columns[1]}": ["intron"], f"{columns[2]}": [e]}
                                 new_row = pandas.DataFrame(new_row)
                                 genetic = pandas.concat([genetic, new_row], axis = 0, ignore_index = True)
+
                 else:
+                    # print("### Not Histogram ###")
+                    for e in gene.exon_seq:
+                        if isinstance(e, str):
+                            exon_count += 1
+                            exon_len = len(e)
+
+                            if exon_len >= min_length:
+                                exon_data_line = f"Exon {exon_count}: {exon_len}\n"
+                                txtf.write(exon_data_line)
+
+                                new_row = {f"{columns[0]}": [ncib], f"{columns[1]}": ["exon"], f"{columns[2]}": [e]}
+                                new_row = pandas.DataFrame(new_row)
+                                genetic = pandas.concat([genetic, new_row], axis = 0, ignore_index = True)
+
                     for i in gene.intron_seq:
                         if isinstance(i, str):
                             intron_count += 1
@@ -116,7 +277,6 @@ def convert2dataframe(dictionary: dict, report_file: pathlib.Path, min_length: i
                                 new_row = {f"{columns[0]}": [ncib], f"{columns[1]}": ["intron"], f"{columns[2]}": [e]}
                                 new_row = pandas.DataFrame(new_row)
                                 genetic = pandas.concat([genetic, new_row], axis = 0, ignore_index = True)
-
 
     return genetic
 
@@ -159,6 +319,33 @@ def clean_dict(dictionary: dict, report_file: pathlib.Path, min_length: int = 10
                 clean_dictionary[ncib] = gene
     
     return clean_dictionary
+
+
+
+def longest(exon_list: list, intron_list: list) -> int:
+    '''
+    Finds the longest sequence, be it exon or intron. This is then used to limit which sequences are filtered.
+    '''
+    long_seq = 0
+    exon_list = tuple(exon_list)
+    intron_list = tuple(intron_list)
+
+    for exon in exon_list:
+        try:
+            if len(exon) > long_seq:
+                long_seq = len(exon)
+        except Exception as e:
+            continue
+    
+
+    for intron in intron_list:
+        try:
+            if len(intron) > long_seq:
+                long_seq = len(intron)
+        except Exception as e:
+            continue
+
+    return long_seq
 
 
 
@@ -280,6 +467,41 @@ def stitch_dict(directory_path: pathlib.Path, output_file: pathlib.Path):
             x = pickle.load(p)
 
         z = z | x
+
+    print(f"Writing master pikle file to {output_file}")
+    with open(output_file, 'wb') as p:
+        pickle.dump(z, p)
+
+
+
+
+def stitch_frame(directory_path: pathlib.Path, output_file: pathlib.Path):
+    '''
+    '''
+    if not isinstance(directory_path, pathlib.Path):
+        directory_path = pathlib.Path(directory_path)
+    if not isinstance(output_file, pathlib.Path):
+        output_file = pathlib.Path(output_file)
+    
+    print(f"Outputing to {output_file}: first checking if {output_file.parent} exists")
+    output_file.parent.mkdir(parents = True, exist_ok = True)  # makes sure the directory is there
+
+    files = []
+    z = pandas.DataFrame()
+
+    print(f"Finding .pkl files in {directory_path}")
+    for file in os.listdir(directory_path):
+        if file.endswith(".pkl"):
+            files.append(directory_path / file)
+    
+    print(f"Found {len(files)} pikle files, now combining them")
+    for file in files:
+        with open(file, "rb") as p:
+            x = pickle.load(p)
+
+        z = pandas.concat([z, x], ignore_index = True)
+
+    z = z.reset_index()
 
     print(f"Writing master pikle file to {output_file}")
     with open(output_file, 'wb') as p:

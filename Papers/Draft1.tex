@@ -8,7 +8,7 @@
 
 \usepackage[utf8]{inputenc}
 
-\title{Machine Learning with a Fractal Genome: working title}
+\title{Differentiating Exons and Introns Using Machine Learning}
 
 \author{Ethan Speakman}
 
@@ -18,21 +18,55 @@
 
 \maketitle
 
-\section{Introduction}
-
-\section{Motivation}
+\section{Motivation \& Introduction}
 \paragraph*{}
-The Spliceosome has one of the most important functions of the genome: the removal of introns from exons. This critcal step takes pre-mRNA and assembles exons in order for translation. A large ribonuclaticprotein strucutre, the Spliceosome will recuit several snRNPs which in turn bind to introns  
+Gene expression is the result of several phases; the transcription of DNA into RNA by the Ribosome, modification and mythelation of RNA such as adding the 5' cap, the removal of introns by the Spliceosome, and transportation of the mature mRNA out of the nucleous to be translated into proteins\cite{covelo2018rna}.
+The Ribosome transcribes DNA into RNA by opening a small bubble of DNA and copying each nucleotide one by one.
+All nucleotides of a given gene are copied: this includes the introns as well as the exons.
+Introns are portiions of genes that have no known function: exons are the portions of genes that are translated into protiens.
+The presence of introns allows for segmentation of exons, which in turn allows for alternative ways for a single gene to be expressed.
+These introns are, on averge, an order of magnitude longer then exons, making their proper identification a complex interaction of multiple factors.
 \paragraph*{}
-
+The Spliceosome has one of the most important functions of the genome: the removal of introns from exons. 
+This critical step takes pre-mRNA and assembles exons for translation into proteins. 
+A large ribonuclaticprotein (RNP) structure, the Spliceosome is composed of several small nuclear RNPs (snRNPs) which in turn bind to specific locations on the intron, fold the intron on itself, and splice it out, leaving only the exons\cite{will2011spliceosome}\cite{matera2014day}.
+This step occurs shortly after transcription by the Ribosome, 
+Following this processes the per-mRNA is further matured and modified before being sent out of the nucleous for translation.
+\paragraph*{}
+Identification is made even more complicated by the role of alternative splicing.
+Alternative splicing allows for a more diverse proteome as the roughly 20,000 genes of the human genome can be expressed in multiple ways: in humans exons can be skipped in different patterns, allowing a single gene have multiple expression forms.
+In fact, any gene that has more then 2 exons can be alternatively expressed.
+This means that the Spliceosome needs not only to properly identify introns for removal, it also must identify which exons are to be skipped if any.
+There are many factors that play into this, such as RNA Secondary Structures and splice site identification, but the precise combination of those factors is not yet fully understood.
+\paragraph*{}
+For this reason a high fidelity of precise intron and exon identification is required for the Spliceosome to properly excise the introns: failure to do so can have pathological consquences. Aberations in alternative splicing can result in tumerogenesis\cite{zhang2021alternative}, and several genetic diseases have been shown to be the result of erroneous alternative splicing\cite{scotti2016rna}.
+And yet errors happens rarely: Duchenne muscular dystrophy, a genetic disease caused by the deletion and skipping of exons for example, effects less then 10 in every 100,000 males, and less then 1 per million in females\cite{duan2021duchenne}.
+According to the CDC, 403 per 100,000 occure every year, while 144 per 100,000 die of cancer every year.
+This is a large number. However considering that the human body has on the order of magnitude $10^{12}$ cells, with many of these translating genes into proteins, which takes on the order of minutes, the sheer volume of operations and their fidelity is astounding.
+\paragraph*{}
+For this reason we use machine learning techniques to look for possible structural differences of exons and introns.
+The Spliceosome is able to identify them regularly and with high accuracy, but the exact nature of how it does so is still not fully understood: it has to be adaptable to changes in regulation that can quickly happen.\cite{wahl2009spliceosome}\cite{will2011spliceosome}.
+Given the length of genes and their constiuent parts looking for patterns lends itself well to a machine learning approach.
+We use Tensorflow to build a 1 Dimensional and 2 Dimensional Convolution Nueral Network (CNN) to identify and predict exons and introns.
+The results show that a 2D model preformed better then our attempts at a 1D model.
 \section{Background}
+\paragraph*{Statistics of Genes}
+
+\paragraph*{The Role of the Spliceosome}
 
 \section{Models}
+\paragraph*{Use of Tensorflow}
+\paragraph*{Numerical Representation of RNA}
+
+\paragraph*{1D Time Analysis}
+\paragraph*{Chaos Game Representation}
 
 \section{Results}
 
 \section{Future}
 
-\section{Bibliography}
+\bibliographystyle{plain}
+\bibliography{References}
+
 
 \end{document}

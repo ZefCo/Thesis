@@ -1,0 +1,19 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=sacCer3
+Species: Saccharomyces cerevisiae
+	chrIV
+	chrI
+	chrVI
+	chrIII
+	chrIX
+	chrVIII
+	chrV
+	chrXI
+	chrX
+	chrXIV
+	chrII
+	chrXIII
+	chrXVI
+	chrXII
+	chrVII
+	chrXV

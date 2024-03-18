@@ -1,0 +1,700 @@
+import pathlib
+cwd = pathlib.Path.cwd()
+import os
+import re
+import numpy as np
+import glob
+from plotly import graph_objects as go
+import timeit
+import DistanceClass as distance
+# from scipy.spatial import distance
+# from statsmodels.graphics.tsaplots import plot_acf
+import pandas
+import pickle
+import itertools
+import matplotlib.pyplot as plt
+import GeneClass as Gene
+import random
+import Heatmaps as hm
+from typing import Tuple
+plt.rcParams['text.usetex'] = True
+
+
+def main():
+    '''
+    Look i knew I keep doing this but never import the things... the project got rather intense and I never was able to keep up with all
+    the demands while keeping everything clean. There should be an import script so I don't recrete the thing over and over again, and probably
+    a few others, but oh well.
+
+    Compare exon k-mer to k-1 -mer.
+
+    do log transform on y axis for moment plots (makes it easier to view).
+    '''
+    # recover_data(cwd / "Dicts")
+    # exit()
+    k = 4
+
+    exon_file = cwd / "Dicts" / f"Exon_{k}mer.pkl"
+    intron_file = cwd / "Dicts" / f"Intron_{k}mer.pkl"
+
+    # data = hm._import_data(exon_file, just_import=True)
+    # data = pandas.DataFrame(data)
+    # data = data.pow(2.1)
+    # print(data)
+    # value = data.to_numpy().sum()
+    # print(value**(1/2.1))
+    # # print(data)
+    # print(type(data))
+    step = 100
+    max_n = 2
+    min_n = 0.5
+    ms = [n / step for n in range(int(step*(min_n)), int(step*max_n) + 1)]
+    title = f"E v I log w/N divided"
+    moments_v2(cwd / "Dicts", ms, min_k = 1, max_k = 6, convergence = False, logy = False, N_value = True, title = title, x_ticks={0.5: 0.5, 1.0: 1.0, 1.5: 1.5, 2.0: 2.0})
+    # evalue = moment(exon_file, unlog = True, k = 2*k, n = 1)
+    # ivalue = moment(intron_file, unlog = True, k = 2*k, n = 1)
+    # print(f"k = {k}\te value = {evalue}\ti = value = {ivalue}")
+
+
+def moments_v3(file_dir: pathlib.Path, 
+               ms: list, 
+               min_k: int = 1, max_k: int = 6, 
+               unlog: bool = False, logy: bool = False, N_value: bool = False, 
+               *args, **kwargs) -> Tuple[dict, dict, dict, dict]:
+    '''
+    Does all the moment calculations, then returns them to be plotted speretly. Probably should have done this much earlier but... oh well.
+
+    Returns a tuple of 4 dictionaries.
+
+    Note, I'll have to modify this to be able to do this with and without the intergenomic data. Right now I'm just hard coding in the inter stuff.
+    '''
+    me = {}
+    mi = {}
+    mn = {}
+    pd = {}
+
+    uni = {}
+
+    for k in range(min_k, max_k + 1):
+        print(f"K = {k}")
+
+        me[k]: list = []
+        mi[k]: list = []
+        pd[k]: list = []
+        uni[k]: list = []
+        mn[k]: list = []
+
+        exon_file = file_dir / f"Exon_{k}mer.pkl"
+        intron_file = file_dir / f"Intron_{k}mer.pkl"
+        inter_file = file_dir / f"Inter_{6}mer.pkl"
+
+        exon_data = hm._import_data(exon_file, just_import = True)
+        exon_data = pandas.DataFrame(exon_data)
+        if unlog:
+            exon_data = _unrenormalize(exon_data, 2*k)
+
+        # print(f"\tImported Exon File")
+
+        # print(exon_data)
+
+        intron_data = hm._import_data(intron_file, just_import = True)
+        intron_data = pandas.DataFrame(intron_data)
+        if unlog:
+            intron_data = _unrenormalize(intron_data, 2*k)
+
+        # print(f"\tImported Intron File")
+        
+        inter_data = hm._import_data(inter_file, just_import = True)
+        inter_data = pandas.DataFrame(inter_data)
+        if unlog:
+            inter_data = _unrenormalize(inter_data, 2*k)
+
+        # print(intron_data)
+        # exit()
+
+
+        for m in ms:
+
+            if N_value:
+                N = 4**(2*k)
+                N = N**((1/m) - 1)
+                print(f"\t\tm = {m}\tN = {N}")
+            else:
+                N = 1
+                print(f"\t\tm = {m}")
+
+            exon_v = moment(exon_data, m = m, unlog = False, N = N, *args, **kwargs)
+            # exon_u = uniform_density(exon_data, m = m, N = N)
+            intron_v = moment(intron_data, m = m, unlog = False, N = N, *args, **kwargs)
+            # intron_u = uniform_density(intron_data, m = m, N = N, *args, **kwargs)
+            inter_v = moment(inter_data, m = m, unlog = False, N = N, *args, **kwargs)
+
+            # if N_value:
+            #     N = 4**(2*k)
+            #     N = N**((1/m) - 1)
+            #     exon_v = N * exon_v
+            #     intron_v = N * intron_v
+
+            if logy:
+                exon_v = np.log2(exon_v)
+                intron_v = np.log2(intron_v)
+                inter_v = np.log2(inter_v)
+            
+            try:
+                per_diff = _percent_difference(exon_v, intron_v)
+            except ZeroDivisionError:
+                per_diff = 0
+
+            me[k].append(exon_v)
+            mi[k].append(intron_v)
+            mn[k].append(inter_v)
+            pd[k].append(per_diff)
+
+            uni[k].append(1)
+
+    return me, mi, mn, uni, pd
+
+
+def moments_v2(file_dir: pathlib.Path, 
+               ms: list, 
+               min_k: int = 1, max_k: int = 6, 
+               unlog: bool = False, convergence: bool = False, logy: bool = False, N_value: bool = False, 
+               title: str = None, 
+               x_ticks: dict = None, y_ticks: dict = None,
+               error_bars: list = None,
+               mer_out: pathlib.Path = None, pd_out: pathlib.Path = None, 
+               *args, **kwargs):
+    '''
+    Moment calculations do NOT need the 4**s part multiplied, everything just needs to be scaled from 0 to 1 in a traditional normalization.*
+
+    You have to feed in the list of moments, because I don't want to deal with a for float loop... I have that code somewhere I just can't find it. It's a for loop with floats, and it's pretty easy but there's a trick and I just don't want to do it... should be called the run on sentence bandit...
+
+
+    Does a for loop of this. Each file needs to be a pickle file and have the same basic file name. Just give it the path and the filename and it will iterate over it.
+
+    Exon files should be f'Exon_{k}mer.pkl' and Intron files should be f'Intron_{k}mer.pkl'
+
+    The for loop for the k iterations is range(min_k, max_k + 1) so you do not need to artifically increase the max_k. That's done for you.
+
+    *Do this as well with a N**(1/m - 1) term where N = 4**k (or in this case 4**2k) which should set all moment calculations for an evenly distributed heatmap to 1 (no matter what the moment is) and will
+    adjust the other moment calculations to be either above or below 1. Sort of like subtracting the mean.
+
+    For error bars: input a list of Dataframes, each Dataframe should have a column titled Exon_Mean, Exon_STD, Intron_Mean, Intron_STD, and the index is the moments.
+    It will then place error bars at x, y, where x and y are the moments and mean respectivly, and xerr and yerr is +- the STD. The length of the list should be the same as the 
+    number of s being used (so if you only want to output s = 12, the length is 1, if s = 8, 10, 12, then the length should be 3). If you only have error bars for some, not others,
+    put None. The script checks the instance and if it's not a DataFrame then it continues.
+    '''
+
+    if convergence and (max_k - min_k) < 1:
+        print("Cannot continue, convergence can only be checked with more then 1 k value")
+        return None 
+
+    me = {}
+    mi = {}
+    pd = {}
+
+    uni = {}
+
+    for k in range(min_k, max_k + 1):
+        print(f"K = {k}")
+
+        me[k]: list = []
+        mi[k]: list = []
+        pd[k]: list = []
+        uni[k]: list = []
+
+        exon_file = file_dir / f"Exon_{k}mer.pkl"
+        intron_file = file_dir / f"Intron_{k}mer.pkl"
+
+        exon_data = hm._import_data(exon_file, just_import = True)
+        exon_data = pandas.DataFrame(exon_data)
+        if unlog:
+            exon_data = _unrenormalize(exon_data, 2*k)
+        print(f"\tImported Exon File")
+
+        intron_data = hm._import_data(intron_file, just_import = True)
+        intron_data = pandas.DataFrame(intron_data)
+        if unlog:
+            intron_data = _unrenormalize(intron_data, 2*k)
+        print(f"\tImported Intron File")
+
+        for m in ms:
+
+            if N_value:
+                N = 4**(2*k)
+                N = N**((1/m) - 1)
+                print(f"\t\tm = {m}\tN = {N}")
+            else:
+                N = 1
+                print(f"\t\tm = {m}")
+
+            exon_v = moment(exon_data, m = m, unlog = False, N = N, *args, **kwargs)
+            # exon_u = uniform_density(exon_data, m = m, N = N)
+            intron_v = moment(intron_data, m = m, unlog = False, N = N, *args, **kwargs)
+            # intron_u = uniform_density(intron_data, m = m, N = N, *args, **kwargs)
+
+            # if N_value:
+            #     N = 4**(2*k)
+            #     N = N**((1/m) - 1)
+            #     exon_v = N * exon_v
+            #     intron_v = N * intron_v
+
+            if logy:
+                exon_v = np.log2(exon_v)
+                intron_v = np.log2(intron_v)
+            
+            try:
+                per_diff = _percent_difference(exon_v, intron_v)
+            except ZeroDivisionError:
+                per_diff = 0
+            
+            me[k].append(exon_v)
+            mi[k].append(intron_v)
+            pd[k].append(per_diff)
+
+            uni[k].append(1)
+
+    print(f"Finished data, printing to plots")
+    plt.rc("font", size = 20)
+    plt.rc('axes', linewidth = 2)
+    for i, (key, value) in enumerate(me.items()):
+        print(f"plotting for {2*key}-mer")
+        fig, axs = plt.subplots()
+        fig.set_size_inches(8, 8)
+        fig_pd, axs_pd = plt.subplots()
+
+        axs.plot(ms, value, label = f"Exon", linestyle = "dashed")
+        axs.plot(ms, mi[key], label = f"Intron", linestyle = "dashdot")
+        axs.plot(ms, uni[key], linestyle = "dotted")
+        axs.set_title(f"{2*key}-mer")
+        axs.set_ylabel(r"$\gamma(m)$", fontsize = 30) #, rotation='horizontal')
+        axs.set_xlabel(r"$m$", fontsize = 30)
+        axs.legend(prop = {"size": 30})
+
+        if isinstance(error_bars, list):
+            errors: pandas.DataFrame = error_bars[i]
+
+            if isinstance(errors, pandas.DataFrame):
+                xs = list(errors.index)
+                ye, yi = list(), list()
+
+                for x in xs:
+                    j = ms.index(x)
+                    ye.append(value[j])
+                    yi.append(mi[key][j])
+
+                ye_err = list(errors["Exon_STD"])
+                yi_err = list(errors["Intron_STD"])
+                axs.errorbar(x=xs, y=ye, yerr=ye_err, fmt = "none", ecolor = "k")
+                axs.errorbar(x=xs, y=yi, yerr=yi_err, fmt = "none", ecolor = "k")
+            else:
+                continue
+
+        if isinstance(x_ticks, dict):
+            axs.set_xticks(list(x_ticks.keys()))
+            axs.set_xticklabels(list(x_ticks.values()))
+        else:
+            axs.set_xticks([])
+        if isinstance(y_ticks, dict):
+            axs.set_yticks(list(y_ticks.keys()))
+            axs.set_yticklabels(list(y_ticks.values()))
+        # else:
+        #     axs.set_yticks([])
+
+        # axs.yaxis.set_label_coords(-0.0, 0.5)
+
+        axs_pd.plot(ms, pd[key])
+        axs_pd.set_title(f"Per Diff for {2*key}-mer")
+        axs_pd.set_xlabel("m")
+
+        if isinstance(mer_out, pathlib.Path):
+            fig.savefig(mer_out)
+        else:
+            fig.savefig(cwd / "TE_Images_ForPaper" / "Moments" / f"{2*key}-mer")
+
+        if isinstance(pd_out, pathlib.Path):
+            fig_pd.savefig(pd_out)
+        else:
+            fig_pd.savefig(cwd / "TE_Images_ForPaper" / "Moments" / f"{2*key}-mer_PD")
+
+
+def moments(file_dir: pathlib.Path, ms: list, min_k: int = 1, max_k: int = 6, unlog: bool = False, convergence: bool = False, logy: bool = False, N_value: bool = False, title: str = None, *args, **kwargs):
+    '''
+    Moment calculations do NOT need the 4**s part multiplied, everything just needs to be scaled from 0 to 1 in a traditional normalization.*
+
+    You have to feed in the list of moments, because I don't want to deal with a for float loop... I have that code somewhere I just can't find it. It's a for loop with floats, and it's pretty easy but there's a trick and I just don't want to do it... should be called the run on sentence bandit...
+
+
+    Does a for loop of this. Each file needs to be a pickle file and have the same basic file name. Just give it the path and the filename and it will iterate over it.
+
+    Exon files should be f'Exon_{k}mer.pkl' and Intron files should be f'Intron_{k}mer.pkl'
+
+    The for loop for the k iterations is range(min_k, max_k + 1) so you do not need to artifically increase the max_k. That's done for you.
+
+    *Do this as well with a N**(1/m - 1) term where N = 4**k (or in this case 4**2k) which should set all moment calculations for an evenly distributed heatmap to 1 (no matter what the moment is) and will
+    adjust the other moment calculations to be either above or below 1. Sort of like subtracting the mean.
+    '''
+
+    if convergence and (max_k - min_k) < 1:
+        print("Cannot continue, convergence can only be checked with more then 1 k value")
+        return None 
+
+    me = {}
+    mi = {}
+    pd = {}
+
+    uni = {}
+
+    for k in range(min_k, max_k + 1):
+        print(f"K = {k}")
+
+        me[k]: list = []
+        mi[k]: list = []
+        pd[k]: list = []
+        uni[k]: list = []
+
+        exon_file = file_dir / f"Exon_{k}mer.pkl"
+        intron_file = file_dir / f"Intron_{k}mer.pkl"
+
+        exon_data = hm._import_data(exon_file, just_import = True)
+        exon_data = pandas.DataFrame(exon_data)
+        if unlog:
+            exon_data = _unrenormalize(exon_data, 2*k)
+        print(f"\tImported Exon File")
+
+        intron_data = hm._import_data(intron_file, just_import = True)
+        intron_data = pandas.DataFrame(intron_data)
+        if unlog:
+            intron_data = _unrenormalize(intron_data, 2*k)
+        print(f"\tImported Intron File")
+
+        for m in ms:
+
+            if N_value:
+                N = 4**(2*k)
+                N = N**((1/m) - 1)
+                print(f"\t\tm = {m}\tN = {N}")
+            else:
+                N = 1
+                print(f"\t\tm = {m}")
+
+            exon_v = moment(exon_data, m = m, unlog = False, N = N, *args, **kwargs)
+            # exon_u = uniform_density(exon_data, m = m, N = N)
+            intron_v = moment(intron_data, m = m, unlog = False, N = N, *args, **kwargs)
+            # intron_u = uniform_density(intron_data, m = m, N = N, *args, **kwargs)
+
+            # if N_value:
+            #     N = 4**(2*k)
+            #     N = N**((1/m) - 1)
+            #     exon_v = N * exon_v
+            #     intron_v = N * intron_v
+
+            if logy:
+                exon_v = np.log2(exon_v)
+                intron_v = np.log2(intron_v)
+            
+            try:
+                per_diff = _percent_difference(exon_v, intron_v)
+            except ZeroDivisionError:
+                per_diff = 0
+            
+            me[k].append(exon_v)
+            mi[k].append(intron_v)
+            pd[k].append(per_diff)
+
+            uni[k].append(1)
+
+    print(f"Finished data, printing to plots")
+    if convergence:
+        fig, axs = plt.subplots(nrows = max_k - min_k, ncols = 4)
+
+        keys = list(me.keys())
+        # keys = keys[0: len(keys) - 2] # removing last entry, so that way I don't have to 
+
+        for i in range(len(keys) - 1):
+
+            axs[i, 0].plot(ms, mi[keys[i]], label = f"{2*keys[i]}-mer")
+            axs[i, 0].plot(ms, mi[keys[i + 1]], label = f"{2*keys[i + 1]}-mer")
+            axs[i, 0].legend()
+
+            ipd = perdiff_list(mi[keys[i]], mi[keys[i + 1]])
+
+            axs[i, 1].plot(ms, ipd)
+            axs[i, 1].set_ylabel("PD")
+
+            axs[i, 2].plot(ms, me[keys[i]], label = f"{2*keys[i]}-mer")
+            axs[i, 2].plot(ms, me[keys[i + 1]], label = f"{2*keys[i + 1]}-mer")
+            axs[i, 2].legend()
+
+            epd = perdiff_list(me[keys[i]], me[keys[i + 1]])
+
+            axs[i, 3].plot(ms, epd)
+            axs[i, 3].set_ylabel("PD")
+
+    else:
+        fig, axs = plt.subplots(nrows = max_k - min_k + 1, ncols = 2)
+
+        if len(me) > 1:
+            for i, (key, value) in enumerate(me.items()):
+                axs[i, 0].plot(ms, value, label = f"Exon")
+                axs[i, 0].plot(ms, mi[key], label = f"Intron")
+                axs[i, 0].plot(ms, uni[key], linestyle = "dotted")
+                # axs[i, 0].plot(ms, ued[key], label = f"Exon U Density", linestyle = "dotted")
+                axs[i, 0].set_ylabel(f"{2*key}-mer")
+                axs[i, 0].legend()
+
+                axs[i, 1].plot(ms, pd[key])
+                axs[i, 1].set_ylabel("PD (0 to 1)")
+
+        else:
+            for key, value in me.items():
+                axs[0].plot(ms, value, label = f"Exon")
+                axs[0].plot(ms, mi[key], label = f"Intron")
+                axs[0].plot(ms, uni[key], linestyle = "dotted")
+                # axs[0].plot(ms, ued[key], label = f"Exon U Density", linestyle = "dotted")
+                axs[0].set_ylabel(f"{2*key}-mer")
+                axs[0].legend()
+
+                axs[1].plot(ms, pd[key])
+                axs[1].set_ylabel("Percent Difference")
+
+    if isinstance(title, str):
+        plt.suptitle(title)
+
+    plt.show()
+
+
+def perdiff_list(list1: list, list2: list):
+    '''
+    Because I don't want the moment script to be to long, I'm putting this part here.
+    '''
+
+    pd = []
+    for i, ei in enumerate(list1):
+        try:
+            diff = _percent_difference(ei, list2[i])
+        except ZeroDivisionError as e:
+            diff = 0
+        pd.append(diff)
+
+    return pd
+
+
+
+def _percent_difference(a, b):
+    '''
+    Because there's a possibility of a divide by zero warning, I have to make this its own function.
+    '''
+    demoninator = (a + b) / 2
+    numerator = a - b
+
+    if demoninator == 0 and numerator == 0:
+        diff = 0
+    elif demoninator == 0 and abs(numerator) > 0:
+        diff = np.inf
+    else:
+        diff = numerator / demoninator
+    
+    return diff
+
+
+
+def moment(data: pandas.DataFrame or dict or pathlib, m: float = 1, N: float = 1, unlog: bool = False, *args, **kwargs):
+    '''
+    Takes a region and finds the moment of that region.
+
+    m = [sum(region)**n / sum(area)]**(1/n)
+
+    Acutally I never did this next part so basically you can ignore it. Don't know if it would have been useful:
+    It will have to import the whole data, then isolate a single area and count that. Maybe I shoudl count by region, add them, then calculate each moment.
+    This would divide the space into R regions
+    '''
+    w: float = 1 / m  # think of this as an upside down m
+
+    if isinstance(data, pathlib.Path) or isinstance(data, str):
+        data = hm._import_data(data, just_import = True)
+
+    if isinstance(data, dict):
+        data: pandas.DataFrame = pandas.DataFrame(data)
+
+    if unlog:
+        data = _unrenormalize(data, *args, **kwargs)
+
+    data = data.pow(m)
+    values = data.to_numpy().sum()
+    values = (1 / N) * (values**w)
+
+    return values
+
+
+def _unrenormalize(data: pandas.DataFrame, s: int, log2: bool = True, *args, **kwargs):
+    '''
+    Yes, that says un-re-normalize. This is because I saved only the log2(x + 1) data where x = 4**2 * (y/sum(y)). This undoes that
+    because I'm lazy.
+
+    if log2:
+        log2( (4**s * x) + 1) = y
+        4**s * x + 1 = 2**y
+        4**s * x = 2**y - 1
+        x = ((2**y) - 1) / 4**s
+    
+    if not log2:
+        4**s * x = 2**y
+        y / 4**s = x
+
+    s = 2*k -> I've always done this as k forward = k backward even though the scripts can handle the two being different.
+    '''
+
+    # rows, cols = data.shape
+    s = 4**s
+
+    if log2:
+        # for row in range(rows):
+        #     for col in range(cols):
+        #         y = data.iloc[row, col]
+
+        #         x = ((2**y) - 1) / s
+        #         data.iloc[row, col] = x
+        fa1 = np.log(2)
+        fa2 = np.dot(fa1, fa1)
+        fa3 = np.dot(fa1, fa2)
+        fa4 = np.dot(fa2, fa2)
+
+        data = (fa1*data + fa2*data.pow(2) + fa3*data.pow(3) + fa4*data.pow(4)) / s  # Taylor expanding out to 4 terms, because hopefully this is faster then doing the above steps via iterations
+        # note there is no -1 because the Taylor expansion picks up a +1 term, so the two will cancel
+    else:
+        # for row in range(rows):
+        #     for col in range(cols):
+        #         y = data.iloc[row, col]
+
+        #         x = y / s
+        #         data.iloc[row, col] = x
+
+        data = data / s
+
+    return data
+
+
+def recover_data(dir: pathlib.Path, kmer: int = 6):
+    '''
+    Because I saved the data with a log2 transform with an extra term that totally screws with the moment calculations.
+
+    This takes a file, saves the original file with a logtransformed extra in its filename, and unrenormalizes the data, and then saves that as a pkl file.
+
+    I'm writing this as a general function in case I need to do it again.
+    '''
+
+    for k in range(1, kmer + 1):
+        exon_file = dir / f"Exon_{k}mer.pkl"
+        log_exon_file = dir / f"Exon_{k}mer_LT.pkl"
+        intron_file = dir / f"Intron_{k}mer.pkl"
+        log_intron_file = dir / f"Intron_{k}mer_LT.pkl"
+
+        print(f"Importing from {exon_file}")
+        exon_data = hm._import_data(exon_file, just_import = True)
+        exon_data = pandas.DataFrame(exon_data)
+        write_pickel(exon_data, log_exon_file)
+
+        print(f"Importing from {exon_file}")
+        intron_data = hm._import_data(intron_file, just_import = True)
+        intron_data = pandas.DataFrame(intron_data)
+        write_pickel(intron_data, log_intron_file)
+
+        print(f"\tUnrenormalizing Exon Data")
+        exon_data = _unrenormalize(exon_data, 2*k)
+        write_pickel(exon_data, exon_file)
+
+        print(f"\tUnrenormalizing Intron Data")
+        intron_data = _unrenormalize(intron_data, 2*k)
+        write_pickel(intron_data, intron_file)
+
+
+def write_pickel(file_data: pandas.DataFrame, file_path: pathlib.Path):
+    '''
+    '''
+    print(f"Exporting to {file_path}")
+    with open(file_path, "wb") as file:
+        file_data.to_pickle(file)
+
+
+def uniform_density(data: pandas.DataFrame, m: int = 1, *args, **kwargs):
+    '''
+    Finds the moment for a uniform density for comparison to the rest of the moment plots.
+    '''
+
+    rows, cols = data.shape
+
+    ave = data.to_numpy().mean()
+
+    data = pandas.DataFrame(0, index = np.arange(rows), columns = np.arange(cols))
+    data = data + ave
+
+    uoment = moment(data, m = m, *args, **kwargs)
+
+    return uoment
+
+
+def multiple_species_plots(ms: list, me: dict, mi: dict, mn: dict, uni: dict, output_dir: pathlib.Path,
+                           x_ticks: dict = None, y_ticks: dict = None, legend: bool = True,
+                           inches: int = 8, filename: str = None, 
+                           *args, **kwargs):
+    '''
+    Because I just want to do it over here, I'm going to dump the script to do multiple species plots here.
+    ms should be a list of the moments used, which will in turn become the x axis.
+
+    me and mi should be a dictionary of dictionaries of lists:
+    m = {species: {k-mer: [points]}}
+
+    uni should be another dict, but in the form similar to other plots. I'm lazy so... deal with it.
+
+    This one will also need to be updated at some point to be able to do this with and without the inter data.
+    '''
+    plt.rc("font", size = 20)
+    plt.rc('axes', linewidth = 2)
+
+    fig, axs = plt.subplots()
+    fig.set_size_inches(inches, inches)
+
+    for species, items in me.items():
+        print(f"Species = {species}")
+        subdict: dict = items["data"]
+        for key, value in subdict.items():
+            print(f"plotting for {2*key}-mer")
+            ms_markers = ms[::5]
+            me_markers = value[::5]
+            mi_markers = mi[species]["data"][key][::5]
+            mn_markers = mi[species]["data"][key][::5]
+
+            # axs.plot(ms, value)
+            axs.plot(ms_markers, me_markers, label = f"Exon - {species}", marker = items["marker"], markersize = 5)
+            # axs.plot(ms, mi[species]["data"][key])
+            axs.plot(ms_markers, mi_markers, label = f"Intron - {species}", marker = mi[species]["marker"], markersize = 5)
+            axs.plot(ms_markers, mn_markers, label = f"Inter - {species}", marker = mn[species]["marker"], markersize = 5)
+            axs.plot(ms, uni[key], linestyle = "dotted")
+        
+    axs.set_title(f"{2*key}-mer")
+    axs.set_ylabel(r"$\gamma(m)$", fontsize = 30) #, rotation='horizontal')
+    axs.set_xlabel(r"$m$", fontsize = 30)
+    if legend:
+        axs.legend()
+    
+    if isinstance(x_ticks, dict):
+        axs.set_xticks(list(x_ticks.keys()))
+        axs.set_xticklabels(list(x_ticks.values()))
+    else:
+        axs.set_xticks([])
+    if isinstance(y_ticks, dict):
+        axs.set_yticks(list(y_ticks.keys()))
+        axs.set_yticklabels(list(y_ticks.values()))
+    else:
+        axs.set_yticks([])
+    
+    if isinstance(filename, str):
+        fig.savefig(output_dir / filename)
+    else:
+        fig.savefig(output_dir / f"{2*key}-mer_idk")
+
+
+
+if __name__ in "__main__":
+    main()

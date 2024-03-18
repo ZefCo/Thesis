@@ -41,13 +41,27 @@ Thesis.Rproj
 /FractalDimension/Distance_Dict_KTA
 /DataCollection/*.txt
 /ML/Data_Set_1_histogram_6mer_KTA
+/ML/Data_Set_2_histogram_6mer_KTA
+/FractalDimension\TE_Images_ForPaper\Error_Data
+
+/FractalDimension/TE_Images_ForPaper/*/Old
+/FractalDimension/TE_Images_ForPaper/*/*/Old
 
 !/ML/FractalModels/IvE/version_school_linux_*/*
 !/ML/FractalModels/IvE/version_home_windows_*/*
 !/ML/FractalModels/IvE/version_slurm_*/*
 !/ML/FractalModels/IvE/version_home_fedora_*/*
+!/FractalDimension/TE_Images_ForPaper/*/*
+!/FractalDimension/TE_Images_ForPaper/*
+!/FractalDimension/TE_Images_ForPaper/*/*/*
 !GenePerChrom.pkl
 
 /ML/FractalModels/IvE/version_slurm_100/Model/variables/variables.data-00000-of-00001
 /ML/FractalModels/IvE/version_slurm_101/Model/variables/variables.data-00000-of-00001
 /ML/FractalModels/IvE/version_slurm_102/Model/variables/variables.data-00000-of-00001
+
+!Iterative_Process_TGGCAGGTGTTTAGTTTAGGTCCCTACAGAATAGGCTGGTTATTCTGGGTCAGATCCGAGTTCATTTCAATACGGTGGCTATCCTTAAGGTCTTGGATCG.csv
+
+/FractalDimension/TE_Images_ForPaper/Dict/
+/FractalDimension/TE_Images_ForPaper/Error_Data/
+

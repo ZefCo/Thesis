@@ -1,0 +1,23 @@
+URL Used:
+https://api.genome.ucsc.edu//list/chromosomes?genome=susScr3
+Species: Sus scrofa
+	chr1
+	chrY
+	chr18
+	chr12
+	chr17
+	chr10
+	chr16
+	chr11
+	chr5
+	chr7
+	chr4
+	chrX
+	chr3
+	chr8
+	chr9
+	chr14
+	chr15
+	chr6
+	chr2
+	chr13

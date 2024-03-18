@@ -28,11 +28,32 @@ def main():
     # History_1D()
     # History_F()
     SelectedHistory(SLSGHis = cwd / "FractalModels" / "IvE" / "version_slurm_47",
+                    DS1_hist = cwd / "FractalModels" / "IvE" / "version_slurm_23",
                     DS1 = cwd / "FractalModels" / "IvE" / "version_slurm_22",
-                    # mer9_v1 = cwd / "FractalModels" / "IvE" / "version_slurm_50",
-                    # mer8_v1 = cwd / "FractalModels" / "IvE" / "version_slurm_51",
-                    # mer8_v2 = cwd / "FractalModels" / "IvE" / "version_slurm_52",
-                    # mer9_v2 = cwd / "FractalModels" / "IvE" / "version_slurm_55",
+                    DS2 = cwd / "FractalModels" / "IvE" / "version_slurm_24",
+                    mer9_v1 = cwd / "FractalModels" / "IvE" / "version_slurm_50",
+                    mer8_v1 = cwd / "FractalModels" / "IvE" / "version_slurm_51",
+                    mer8_v2 = cwd / "FractalModels" / "IvE" / "version_slurm_52",
+                    mer9_v2 = cwd / "FractalModels" / "IvE" / "version_slurm_55",
+                    new_v70 = cwd / "FractalModels" / "IvE" / "version_slurm_70",
+                    new_71 = cwd / "FractalModels" / "IvE" / "version_slurm_71",
+                    new_73 = cwd / "FractalModels" / "IvE" / "version_slurm_73",
+                    new_74 = cwd / "FractalModels" / "IvE" / "version_slurm_74",
+                    new_75 = cwd / "FractalModels" / "IvE" / "version_slurm_75",
+                    new_76 = cwd / "FractalModels" / "IvE" / "version_slurm_76",
+                    new_77 = cwd / "FractalModels" / "IvE" / "version_slurm_77",
+                    new_78 = cwd / "FractalModels" / "IvE" / "version_slurm_78",
+                    new_79 = cwd / "FractalModels" / "IvE" / "version_slurm_79",
+                    new_80 = cwd / "FractalModels" / "IvE" / "version_slurm_80",
+                    new_81 = cwd / "FractalModels" / "IvE" / "version_slurm_81",
+                    new_82 = cwd / "FractalModels" / "IvE" / "version_slurm_82",
+                    new_83 = cwd / "FractalModels" / "IvE" / "version_slurm_83",
+                    new_85 = cwd / "FractalModels" / "IvE" / "version_slurm_85",
+                    new_86 = cwd / "FractalModels" / "IvE" / "version_slurm_86",
+                    new_87 = cwd / "FractalModels" / "IvE" / "version_slurm_87",
+                    new_88 = cwd / "FractalModels" / "IvE" / "version_slurm_88",
+                    new_89 = cwd / "FractalModels" / "IvE" / "version_slurm_89",
+
                     line_of_best_epochs = epochs)
 
 
