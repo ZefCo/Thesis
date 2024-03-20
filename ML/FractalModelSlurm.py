@@ -97,7 +97,7 @@ python_script = pathlib.Path(__file__)
 shutil.copy(str(python_script), str(version_dir / python_script.name))
 
 input_layer = tf.keras.Input(shape = (w, h, 1))
-a = tf.keras.layers.Conv2D(20, (3, 3), padding = "same")(input_layer) #), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(input_layer)
+a = tf.keras.layers.Conv2D(3, (3, 3), padding = "same")(input_layer) #), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(input_layer)
 #a = tf.keras.layers.Dropout(.5)(a)
 a = tf.keras.layers.BatchNormalization()(a)
 #a = tf.keras.layers.MaxPooling2D(pool_size = (2, 2))(a)
