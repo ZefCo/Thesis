@@ -34,6 +34,7 @@ from PIL import Image
 # https://stackoverflow.com/questions/53514495/what-does-batch-repeat-and-shuffle-do-with-tensorflow-dataset
 # https://stackoverflow.com/questions/53066762/understanding-1d-convolution-of-dna-sequences-encoded-as-a-one-hot-vector
 cwd = pathlib.Path.cwd()
+import datetime
 # exit()
 def get_num_pixels(filepath):
     width, height = Image.open(filepath).size
@@ -46,7 +47,8 @@ branch = "slurm"
 
 image_dir = cwd / "GHMSubsample"
 ive_dir = cwd / "FractalModels" / "IvE"
-version_num = len(next(os.walk(ive_dir))[1]) + 60
+date = datetime.datetime.now()
+version_num = f"{date.year}-{date.month}-{date.day}-{date.hour}-{date.minute}-{date.second}"# len(next(os.walk(ive_dir))[1]) + 60
 version_dir = ive_dir / f"version_{branch}_{version_num}"
 version_dir.mkdir(parents = True, exist_ok = True)
 model_dir = version_dir / "Model"
