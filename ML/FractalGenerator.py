@@ -27,7 +27,7 @@ def main():
     classification_col: str = "Classificaion"
     gene_name_col: str = "NCIBName"
 
-    generator(f"/media/ethanspeakman/Elements/Gene_Data_Sets/Data_Set_{data_set}_histogram.pkl", kmer, target_dir = f"/media/ethanspeakman/Elements/Gene_Data_Sets/Data_Set_{data_set}_histogram_{kmer}mer_{method}", ex_col = ex_col, int_col = int_col, classification_col = classification_col, method = method, min_length = min_length, gene_name_col = gene_name_col)
+    generator(f"/media/ethanspeakman/Elements/Gene_Data_Sets/Data_Set_{data_set}_frame.pkl", kmer, target_dir = f"/media/ethanspeakman/Elements/Gene_Data_Sets/Data_Set_{data_set}_frame_{kmer}mer_{method}", ex_col = ex_col, int_col = int_col, classification_col = classification_col, method = method, min_length = min_length, gene_name_col = gene_name_col)
 
 
 def generator(data_file: pathlib.Path, kmer: int,
