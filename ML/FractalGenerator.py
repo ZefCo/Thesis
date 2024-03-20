@@ -226,7 +226,7 @@ def gaussian_generator(train_data: pandas.DataFrame,
             try:
                 plot_gaussmap(density, filepath)
                 with open(meta_data, "at") as mf:
-                    mf.write(f"{filepath.name}\t{gene_name}\tExon {intron}\tLength = {length}\n")
+                    mf.write(f"{filepath.name}\t{gene_name}\tExon {exon}\tLength = {length}\n")
 
             except Exception as e:
                 print(type(e))
@@ -507,24 +507,20 @@ def gaussian(xy: np.ndarray, t: np.ndarray, delta: int = 2, *args, **kwargs) -> 
     m = t.shape[0]
     field = np.zeros((m, m))
     N = xy.shape[0]
-    # N = m * m
+    N = m * m
 
-    for x in xy:
-        P = list()
-        Np = 0
-        for ix, tx in enumerate(t):
-            for iy, ty in enumerate(t[::-1]):
-                T = np.array([tx, ty])
-                d = np.linalg.norm(x - T)
-                if d < sigma:
-                    p = np.exp((-1/2) * np.dot(d, d) / sigma_sqr)
-                    Np += p
-                    P.append([p, iy, ix])
+    G = [[x, y] for x in t for y in t]
+    G = np.array(G)
 
-        for p in P:
-            field[p[1], p[2]] += p[0] / Np
+    for gi, g in enumerate(G):
+        D = np.linalg.norm(g - xy, axis = 1)
+        D = D[D < sigma]
+        p = np.sum(np.exp((-1/2) * np.power(D, 2) / sigma_sqr))
+        iy, ix = int(gi / m), gi % m
+        field[ix, iy] += p
 
-    field = field / N
+    field = field / np.sum(field)
+    field = np.flip(field, axis = 0)  # for some reason it's flipped on the y axis. Probably beause the bottom is the top is row 0 but we want the bottom to be row 0
 
     return field
 
