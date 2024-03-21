@@ -1,10 +1,11 @@
 #!/bin/bash
-#SBATCH --job-name=envtest_eas1
 #SBATCH --time=72:00:00
-#SBATCH --ntasks-per-node=10 -N 1
-#SBATCH --mem=5gb
+#SBATCH --ntasks-per-node=1 -N 1
+#SBATCH --mem=1gb
 #SBATCH --mail-user=espeakma@cougarnet.uh.edu
 #SBATCH --mail-type=ALL
+#SBATCH -J EASEnvTest
+#SBATCH -o EnvTest.out
 
 
 module load Anaconda3/2023.03-1
