@@ -45,10 +45,10 @@ def get_num_pixels(filepath):
 # branch = report.active_branch
 branch = "slurm"
 
-image_dir = cwd / "GHMSubsample"
+image_dir = cwd / "GMSubsample"
 ive_dir = cwd / "FractalModels" / "IvE"
 date = datetime.datetime.now()
-version_num = f"{date.year}-{date.month}-{date.day}-{date.hour}-{date.minute}-{date.second}"# len(next(os.walk(ive_dir))[1]) + 60
+version_num = f"{date.year}-{date.month}-{date.day}-{date.hour}-{date.minute}-{date.second}-{date.microsecond}"# len(next(os.walk(ive_dir))[1]) + 60
 version_dir = ive_dir / f"version_{branch}_{version_num}"
 version_dir.mkdir(parents = True, exist_ok = True)
 model_dir = version_dir / "Model"
@@ -100,11 +100,11 @@ input_layer = tf.keras.Input(shape = (w, h, 1))
 a = tf.keras.layers.Conv2D(3, (3, 3), padding = "same")(input_layer) #), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(input_layer)
 #a = tf.keras.layers.Dropout(.5)(a)
 a = tf.keras.layers.BatchNormalization()(a)
-#a = tf.keras.layers.MaxPooling2D(pool_size = (2, 2))(a)
-#b = tf.keras.layers.Conv2D(6, (3, 3), padding = "same")(a)
-#b = tf.keras.layers.BatchNormalization()(b)
-flatten = tf.keras.layers.Flatten()(a)
-dense = tf.keras.layers.Dense(1000, activation = "gelu")(flatten)
+a = tf.keras.layers.MaxPooling2D(pool_size = (3, 3))(a)
+b = tf.keras.layers.Conv2D(6, (3, 3), padding = "same")(a)
+b = tf.keras.layers.BatchNormalization()(b)
+flatten = tf.keras.layers.Flatten()(b)
+dense = tf.keras.layers.Dense(50, activation = "gelu")(flatten)
 final = tf.keras.layers.Dropout(.25)(dense)
 output_layer = tf.keras.layers.Dense(output_classes, activation = "softmax")(final)
 model = tf.keras.Model(inputs = input_layer, outputs = output_layer)

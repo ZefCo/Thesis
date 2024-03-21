@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH -J fractal_GHMSS_v3
-#SBATCH -o fractal_GHMSS_v3.out
+#SBATCH -J fractal_GHMSS_v1
+#SBATCH -o fractal_GHMSS_v1.out
 #SBATCH --time=72:00:00
 #SBATCH --ntasks-per-node=8 -N 1
 #SBATCH --mem-per-cpu=5GB
