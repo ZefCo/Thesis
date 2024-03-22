@@ -26,9 +26,10 @@ import random
 # import pandas as pd
 # import plotly.graph_objects as go
 # import datetime
-from matplotlib import pyplot as plt
+# from matplotlib import pyplot as plt
 from contextlib import redirect_stdout
-from PIL import Image
+# from PIL import Image
+# import sys
 # import keras
 # https://stackoverflow.com/questions/53066762/understanding-1d-convolution-of-dna-sequences-encoded-as-a-one-hot-vector
 # https://stackoverflow.com/questions/53514495/what-does-batch-repeat-and-shuffle-do-with-tensorflow-dataset
@@ -36,9 +37,16 @@ from PIL import Image
 cwd = pathlib.Path.cwd()
 import datetime
 # exit()
-def get_num_pixels(filepath):
-    width, height = Image.open(filepath).size
-    return width, height
+w, h = 64, 64
+# def get_num_pixels(filepath):
+#     '''
+#     So this used to be the way that the height and width were determined: it just needed a filepath and would open the file, determine the pixel size
+#     and use that for the width and height input of tensorflow. It was a great system that allowed me to ignore the image size and just run the code. But
+#     as of 3/21/24, noon, when I load the Anaconda and TensorFlow module they somehow conflict and I loose access to matplotlib and PIL and tensorflow.
+#     The work-around: this is now hard coded. You HAVE to manually tell it what the image size it. Until UH fixes itself (HA!) you're fucked.
+#     '''
+#     width, height = Image.open(filepath).size
+#     return width, height
 
 
 # report = git.Repo(search_parent_directories=True)
@@ -64,7 +72,7 @@ output_classes = 2
 
 # w, h = get_num_pixels(image_dir / "EXON" / "Exon_0.png")  # probably shouldn't hard code it to the first image, but I'm feeling lazy this morning
 # The reason you don't hard code this is because there might not be an exon_0. Since there might not be you need to grab a random image and check that size.
-w, h = get_num_pixels(image_dir / "EXON" / random.choice(os.listdir(image_dir / "EXON")))
+# w, h = get_num_pixels(image_dir / "EXON" / random.choice(os.listdir(image_dir / "EXON")))
 
 seed = random.randint(1000000, 9000000)
 
@@ -138,21 +146,21 @@ history_data = history.history
 pandas.DataFrame(history_data).to_csv(str(version_dir / "ModelSteps.csv"))
 
 
-plt.plot(history_data["loss"])
-plt.plot(history_data["val_loss"])
-plt.xlabel("Epochs")
-plt.legend(["Loss", "Valid Loss"])
-plt.ylim(top = 10, bottom = 0)
-plt.savefig(str(version_dir / "Loss_Graph.png"))
+# plt.plot(history_data["loss"])
+# plt.plot(history_data["val_loss"])
+# plt.xlabel("Epochs")
+# plt.legend(["Loss", "Valid Loss"])
+# plt.ylim(top = 10, bottom = 0)
+# plt.savefig(str(version_dir / "Loss_Graph.png"))
 
-plt.close()
+# plt.close()
 
 
-plt.plot(history_data["categorical_accuracy"])
-plt.plot(history_data["val_categorical_accuracy"])
-plt.xlabel("Epochs")
-plt.legend(["Accuracy", "Valid Accuracy"])
-# plt.show()
-plt.savefig(str(version_dir / "Accuracy_Graph.png"))
+# plt.plot(history_data["categorical_accuracy"])
+# plt.plot(history_data["val_categorical_accuracy"])
+# plt.xlabel("Epochs")
+# plt.legend(["Accuracy", "Valid Accuracy"])
+# # plt.show()
+# plt.savefig(str(version_dir / "Accuracy_Graph.png"))
 
-print(f"\nOutput files to {version_dir}")
+print(f"\nOutput files to\n{version_dir}")
