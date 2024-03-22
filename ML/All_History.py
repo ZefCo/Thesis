@@ -27,9 +27,13 @@ def main():
     '''
     # History_1D()
     # History_F()
-    SelectedHistory(GMD_100 = cwd / "FractalModels" / "IvE" / "version_slurm_100",
-                    GMD_101 = cwd / "FractalModels" / "IvE" / "version_slurm_101",
-                    GMD_102 = cwd / "FractalModels" / "IvE" / "version_slurm_102",
+    SelectedHistory(GMD_320_183921 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-20-18-39-21",
+                    GMD_320_18437 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-20-18-43-7",
+                    GMD_320_184338 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-20-18-43-38",
+                    GMD_321_8557 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-21-8-5-57-994627",
+                    GMD_321_21467 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-21-21-46-7-886939",
+                    GMD_322_74153 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-7-41-53-606828",
+                    GMD_322_74917 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-7-49-17-995433",
         
                     # GMD_94 = cwd / "FractalModels" / "IvE" / "version_slurm_94",
                     # GMD_95 = cwd / "FractalModels" / "IvE" / "version_slurm_95",
