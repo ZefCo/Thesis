@@ -91,8 +91,8 @@ def normalization(image, label):
     image = tf.cast(image / 255, tf.float32)
     return image, label
 
-train_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (w, h), shuffle = True, seed = seed, subset = "training", validation_split = 0.2, batch_size = batch_size, label_mode = "categorical", color_mode = "grayscale")
-valid_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (w, h), shuffle = True, seed = seed, subset = "validation", validation_split = 0.2, batch_size = batch_size, label_mode = "categorical", color_mode = "grayscale")
+train_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (w, h), seed = seed, subset = "training", validation_split = 0.2, batch_size = batch_size, label_mode = "categorical", color_mode = "grayscale")
+valid_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (w, h), seed = seed, subset = "validation", validation_split = 0.2, batch_size = batch_size, label_mode = "categorical", color_mode = "grayscale")
 
 train_set = train_set.map(normalization)
 valid_set = valid_set.map(normalization)
@@ -108,14 +108,11 @@ input_layer = tf.keras.Input(shape = (w, h, 1))
 a = tf.keras.layers.Conv2D(3, (3, 3), padding = "same")(input_layer) #), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(input_layer)
 #a = tf.keras.layers.Dropout(.5)(a)
 a = tf.keras.layers.BatchNormalization()(a)
-a = tf.keras.layers.MaxPooling2D(pool_size = (3, 3))(a)
-b = tf.keras.layers.Conv2D(4, (3, 3), padding = "same")(a)
+a = tf.keras.layers.MaxPooling2D(pool_size = (2, 2))(a)
+b = tf.keras.layers.Conv2D(6, (3, 3), padding = "same")(a)
 b = tf.keras.layers.BatchNormalization()(b)
-b = tf.keras.layers.MaxPooling2D(pool_size = (2, 2))(b)
-c = tf.keras.layers.Conv2D(4, (3, 3), padding = "same")(b)
-c = tf.keras.layers.BatchNormalization()(c)
-flatten = tf.keras.layers.Flatten()(c)
-dense = tf.keras.layers.Dense(50, activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.01))(flatten)
+flatten = tf.keras.layers.Flatten()(b)
+dense = tf.keras.layers.Dense(50, activation = "gelu", kernel_regularizer = tf.keras.regularizers.ls(l = 0.001))(flatten)
 final = tf.keras.layers.Dropout(.25)(dense)
 output_layer = tf.keras.layers.Dense(output_classes, activation = "softmax")(final)
 model = tf.keras.Model(inputs = input_layer, outputs = output_layer)
@@ -124,7 +121,6 @@ model.compile(optimizer = 'adam',
               loss = 'categorical_crossentropy',
               #   metrics = ['accuracy'])
               metrics = [tf.keras.metrics.CategoricalAccuracy()])
-
 
 
 with open(str(version_dir / "Summery.txt"), "w") as f:

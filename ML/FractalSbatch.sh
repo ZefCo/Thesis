@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH -J fractal_GHMSS_v2
-#SBATCH -o fractal_GHMSS_v2.out
+#SBATCH -J fractal_GHMSS_v4
+#SBATCH -o fractal_GHMSS_v4.out
 #SBATCH --time=72:00:00
 #SBATCH --ntasks-per-node=8 -N 1
 #SBATCH --mem-per-cpu=5GB
@@ -13,7 +13,7 @@ python FractalModelSlurm.py
 module unload TensorFlow/2.11.0-foss-2022a
 
 module load Anaconda3
-python PrintPlots.py fractal_GHMSS_v2.out
+python PrintPlots.py fractal_GHMSS_v4.out
 module unload Anaconda3
 
 # Don't forget: you must adjust the image size in the FractalModelSlurm.py file manually and you need to adjust the input arguement
