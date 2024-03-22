@@ -3,71 +3,69 @@ print("Starting Env Test")
 try:
     import os
 except Exception as e:
-    print("Unable to import module os")
+    print("Unable to import os")
     fail_state = True
 
 try:
     import shutil
 except Exception as e:
-    print("Unable to import module shutil")
+    print("Unable to import shutil")
     fail_state = True
 
 try:
     import pandas
 except Exception as e:
-    print("Unable to import module pandas")
+    print("Unable to import pandas")
     fail_state = True
 
 try:
     import pathlib
 except Exception as e:
-    print("Unable to import module pathlib")
+    print("Unable to import pathlib")
     fail_state = True
 
 try:
     import re
 except Exception as e:
-    print("Unable to import module re")
+    print("Unable to import re")
     fail_state = True
 
 try:
     import sys
 except Exception as e:
-    print("Unable to import module sys")
+    print("Unable to import sys")
     fail_state = True
 
 try:
     import tensorflow as tf
-    print("Unable to import module tensorflow")
-    fail_state = True
     print(tf.__version__)
 
 except Exception as e:
-    print("Unable to import module")
+    print("Unable to import tensorflow")
     fail_state = True
 
 try:
     import random
 except Exception as e:
-    print("Unable to import module random")
+    print("Unable to import random")
     fail_state = True
 
 try:
     import datetime
 except Exception as e:
-    print("Unable to import module datetime")
+    print("Unable to import datetime")
     fail_state = True
 
 try:
     from matplotlib import pyplot as plt
 except Exception as e:
-    print("Unable to import module matplotlib")
+    print("Unable to import matplotlib")
     fail_state = True
 
 try:
     from PIL import Image
 except Exception as e:
-    print("Unable to import module PIL")
+    print("Unable to import PIL")
     fail_state = True
 
 
