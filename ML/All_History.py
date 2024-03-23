@@ -34,6 +34,10 @@ def main():
                     GMD_321_21467 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-21-21-46-7-886939",
                     GMD_322_74153 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-7-41-53-606828",
                     GMD_322_74917 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-7-49-17-995433",
+                    GMD_322_13120 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-13-12-0-637765",
+                    GMD_322_131356 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-13-13-56-583206",
+                    GMD_322_133756 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-13-37-56-620653",
+                    GMD_322_14720 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-14-7-20-431707",
         
                     # GMD_94 = cwd / "FractalModels" / "IvE" / "version_slurm_94",
                     # GMD_95 = cwd / "FractalModels" / "IvE" / "version_slurm_95",
