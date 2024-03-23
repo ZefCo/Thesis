@@ -1,0 +1,48 @@
+Seed: 7064024
+
+Model: "model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ input_1 (InputLayer)        [(None, 64, 64, 1)]       0         
+                                                                 
+ conv2d (Conv2D)             (None, 64, 64, 3)         30        
+                                                                 
+ re_lu (ReLU)                (None, 64, 64, 3)         0         
+                                                                 
+ batch_normalization (BatchN  (None, 64, 64, 3)        12        
+ ormalization)                                                   
+                                                                 
+ max_pooling2d (MaxPooling2D  (None, 21, 21, 3)        0         
+ )                                                               
+                                                                 
+ conv2d_1 (Conv2D)           (None, 21, 21, 5)         140       
+                                                                 
+ re_lu_1 (ReLU)              (None, 21, 21, 5)         0         
+                                                                 
+ batch_normalization_1 (Batc  (None, 21, 21, 5)        20        
+ hNormalization)                                                 
+                                                                 
+ max_pooling2d_1 (MaxPooling  (None, 10, 10, 5)        0         
+ 2D)                                                             
+                                                                 
+ conv2d_2 (Conv2D)           (None, 10, 10, 9)         414       
+                                                                 
+ re_lu_2 (ReLU)              (None, 10, 10, 9)         0         
+                                                                 
+ batch_normalization_2 (Batc  (None, 10, 10, 9)        36        
+ hNormalization)                                                 
+                                                                 
+ flatten (Flatten)           (None, 900)               0         
+                                                                 
+ dense (Dense)               (None, 50)                45050     
+                                                                 
+ dropout (Dropout)           (None, 50)                0         
+                                                                 
+ dense_1 (Dense)             (None, 2)                 102       
+                                                                 
+=================================================================
+Total params: 45,804
+Trainable params: 45,770
+Non-trainable params: 34
+_________________________________________________________________

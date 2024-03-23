@@ -77,7 +77,7 @@ output_classes = 2
 seed = random.randint(1000000, 9000000)
 
 
-batch_size = 521
+batch_size = 256
 epochs = 100
 
 pngs = 0
@@ -106,15 +106,13 @@ shutil.copy(str(python_script), str(version_dir / python_script.name))
 
 input_layer = tf.keras.Input(shape = (w, h, 1))
 a = tf.keras.layers.Conv2D(3, (3, 3), padding = "same")(input_layer) #), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(input_layer)
-a = tf.keras.layers.ReLU()(a)
+#a = tf.keras.layers.Dropout(.5)(a)
 a = tf.keras.layers.BatchNormalization()(a)
 a = tf.keras.layers.MaxPooling2D(pool_size = (3, 3))(a)
-b = tf.keras.layers.Conv2D(5, (3, 3), padding = "same")(a)
-b = tf.keras.layers.ReLU()(b)
+b = tf.keras.layers.Conv2D(4, (3, 3), padding = "same")(a)
 b = tf.keras.layers.BatchNormalization()(b)
 b = tf.keras.layers.MaxPooling2D(pool_size = (2, 2))(b)
-c = tf.keras.layers.Conv2D(9, (3, 3), padding = "same")(b)
-c = tf.keras.layers.ReLU()(c)
+c = tf.keras.layers.Conv2D(6, (3, 3), padding = "same")(b)
 c = tf.keras.layers.BatchNormalization()(c)
 flatten = tf.keras.layers.Flatten()(c)
 dense = tf.keras.layers.Dense(50, activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.01))(flatten)

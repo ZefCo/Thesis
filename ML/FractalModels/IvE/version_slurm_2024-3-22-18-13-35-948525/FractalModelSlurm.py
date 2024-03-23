@@ -77,7 +77,7 @@ output_classes = 2
 seed = random.randint(1000000, 9000000)
 
 
-batch_size = 521
+batch_size = 256
 epochs = 100
 
 pngs = 0

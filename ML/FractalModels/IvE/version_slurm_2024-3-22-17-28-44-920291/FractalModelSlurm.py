@@ -77,7 +77,7 @@ output_classes = 2
 seed = random.randint(1000000, 9000000)
 
 
-batch_size = 521
+batch_size = 256
 epochs = 100
 
 pngs = 0
@@ -109,11 +109,11 @@ a = tf.keras.layers.Conv2D(3, (3, 3), padding = "same")(input_layer) #), activat
 a = tf.keras.layers.ReLU()(a)
 a = tf.keras.layers.BatchNormalization()(a)
 a = tf.keras.layers.MaxPooling2D(pool_size = (3, 3))(a)
-b = tf.keras.layers.Conv2D(5, (3, 3), padding = "same")(a)
+b = tf.keras.layers.Conv2D(4, (3, 3), padding = "same")(a)
 b = tf.keras.layers.ReLU()(b)
 b = tf.keras.layers.BatchNormalization()(b)
 b = tf.keras.layers.MaxPooling2D(pool_size = (2, 2))(b)
-c = tf.keras.layers.Conv2D(9, (3, 3), padding = "same")(b)
+c = tf.keras.layers.Conv2D(6, (3, 3), padding = "same")(b)
 c = tf.keras.layers.ReLU()(c)
 c = tf.keras.layers.BatchNormalization()(c)
 flatten = tf.keras.layers.Flatten()(c)
