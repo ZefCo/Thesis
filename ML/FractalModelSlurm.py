@@ -37,7 +37,7 @@ from contextlib import redirect_stdout
 cwd = pathlib.Path.cwd()
 import datetime
 # exit()
-w, h = 64, 64
+width, height, depth = 64, 64, 1
 # def get_num_pixels(filepath):
 #     '''
 #     So this used to be the way that the height and width were determined: it just needed a filepath and would open the file, determine the pixel size
@@ -104,17 +104,17 @@ cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath = str(model_dir))
 python_script = pathlib.Path(__file__)
 shutil.copy(str(python_script), str(version_dir / python_script.name))
 
-input_layer = tf.keras.Input(shape = (w, h, 1))
-a = tf.keras.layers.Conv2D(3, (3, 3), padding = "same")(input_layer) #), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(input_layer)
-a = tf.keras.layers.ReLU()(a)
+input_layer = tf.keras.Input(shape = (width, height, depth))
+a = tf.keras.layers.Conv2D(3, (3, 3), padding = "same", activation="gelu")(input_layer) #), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(input_layer)
+# a = tf.keras.layers.ReLU()(a)
 a = tf.keras.layers.BatchNormalization()(a)
 a = tf.keras.layers.MaxPooling2D(pool_size = (3, 3))(a)
-b = tf.keras.layers.Conv2D(5, (3, 3), padding = "same")(a)
-b = tf.keras.layers.ReLU()(b)
+b = tf.keras.layers.Conv2D(5, (3, 3), padding = "same", activation="gelu")(a)
+# b = tf.keras.layers.ReLU()(b)
 b = tf.keras.layers.BatchNormalization()(b)
 b = tf.keras.layers.MaxPooling2D(pool_size = (2, 2))(b)
-c = tf.keras.layers.Conv2D(9, (3, 3), padding = "same")(b)
-c = tf.keras.layers.ReLU()(c)
+c = tf.keras.layers.Conv2D(9, (3, 3), padding = "same", activation="gelu")(b)
+# c = tf.keras.layers.ReLU()(c)
 c = tf.keras.layers.BatchNormalization()(c)
 flatten = tf.keras.layers.Flatten()(c)
 dense = tf.keras.layers.Dense(50, activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.01))(flatten)
