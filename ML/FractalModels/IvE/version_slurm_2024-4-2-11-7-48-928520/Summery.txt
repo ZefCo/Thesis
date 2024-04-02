@@ -1,0 +1,53 @@
+Seed: 6410926
+
+Model: "model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ input_1 (InputLayer)        [(None, 64, 64, 1)]       0         
+                                                                 
+ conv2d (Conv2D)             (None, 64, 64, 6)         60        
+                                                                 
+ max_pooling2d (MaxPooling2D  (None, 32, 32, 6)        0         
+ )                                                               
+                                                                 
+ batch_normalization (BatchN  (None, 32, 32, 6)        24        
+ ormalization)                                                   
+                                                                 
+ conv2d_1 (Conv2D)           (None, 32, 32, 36)        1980      
+                                                                 
+ max_pooling2d_1 (MaxPooling  (None, 16, 16, 36)       0         
+ 2D)                                                             
+                                                                 
+ batch_normalization_1 (Batc  (None, 16, 16, 36)       144       
+ hNormalization)                                                 
+                                                                 
+ conv2d_2 (Conv2D)           (None, 16, 16, 216)       70200     
+                                                                 
+ max_pooling2d_2 (MaxPooling  (None, 8, 8, 216)        0         
+ 2D)                                                             
+                                                                 
+ batch_normalization_2 (Batc  (None, 8, 8, 216)        864       
+ hNormalization)                                                 
+                                                                 
+ conv2d_3 (Conv2D)           (None, 8, 8, 1296)        2520720   
+                                                                 
+ max_pooling2d_3 (MaxPooling  (None, 4, 4, 1296)       0         
+ 2D)                                                             
+                                                                 
+ batch_normalization_3 (Batc  (None, 4, 4, 1296)       5184      
+ hNormalization)                                                 
+                                                                 
+ flatten (Flatten)           (None, 20736)             0         
+                                                                 
+ dense (Dense)               (None, 50)                1036850   
+                                                                 
+ dropout (Dropout)           (None, 50)                0         
+                                                                 
+ dense_1 (Dense)             (None, 2)                 102       
+                                                                 
+=================================================================
+Total params: 3,636,128
+Trainable params: 3,633,020
+Non-trainable params: 3,108
+_________________________________________________________________

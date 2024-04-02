@@ -1,0 +1,21 @@
+Seed: 6183752
+
+Model: "model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ input_1 (InputLayer)        [(None, 64, 64, 1)]       0         
+                                                                 
+ flatten (Flatten)           (None, 4096)              0         
+                                                                 
+ dense (Dense)               (None, 50)                204850    
+                                                                 
+ dropout (Dropout)           (None, 50)                0         
+                                                                 
+ dense_1 (Dense)             (None, 2)                 102       
+                                                                 
+=================================================================
+Total params: 204,952
+Trainable params: 204,952
+Non-trainable params: 0
+_________________________________________________________________
