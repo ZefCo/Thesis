@@ -3,14 +3,14 @@
 
 %InputFile   = '../Data/Intron.xlsx';
 %OutputDir   = '../Images/Images_Q3_3K/Intron/';
-InputFile   = 'Intron.xlsx';
-OutputDir   = 'Intron/';
+InputFile   = 'Exon.xlsx';
+OutputDir   = 'Exon/';
 
 LattSize    = 64;
 QuartLength = 3;
 EdgeLength  = 10;
 NSide       = 4^QuartLength;
-NumImages   = 3;
+NumImages   = 3000;
 
 % Factors and Sums for Fuzzy Distribution
 Fact1  = exp(-0.5);            Fact2   = exp(-1);

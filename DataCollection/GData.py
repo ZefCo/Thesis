@@ -9,7 +9,58 @@ import random
 import GeneClass as Gene
 
 
+
 def main():
+    '''
+    '''
+    # data_files = cwd.parent / "Data_Files"
+    # ut_file = data_files / "UTData_fs.pkl"
+    # ut_data: pandas.DataFrame = pandas.read_pickle(ut_file)
+    # ut_data = ut_data.rename(columns={"Unnamed: 18": "Posterior_20", "Unnamed: 19": "Anterior_20"})
+    # ut_data.to_pickle(ut_file)
+
+    CancerData()
+
+
+def CancerData():
+    '''
+    '''
+    data_files = cwd.parent / "Data_Files"
+
+    lab_file = data_files / "Fusion_AllConfidence.pkl"
+    lab_file_out = data_files / "Lab_Cancer.xlsx"
+
+    ut_file = data_files / "UTData_fs.pkl"
+    ut_file_out = data_files / "UT_Cancer.xlsx"
+
+    lab_cancer = pandas.DataFrame(columns = ["Name_A", "Chrm_A", "Name_P", "Chrm_P", "Posterior_10", "Anterior_10"])
+
+    lab_data: pandas.DataFrame = pandas.read_pickle(lab_file)
+    lab_data["Posterior_20"] = lab_data["Head"].apply(lambda x: x[len(x) - 20:len(x)])
+    lab_data["Posterior_20"] = lab_data["Posterior_20"].apply(lambda x: pandas.NA if re.search(r"\_|\.", x) else x)
+    lab_data["Anterior_20"] = lab_data["Tail"].apply(lambda x: x[0: 20])
+    lab_data["Anterior_20"] = lab_data["Anterior_20"].apply(lambda x: pandas.NA if re.search(r"\_|\.", x) else x)
+
+    lab_data = lab_data.dropna()
+    lab_data = lab_data.reset_index()
+
+    # print(lab_data.head())
+    # print(lab_data.columns)
+
+    lab_data = lab_data[["gene_id1", "gene_id2", "Posterior_20", "Anterior_20"]]
+    lab_data = lab_data.rename({"gene_id1": "Post_name", "gene_id2": "Ant_Name"})
+    
+    ut_data: pandas.DataFrame = pandas.read_pickle(ut_file)
+    ut_data = ut_data[["Henst", "Tenst", "Hchr", "Tchr", 'Posterior_20', 'Anterior_20']]
+    ut_data = ut_data.rename({"Henst": "Post_Name", "Tenst": "Ant_Name", "Hchr": "Post_Chr", "Tchr": "Ant_Chr"})
+    
+    lab_data.to_excel(data_files / "Cancer_Data_Lab.xlsx")
+    ut_data.to_excel(data_files / "Cancer_Data_UT.xlsx")
+
+
+
+
+def NormalData():
     '''
     '''
     element_drive = pathlib.Path("F:\Gene_Data_Sets")

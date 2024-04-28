@@ -2,8 +2,11 @@
 
 %  Read Data and re-organize 
 NumImages  = 3000;
-ExonPath   = '../Images/Images_Q3_3K/Exon/';
-IntronPath = '../Images/Images_Q3_3K/Intron/';
+%ExonPath   = '../Images/Images_Q3_3K/Exon/';
+%IntronPath = '../Images/Images_Q3_3K/Intron/';
+ExonPath   = 'Exon/';
+IntronPath = 'Intron/';
+
 
 for nimag = 1:1:NumImages
     dtExon = imread (strcat(ExonPath, "Image", sprintf('%05d',nimag), ".png"));
