@@ -26,16 +26,16 @@ def main():
     # # data.to_csv(cwd / "Raw_Exon2Exon.csv")
     data_set = 2
     k = 6
-    # folder_path = pathlib.Path("F:\Gene_Data_Sets")  # windows path
-    folder_path = cwd.parent.parent / "Thesis_Data" / "Gene_Data_Sets"  #Linux path
+    folder_path = pathlib.Path("F:\Gene_Data_Sets")  # windows path
+    # folder_path = cwd.parent.parent / "Thesis_Data" / "Gene_Data_Sets"  #Linux path
 
     save_file_path = folder_path / f"E2E_DS{data_set}_k{k}.pkl"
     data: pathlib.Path = folder_path / f"Data_Set_{data_set}_cleaned_dict.pkl"
     genes = eed.collect_genes(data, n = 10_000)  # I'm trying something
 
     
-    heatmaps(genes, cwd / "Sanity_HE.png", k = k)
-    plots(genes, cwd / "Dumping.pkl", cwd / "Sanity_TE_v2.png")
+    # heatmaps(genes, cwd / "Sanity_HE.png", k = k)
+    plots(genes, cwd / "TE_Images_ForPaper" / "Exon2Exon" / "Cancer" / "E2ENormal.pkl", cwd / "TE_Images_ForPaper" / "Exon2Exon" / "Cancer" / "E2ENormal.png")
     # heatmap(data, colors=["white", "black"], bounds = [0, 0.1, 0.2], fileoutput=cwd / "Sanity.png")
 
 

@@ -27,6 +27,17 @@ def main():
     '''
     # History_1D()
     # History_F()
+    # SelectedTain(Layers_0 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-24-49-791398", 
+    #              Layers_1 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-22-58-713760", 
+    #              Layers_3 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-21-46-358515", 
+    #              Layers_4 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-11-7-48-928520", 
+    #              Layers_5 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-9-29-1-672357")
+    # SelectedVals(Layers_0 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-24-49-791398", 
+    #              Layers_1 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-22-58-713760", 
+    #              Layers_3 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-21-46-358515", 
+    #              Layers_4 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-11-7-48-928520", 
+    #              Layers_5 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-9-29-1-672357")
+
     SelectedHistory( # GMD_320_183921 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-20-18-39-21",
                     # GMD_320_18437 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-20-18-43-7",
                     # GMD_320_184338 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-20-18-43-38",
@@ -51,17 +62,24 @@ def main():
                     # GMD_328_18400 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-28-18-40-0-627592",
                     # GMD_328_20326 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-28-20-3-26-838164",
                     # GMD_329_11417 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-29-11-4-17-715548",
-                    GMD_41_121535 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-12-15-35-318714",
-                    GMD_41_121615 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-12-16-15-133625",
-                    GMD_41_121714 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-12-17-14-742849",
-                    GMD_41_13350 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-13-3-50-75025",
-                    GMD_41_16428 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-16-4-28-483121",
-                    GMD_41_13449 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-13-4-49-745048",
-                    GMD_41_16528 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-16-5-28-75762",
-                    GMD_41_1684 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-16-8-4-935706",
-                    GMD_41_161038 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-16-10-38-955229",
-                    GMD_41_191558 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-19-15-58-847784",
-        
+
+                    # GMD_41_121535 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-12-15-35-318714",
+                    # GMD_41_121615 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-12-16-15-133625",
+                    # GMD_41_121714 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-12-17-14-742849",
+                    # GMD_41_13350 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-13-3-50-75025",
+                    # GMD_41_16428 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-16-4-28-483121",
+                    # GMD_41_13449 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-13-4-49-745048",
+                    # GMD_41_16528 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-16-5-28-75762",
+                    # GMD_41_1684 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-16-8-4-935706",
+                    # GMD_41_161038 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-16-10-38-955229",
+                    # GMD_41_191558 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-19-15-58-847784",
+
+                    # Layers_0 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-24-49-791398",
+                    # Layers_1 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-22-58-713760",
+                    # Layers_3 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-21-46-358515",
+                    # Layers_4 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-11-7-48-928520",
+                    Layers_5 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-9-29-1-672357",
+
                     # GMD_94 = cwd / "FractalModels" / "IvE" / "version_slurm_94",
                     # GMD_95 = cwd / "FractalModels" / "IvE" / "version_slurm_95",
                     # GMD_96 = cwd / "FractalModels" / "IvE" / "version_slurm_96",
@@ -341,6 +359,199 @@ def SelectedHistory(line_of_best_epochs = None, *args, **kwargs):
     # print(str(cwd / "ML_Acc.html"))
     all_acc.write_html(str(cwd / "ML_Acc.html"))
     all_los.write_html(str(cwd / "ML_Losses.html"))
+
+
+
+
+def SelectedVals(line_of_best_epochs = None, *args, **kwargs):
+    '''
+    Right now this cannot combine args and kwargs, so use only one at a time.
+    '''
+    models = pandas.DataFrame()
+
+    if (len(args) > 0) and (len(kwargs) < 1):
+
+        model_count = 0
+
+        for path in args:
+            for _, _, files in os.walk(path):
+                # print(file)
+                for file in files:
+                    if file in "ModelSteps.csv":
+                        model_count += 1
+                        local_model = pandas.read_csv(pathlib.Path(path, file), header = 0)
+                        local_model["ModelIndex"] = f"Model_{model_count}"
+                        local_model["ModelIndex"] = pandas.Categorical(local_model["ModelIndex"])
+                        local_model["Epoch"] = local_model.index + 1
+                
+                        models = pandas.concat([models, local_model])
+                        # print(pathlib.Path(parent, file))
+
+    elif (len(args) < 1) and (len(kwargs) > 0):
+        for model, path in kwargs.items():
+            for _, _, files in os.walk(path):
+                # print(file)
+                for file in files:
+                    if file in "ModelSteps.csv":
+                        local_model = pandas.read_csv(pathlib.Path(path, file), header = 0)
+                        local_model["ModelIndex"] = model
+                        local_model["ModelIndex"] = pandas.Categorical(local_model["ModelIndex"])
+                        local_model["Epoch"] = local_model.index + 1
+                
+                        models = pandas.concat([models, local_model])
+                        # print(pathlib.Path(parent, file))
+
+    
+    models.pop("Unnamed: 0")
+    models = models.reset_index()
+    models.pop("index")
+    # # models["Epoch"]
+    # print(models)
+    # # print(models.shape)
+    # epochs = models["Epoch"].unique()
+    # print(epochs)
+
+    all_acc = go.Figure()
+    all_los = go.Figure()
+
+    for m, model in enumerate(pandas.unique(models["ModelIndex"])):
+        # print(model)
+        local_model: pandas.DataFrame = models[models["ModelIndex"] == model]
+        local_model = local_model.set_index("Epoch")
+        # print(local_model)
+
+        all_acc.add_trace(go.Scatter(x = local_model.index, y = local_model["val_categorical_accuracy"], name = f"{model}: VA", legendgroup = model))
+
+        all_los.add_trace(go.Scatter(x = local_model.index, y = local_model["val_loss"], name = f"{model}: VL", legendgroup = model))
+
+        if line_of_best_epochs is not None:
+            epochs = local_model.index
+
+            val_range = local_model.loc[line_of_best_epochs:max(epochs) + 1, "val_categorical_accuracy"].to_numpy()
+            
+            x_points = np.array([x for x in range(line_of_best_epochs, max(epochs) + 1)])
+            # print(x_points)
+            # print(acc_range)
+            # print(val_range)
+
+            val_ls, val_m, val_b = least_squares(x_points, val_range)
+
+            # print(acc_ls)
+            
+            all_acc.add_trace(go.Scatter(x = tuple(val_ls.keys()), y = tuple(val_ls.values()), name = rf"{model} LoBF starting @ {line_of_best_epochs}<br>y = {round(val_m, 6)}x + {round(val_b, 2)}", legendgroup = model))
+
+            # Putting this here in case Dr. G says anything, then I can show him it doesn't work
+            # all_acc.add_annotation(x = 0, y = tuple(acc_ls.values()), text = f"y = {round(acc_m, 6)}x + {round(acc_b, 6)}")
+            # all_acc.add_annotation(x = 0, y = tuple(val_ls.values()), text = f"y = {round(val_m, 6)}x + {round(val_b, 6)}")
+
+
+    all_acc.update_xaxes(title = "Epoch")
+    all_los.update_xaxes(title = "Epoch")
+
+    all_acc.update_layout(title = "Validation Accuracy", legend = dict(orientation = "h"))
+    all_los.update_layout(title = "Validation Loss")
+
+    all_acc.show()
+    # all_los.show()
+    # print(str(cwd / "ML_Acc.html"))
+    all_acc.write_html(str(cwd / "ML_Val_Acc.html"))
+    all_los.write_html(str(cwd / "ML_Val_Losses.html"))
+
+
+
+def SelectedTain(line_of_best_epochs = None, *args, **kwargs):
+    '''
+    Right now this cannot combine args and kwargs, so use only one at a time.
+    '''
+    models = pandas.DataFrame()
+
+    if (len(args) > 0) and (len(kwargs) < 1):
+
+        model_count = 0
+
+        for path in args:
+            for _, _, files in os.walk(path):
+                # print(file)
+                for file in files:
+                    if file in "ModelSteps.csv":
+                        model_count += 1
+                        local_model = pandas.read_csv(pathlib.Path(path, file), header = 0)
+                        local_model["ModelIndex"] = f"Model_{model_count}"
+                        local_model["ModelIndex"] = pandas.Categorical(local_model["ModelIndex"])
+                        local_model["Epoch"] = local_model.index + 1
+                
+                        models = pandas.concat([models, local_model])
+                        # print(pathlib.Path(parent, file))
+
+    elif (len(args) < 1) and (len(kwargs) > 0):
+        for model, path in kwargs.items():
+            for _, _, files in os.walk(path):
+                # print(file)
+                for file in files:
+                    if file in "ModelSteps.csv":
+                        local_model = pandas.read_csv(pathlib.Path(path, file), header = 0)
+                        local_model["ModelIndex"] = model
+                        local_model["ModelIndex"] = pandas.Categorical(local_model["ModelIndex"])
+                        local_model["Epoch"] = local_model.index + 1
+                
+                        models = pandas.concat([models, local_model])
+                        # print(pathlib.Path(parent, file))
+
+    
+    models.pop("Unnamed: 0")
+    models = models.reset_index()
+    models.pop("index")
+    # # models["Epoch"]
+    # print(models)
+    # # print(models.shape)
+    # epochs = models["Epoch"].unique()
+    # print(epochs)
+
+    all_acc = go.Figure()
+    all_los = go.Figure()
+
+    for m, model in enumerate(pandas.unique(models["ModelIndex"])):
+        # print(model)
+        local_model: pandas.DataFrame = models[models["ModelIndex"] == model]
+        local_model = local_model.set_index("Epoch")
+        # print(local_model)
+
+        all_acc.add_trace(go.Scatter(x = local_model.index, y = local_model["categorical_accuracy"], name = f"{model}: TA", legendgroup = model))
+
+        all_los.add_trace(go.Scatter(x = local_model.index, y = local_model["loss"], name = f"{model}: TL", legendgroup = model))
+
+        if line_of_best_epochs is not None:
+            epochs = local_model.index
+
+            acc_range = local_model.loc[line_of_best_epochs:max(epochs) + 1, "categorical_accuracy"].to_numpy()
+            
+            x_points = np.array([x for x in range(line_of_best_epochs, max(epochs) + 1)])
+            # print(x_points)
+            # print(acc_range)
+            # print(val_range)
+
+            acc_ls, acc_m, acc_b = least_squares(x_points, acc_range)
+
+            # print(acc_ls)
+            
+            all_acc.add_trace(go.Scatter(x = tuple(acc_ls.keys()), y = tuple(acc_ls.values()), name = rf"{model} LoBF starting @ {line_of_best_epochs}<br>y = {round(acc_m, 6)}x + {round(acc_b, 6)}", legendgroup = model))
+
+            # Putting this here in case Dr. G says anything, then I can show him it doesn't work
+            # all_acc.add_annotation(x = 0, y = tuple(acc_ls.values()), text = f"y = {round(acc_m, 6)}x + {round(acc_b, 6)}")
+            # all_acc.add_annotation(x = 0, y = tuple(val_ls.values()), text = f"y = {round(val_m, 6)}x + {round(val_b, 6)}")
+
+
+    all_acc.update_xaxes(title = "Epoch")
+    all_los.update_xaxes(title = "Epoch")
+
+    all_acc.update_layout(title = "Training Accuracy", legend = dict(orientation = "h"))
+    all_los.update_layout(title = "Training Loss")
+
+    all_acc.show()
+    # all_los.show()
+    # print(str(cwd / "ML_Acc.html"))
+    all_acc.write_html(str(cwd / "ML_Train_Acc.html"))
+    all_los.write_html(str(cwd / "ML_Train_Losses.html"))
 
 
 

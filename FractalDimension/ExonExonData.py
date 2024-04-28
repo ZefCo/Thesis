@@ -34,7 +34,7 @@ def main():
 
     # file_plot_names = []
 
-    # plots(save_file_path)
+    plots(save_file_path, file_path = cwd / "TE_Images_ForPaper" / "Exon2Exon" / "Cancer" / "E2ENormal.png")
 
 
 
@@ -226,7 +226,7 @@ def exon2exon(gene: Gene.Gene, k: int = 6, *args, **kwargs) -> pandas.DataFrame:
     '''
     exons: list = gene.exon_seq
     index: int = len(exons)
-    xy_points: pandas.DataFrame = pandas.DataFrame(None, index = [i for i in range(index - 1)], columns = ["X", "Y", "Chrm"])
+    xy_points: pandas.DataFrame = pandas.DataFrame(None, index = [i for i in range(index - 1)], columns = ["X", "Y", "Chrm", "Seq"])
 
     for i in range(1, index):
         # we're just going to look at exons and introns that are at minimum len >= 6
@@ -255,6 +255,7 @@ def exon2exon(gene: Gene.Gene, k: int = 6, *args, **kwargs) -> pandas.DataFrame:
 
             if isinstance(xy, np.ndarray):
                 xy_points.loc[i - 1, "X"], xy_points.loc[i - 1, "Y"], xy_points.loc[i - 1, "Chrm"] = xy[0][1], xy[0][0], gene.chrm
+                xy_points.loc[i - 1, "Seq"] = f"{exon_y}{exon_x}"
         
         else:
             return None
