@@ -27,93 +27,97 @@ def main():
     '''
     # History_1D()
     # History_F()
-    # SelectedTain(Layers_0 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-24-49-791398", 
-    #              Layers_1 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-22-58-713760", 
-    #              Layers_3 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-21-46-358515", 
-    #              Layers_4 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-11-7-48-928520", 
-    #              Layers_5 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-9-29-1-672357")
-    # SelectedVals(Layers_0 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-24-49-791398", 
-    #              Layers_1 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-22-58-713760", 
-    #              Layers_3 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-21-46-358515", 
-    #              Layers_4 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-11-7-48-928520", 
-    #              Layers_5 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-9-29-1-672357")
+    SelectedTain(Layers_0 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-24-49-791398", 
+                 Layers_1 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-22-58-713760", 
+                 Layers_3 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-21-46-358515", 
+                 Layers_4 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-11-7-48-928520", 
+                 Layers_5 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-9-29-1-672357",
+                 save_all_acc = cwd / "Layers_Train.png", save_all_los = cwd / "Layers_TLos.png",
+                 height = 1000, width = 1000)
+    SelectedVals(Layers_0 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-24-49-791398", 
+                 Layers_1 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-22-58-713760", 
+                 Layers_3 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-21-46-358515", 
+                 Layers_4 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-11-7-48-928520", 
+                 Layers_5 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-9-29-1-672357",
+                 save_all_acc = cwd / "Layers_Val.png", save_all_los = cwd / "Layers_VLos.png",
+                 height = 1000, width = 1000)
 
-    SelectedHistory( # GMD_320_183921 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-20-18-39-21",
-                    # GMD_320_18437 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-20-18-43-7",
-                    # GMD_320_184338 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-20-18-43-38",
-                    # GMD_321_8557 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-21-8-5-57-994627",
-                    # GMD_321_21467 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-21-21-46-7-886939",
-                    # GMD_322_74153 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-7-41-53-606828",
-                    # GMD_322_74917 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-7-49-17-995433",
-                    # GMD_322_13120 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-13-12-0-637765",
-                    # GMD_322_131356 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-13-13-56-583206",
-                    # GMD_322_133756 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-13-37-56-620653",
-                    # GMD_322_14720 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-14-7-20-431707",
-                    # GMD_322_17955 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-17-9-55-837319",
-                    # GMD_322_172844 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-17-28-44-920291",
-                    # GMD_322_181335 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-18-13-35-948525",
-                    # GMD_322_181532 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-18-15-32-995204",
-                    # GMD_322_194111 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-19-41-11-248177",
-                    # GMD_325_123957 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-25-12-39-57-34508",
-                    # GMD_325_124528 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-25-12-45-28-551325",
-                    # GMD_326_11223 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-26-11-22-3-83685",
-                    # GMD_328_81013 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-28-8-10-13-808889",
-                    # GMD_328_121823 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-28-12-18-23-559016",
-                    # GMD_328_18400 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-28-18-40-0-627592",
-                    # GMD_328_20326 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-28-20-3-26-838164",
-                    # GMD_329_11417 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-29-11-4-17-715548",
+    # SelectedHistory( # GMD_320_183921 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-20-18-39-21",
+    #                 # GMD_320_18437 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-20-18-43-7",
+    #                 # GMD_320_184338 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-20-18-43-38",
+    #                 # GMD_321_8557 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-21-8-5-57-994627",
+    #                 # GMD_321_21467 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-21-21-46-7-886939",
+    #                 # GMD_322_74153 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-7-41-53-606828",
+    #                 # GMD_322_74917 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-7-49-17-995433",
+    #                 # GMD_322_13120 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-13-12-0-637765",
+    #                 # GMD_322_131356 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-13-13-56-583206",
+    #                 # GMD_322_133756 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-13-37-56-620653",
+    #                 # GMD_322_14720 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-14-7-20-431707",
+    #                 # GMD_322_17955 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-17-9-55-837319",
+    #                 # GMD_322_172844 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-17-28-44-920291",
+    #                 # GMD_322_181335 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-18-13-35-948525",
+    #                 # GMD_322_181532 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-18-15-32-995204",
+    #                 # GMD_322_194111 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-22-19-41-11-248177",
+    #                 # GMD_325_123957 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-25-12-39-57-34508",
+    #                 # GMD_325_124528 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-25-12-45-28-551325",
+    #                 # GMD_326_11223 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-26-11-22-3-83685",
+    #                 # GMD_328_81013 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-28-8-10-13-808889",
+    #                 # GMD_328_121823 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-28-12-18-23-559016",
+    #                 # GMD_328_18400 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-28-18-40-0-627592",
+    #                 # GMD_328_20326 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-28-20-3-26-838164",
+    #                 # GMD_329_11417 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-3-29-11-4-17-715548",
 
-                    # GMD_41_121535 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-12-15-35-318714",
-                    # GMD_41_121615 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-12-16-15-133625",
-                    # GMD_41_121714 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-12-17-14-742849",
-                    # GMD_41_13350 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-13-3-50-75025",
-                    # GMD_41_16428 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-16-4-28-483121",
-                    # GMD_41_13449 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-13-4-49-745048",
-                    # GMD_41_16528 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-16-5-28-75762",
-                    # GMD_41_1684 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-16-8-4-935706",
-                    # GMD_41_161038 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-16-10-38-955229",
-                    # GMD_41_191558 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-19-15-58-847784",
+    #                 # GMD_41_121535 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-12-15-35-318714",
+    #                 # GMD_41_121615 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-12-16-15-133625",
+    #                 # GMD_41_121714 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-12-17-14-742849",
+    #                 # GMD_41_13350 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-13-3-50-75025",
+    #                 # GMD_41_16428 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-16-4-28-483121",
+    #                 # GMD_41_13449 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-13-4-49-745048",
+    #                 # GMD_41_16528 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-16-5-28-75762",
+    #                 # GMD_41_1684 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-16-8-4-935706",
+    #                 # GMD_41_161038 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-16-10-38-955229",
+    #                 # GMD_41_191558 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-1-19-15-58-847784",
 
-                    # Layers_0 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-24-49-791398",
-                    # Layers_1 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-22-58-713760",
-                    # Layers_3 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-21-46-358515",
-                    # Layers_4 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-11-7-48-928520",
-                    Layers_5 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-9-29-1-672357",
+    #                 Layers_0 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-24-49-791398",
+    #                 Layers_1 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-22-58-713760",
+    #                 Layers_3 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-14-21-46-358515",
+    #                 Layers_4 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-11-7-48-928520",
+    #                 Layers_5 = cwd / "FractalModels" / "IvE" / "version_slurm_2024-4-2-9-29-1-672357",
 
-                    # GMD_94 = cwd / "FractalModels" / "IvE" / "version_slurm_94",
-                    # GMD_95 = cwd / "FractalModels" / "IvE" / "version_slurm_95",
-                    # GMD_96 = cwd / "FractalModels" / "IvE" / "version_slurm_96",
-                    # GMD_97 = cwd / "FractalModels" / "IvE" / "version_slurm_97",
-                    # GMD_98 = cwd / "FractalModels" / "IvE" / "version_slurm_98",
-                    # GMD_99 = cwd / "FractalModels" / "IvE" / "version_slurm_99",
-                    # SLSGHis = cwd / "FractalModels" / "IvE" / "version_slurm_47",
-                    # DS1_hist = cwd / "FractalModels" / "IvE" / "version_slurm_23",
-                    # DS1 = cwd / "FractalModels" / "IvE" / "version_slurm_22",
-                    # DS2 = cwd / "FractalModels" / "IvE" / "version_slurm_24",
-                    # mer9_v1 = cwd / "FractalModels" / "IvE" / "version_slurm_50",
-                    # mer8_v1 = cwd / "FractalModels" / "IvE" / "version_slurm_51",
-                    # mer8_v2 = cwd / "FractalModels" / "IvE" / "version_slurm_52",
-                    # mer9_v2 = cwd / "FractalModels" / "IvE" / "version_slurm_55",
-                    # new_v70 = cwd / "FractalModels" / "IvE" / "version_slurm_70",
-                    # new_71 = cwd / "FractalModels" / "IvE" / "version_slurm_71",
-                    # new_73 = cwd / "FractalModels" / "IvE" / "version_slurm_73",
-                    # new_74 = cwd / "FractalModels" / "IvE" / "version_slurm_74",
-                    # new_75 = cwd / "FractalModels" / "IvE" / "version_slurm_75",
-                    # new_76 = cwd / "FractalModels" / "IvE" / "version_slurm_76",
-                    # new_77 = cwd / "FractalModels" / "IvE" / "version_slurm_77",
-                    # new_78 = cwd / "FractalModels" / "IvE" / "version_slurm_78",
-                    # new_79 = cwd / "FractalModels" / "IvE" / "version_slurm_79",
-                    # new_80 = cwd / "FractalModels" / "IvE" / "version_slurm_80",
-                    # new_81 = cwd / "FractalModels" / "IvE" / "version_slurm_81",
-                    # new_82 = cwd / "FractalModels" / "IvE" / "version_slurm_82",
-                    # new_83 = cwd / "FractalModels" / "IvE" / "version_slurm_83",
-                    # new_85 = cwd / "FractalModels" / "IvE" / "version_slurm_85",
-                    # new_86 = cwd / "FractalModels" / "IvE" / "version_slurm_86",
-                    # new_87 = cwd / "FractalModels" / "IvE" / "version_slurm_87",
-                    # new_88 = cwd / "FractalModels" / "IvE" / "version_slurm_88",
-                    # new_89 = cwd / "FractalModels" / "IvE" / "version_slurm_89",
+    #                 # GMD_94 = cwd / "FractalModels" / "IvE" / "version_slurm_94",
+    #                 # GMD_95 = cwd / "FractalModels" / "IvE" / "version_slurm_95",
+    #                 # GMD_96 = cwd / "FractalModels" / "IvE" / "version_slurm_96",
+    #                 # GMD_97 = cwd / "FractalModels" / "IvE" / "version_slurm_97",
+    #                 # GMD_98 = cwd / "FractalModels" / "IvE" / "version_slurm_98",
+    #                 # GMD_99 = cwd / "FractalModels" / "IvE" / "version_slurm_99",
+    #                 # SLSGHis = cwd / "FractalModels" / "IvE" / "version_slurm_47",
+    #                 # DS1_hist = cwd / "FractalModels" / "IvE" / "version_slurm_23",
+    #                 # DS1 = cwd / "FractalModels" / "IvE" / "version_slurm_22",
+    #                 # DS2 = cwd / "FractalModels" / "IvE" / "version_slurm_24",
+    #                 # mer9_v1 = cwd / "FractalModels" / "IvE" / "version_slurm_50",
+    #                 # mer8_v1 = cwd / "FractalModels" / "IvE" / "version_slurm_51",
+    #                 # mer8_v2 = cwd / "FractalModels" / "IvE" / "version_slurm_52",
+    #                 # mer9_v2 = cwd / "FractalModels" / "IvE" / "version_slurm_55",
+    #                 # new_v70 = cwd / "FractalModels" / "IvE" / "version_slurm_70",
+    #                 # new_71 = cwd / "FractalModels" / "IvE" / "version_slurm_71",
+    #                 # new_73 = cwd / "FractalModels" / "IvE" / "version_slurm_73",
+    #                 # new_74 = cwd / "FractalModels" / "IvE" / "version_slurm_74",
+    #                 # new_75 = cwd / "FractalModels" / "IvE" / "version_slurm_75",
+    #                 # new_76 = cwd / "FractalModels" / "IvE" / "version_slurm_76",
+    #                 # new_77 = cwd / "FractalModels" / "IvE" / "version_slurm_77",
+    #                 # new_78 = cwd / "FractalModels" / "IvE" / "version_slurm_78",
+    #                 # new_79 = cwd / "FractalModels" / "IvE" / "version_slurm_79",
+    #                 # new_80 = cwd / "FractalModels" / "IvE" / "version_slurm_80",
+    #                 # new_81 = cwd / "FractalModels" / "IvE" / "version_slurm_81",
+    #                 # new_82 = cwd / "FractalModels" / "IvE" / "version_slurm_82",
+    #                 # new_83 = cwd / "FractalModels" / "IvE" / "version_slurm_83",
+    #                 # new_85 = cwd / "FractalModels" / "IvE" / "version_slurm_85",
+    #                 # new_86 = cwd / "FractalModels" / "IvE" / "version_slurm_86",
+    #                 # new_87 = cwd / "FractalModels" / "IvE" / "version_slurm_87",
+    #                 # new_88 = cwd / "FractalModels" / "IvE" / "version_slurm_88",
+    #                 # new_89 = cwd / "FractalModels" / "IvE" / "version_slurm_89",
 
-                    line_of_best_epochs = epochs)
+    #                 line_of_best_epochs = epochs)
 
 
 def least_squares(x_points: np.array, y_points: np.array):
@@ -261,7 +265,10 @@ def History_F():
     all_los.show()
 
 
-def SelectedHistory(line_of_best_epochs = None, *args, **kwargs):
+def SelectedHistory(line_of_best_epochs: str = None, 
+                    acc_save_file: pathlib.Path = None, val_save_file: pathlib.Path = None,
+                    height: int = None, width: int = None,
+                    *args, **kwargs):
     '''
     Right now this cannot combine args and kwargs, so use only one at a time.
     '''
@@ -363,7 +370,10 @@ def SelectedHistory(line_of_best_epochs = None, *args, **kwargs):
 
 
 
-def SelectedVals(line_of_best_epochs = None, *args, **kwargs):
+def SelectedVals(line_of_best_epochs = None, 
+                 height: int = None, width: int = None,
+                 save_all_acc: pathlib.Path = None, save_all_los: pathlib.Path = None,
+                 *args, **kwargs):
     '''
     Right now this cannot combine args and kwargs, so use only one at a time.
     '''
@@ -454,12 +464,33 @@ def SelectedVals(line_of_best_epochs = None, *args, **kwargs):
     all_acc.show()
     # all_los.show()
     # print(str(cwd / "ML_Acc.html"))
-    all_acc.write_html(str(cwd / "ML_Val_Acc.html"))
-    all_los.write_html(str(cwd / "ML_Val_Losses.html"))
+
+    if isinstance(height, int) and isinstance(width, int):
+        all_acc.update_layout(height = height, width = width)
+        all_los.update_layout(height = height, width = width)
+
+    if isinstance(save_all_acc, pathlib.Path):
+        if save_all_acc.suffix in "html":
+            all_acc.write_html(str(save_all_acc))
+        else:
+            all_acc.write_image(str(save_all_acc))
+    else:
+        all_acc.write_html(str(cwd / "ML_Val_Acc.html"))
+
+    if isinstance(save_all_los, pathlib.Path):
+        if save_all_los.suffix in "html":
+            all_los.write_html(str(save_all_los))
+        else:
+            all_los.write_image(str(save_all_los))
+    else:
+        all_los.write_html(str(cwd / "ML_Val_Losses.html"))
 
 
 
-def SelectedTain(line_of_best_epochs = None, *args, **kwargs):
+def SelectedTain(line_of_best_epochs = None,
+                 height: int = None, width: int = None,
+                 save_all_acc: pathlib.Path = None, save_all_los: pathlib.Path = None,
+                 *args, **kwargs):
     '''
     Right now this cannot combine args and kwargs, so use only one at a time.
     '''
@@ -550,8 +581,26 @@ def SelectedTain(line_of_best_epochs = None, *args, **kwargs):
     all_acc.show()
     # all_los.show()
     # print(str(cwd / "ML_Acc.html"))
-    all_acc.write_html(str(cwd / "ML_Train_Acc.html"))
-    all_los.write_html(str(cwd / "ML_Train_Losses.html"))
+
+    if isinstance(height, int) and isinstance(width, int):
+        all_acc.update_layout(height = height, width = width)
+        all_los.update_layout(height = height, width = width)
+
+    if isinstance(save_all_acc, pathlib.Path):
+        if save_all_acc.suffix in "html":
+            all_acc.write_html(str(save_all_acc))
+        else:
+            all_acc.write_image(str(save_all_acc))
+    else:
+        all_acc.write_html(str(cwd / "ML_Train_Acc.html"))
+
+    if isinstance(save_all_los, pathlib.Path):
+        if save_all_los.suffix in "html":
+            all_los.write_html(str(save_all_los))
+        else:
+            all_los.write_image(str(save_all_los))
+    else:
+        all_los.write_html(str(cwd / "ML_Train_Losses.html"))
 
 
 

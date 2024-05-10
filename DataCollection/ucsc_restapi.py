@@ -111,17 +111,18 @@ def compliment_strand(sequence: str) -> str:
     '''
     '''
     if isinstance(sequence, str):
+        sequence = sequence.upper()
         compliment_sequence = ''
 
         for n in sequence:
             if n in "A":
-                compliment_sequence = f"{compliment_sequence}T"
+                compliment_sequence = f"T{compliment_sequence}"
             if n in "C":
-                compliment_sequence = f"{compliment_sequence}G"
+                compliment_sequence = f"G{compliment_sequence}"
             if n in "G":
-                compliment_sequence = f"{compliment_sequence}C"
+                compliment_sequence = f"C{compliment_sequence}"
             if n in "T":
-                compliment_sequence = f"{compliment_sequence}A"
+                compliment_sequence = f"A{compliment_sequence}"
 
     else:
         compliment_sequence = None

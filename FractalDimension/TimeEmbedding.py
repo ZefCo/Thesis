@@ -434,6 +434,39 @@ def _steal_manager():
     return fig, ax
 
 
+def time_embedding_1D(sequence: str, 
+                      k: int = 6, 
+                      w_backwards: bool = False, 
+                      nucsequence: str = "AGTC"):
+    '''
+    For when you only want one point, not both. By default it does the X coordinate, and for the Y you just need to revese the direction of the weights
+    '''
+    sequence = sequence.upper()
+    nucsequence = nucsequence.upper() # Just in case someone puts in a different order and forgets to capitalize everything
+    seq_length = len(sequence)
+
+    if seq_length < k:  # I'm making this an |gap| becuase I don't want to think about how it should be done if g < 0. It has to be a certain length, and that length needs to be long.
+        print("Cannont find Trajectory for this gene: to small")
+        return None
+    
+    w = [(0.25)**n for n in range(1, k + 1)]
+
+    if w_backwards:
+        w.reverse()
+
+    r = np.zeros(shape=(seq_length - k + 1, 1))
+    k_seq = [sequence[k_prime:k_prime + k] for k_prime in range(0, seq_length - k + 1)]
+    
+    for i, k_prime in enumerate(k_seq):
+        n = [0 if n in nucsequence[0] else 1 if n in nucsequence[1] else 2 if n in nucsequence[2] else 3 if n in nucsequence[3] else 100 for n in k_prime]
+        k_r = np.dot(w, n)
+
+        r[i][0] = k_r
+
+    return r
+
+
+
 def time_embedding(sequence: str, 
                       k_p: int = 6, k_m: int = 6, gap: int = 0, 
                       m_backwards: bool = True, p_backwards: bool = False, 

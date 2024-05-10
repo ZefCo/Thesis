@@ -127,7 +127,7 @@ def gen_he_points(genes, str_names: bool = False, *args, **kwargs) -> pandas.Dat
     
 
 
-def gen_te_points(genes, *args, **kwargs) -> pandas.DataFrame:
+def gen_te_points(genes: list, *args, **kwargs) -> pandas.DataFrame:
     '''
     Generates a series of points.
     '''
@@ -214,6 +214,39 @@ def heat2heat(gene: Gene.Gene, local_xy: dict, k: int = 6, *args, **kwargs) -> d
             return None
         
     return local_xy
+
+
+
+def exon2exonSeq(gene: Gene.Gene, k: int = 10, *args, **kwargs) -> pandas.DataFrame:
+    '''
+    Just returns the sequence
+    '''
+    exons: list = gene.exon_seq
+    index: int = len(exons)
+    seq_points: pandas.DataFrame = pandas.DataFrame(None, index = [i for i in range(index - 1)], columns = ["Name", "Chrm", f"Posterior_{k}", f"Anterior_{k}"])
+
+    for i in range(1, index):
+            # we're just going to look at exons and introns that are at minimum len >= k
+        try:
+            len_x = len(exons[i])
+            len_y = len(exons[i - 1])
+        except Exception as e:
+            return None
+
+        if (len_x >= k) and (len_y >= k):
+
+            exon_x = exons[i][:k]  # each entry in the list is a string, this grabs the first k nucleotides
+            exon_y = exons[i - 1][-k:]  # this grabs the last k nucleotides
+
+            seq_points.loc[i, "Name"] = gene.name
+            seq_points.loc[i, "Chrm"] = gene.chrm
+            seq_points.loc[i, f"Posterior_{k}"] = exon_y.upper()
+            seq_points.loc[i, f"Anterior_{k}"] = exon_x.upper()
+
+    return seq_points
+
+
+
 
 
 def exon2exon(gene: Gene.Gene, k: int = 6, *args, **kwargs) -> pandas.DataFrame:

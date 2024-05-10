@@ -32,7 +32,7 @@ class Gene():
         self.utr5_cords, self.cds_cords, self.utr3_cords, self.intron_cords, self.exon_cords = None, None, None, None, None
         self.utr5_seq, self.cds_seq, self.utr3_seq, self.intron_seq, self.exon_seq = None, None, None, None, None
         self.full_seq = None
-        self.urls = []
+        self.urls = {}
 
         if genome is None:
             self.genome = "hg19"
@@ -58,54 +58,64 @@ class Gene():
         if len(self.utr5_cords) > 0:
             # print(f"UTR Seqs")
             self.utr5_seq = []
+            utr5_count = 0
             for utr5 in self.utr5_cords:
                 seq, url = upi.sequence(chrom=self.chrm, start = utr5[0], end = utr5[1], strand = self.strand, genome = self.genome)
                 if seq is None:
                     raise Exception("Json Decode Error probably or url redirect. Not sure, don't care")
                 self.utr5_seq.append(seq)
-                self.urls.append(url)
+                self.urls[f"UTR5_{utr5_count}"] = url
+                utr5_count += 1
                 # print(url)
 
         if len(self.cds_cords) > 0:
             # print(f"CDS Seqs")
             self.cds_seq = []
+            cds_count = 0
             for cds in self.cds_cords:
                 seq, url = upi.sequence(chrom = self.chrm, start = cds[0], end = cds[1], strand = self.strand, genome = self.genome)
                 if seq is None:
                     raise Exception("Json Decode Error probably or url redirect. Not sure, don't care")
                 self.cds_seq.append(seq)
-                self.urls.append(url)
+                self.urls[f"CDS_{cds_count}"] = url
+                cds_count += 1
                 # print(url)
         
         if len(self.utr3_cords) > 0:
             # print(f"UTR Seqs")
             self.utr3_seq = []
+            utr3_count = 0
             for utr3 in self.utr3_cords:
                 seq, url = upi.sequence(chrom = self.chrm, start = utr3[0], end = utr3[1], strand = self.strand, genome = self.genome)
                 if seq is None:
                     raise Exception("Json Decode Error probably or url redirect. Not sure, don't care")
                 self.utr3_seq.append(seq)
-                self.urls.append(url)
+                self.urls[f"UTR3_{utr3_count}"] = url
+                utr3_count += 1
                 # print(url)
 
         if len(self.exon_cords) > 0:
             self.exon_seq = []
+            exon_count = 0
             for exon in self.exon_cords:
                 seq, url = upi.sequence(chrom = self.chrm, start = exon[0], end = exon[1], strand = self.strand, genome = self.genome)
                 if seq is None:
                     raise Exception("Json Decode Error probably or url redirect. Not sure, don't care")
                 self.exon_seq.append(seq)
-                self.urls.append(url)
+                self.urls[f"Exon_{exon_count}"] = url
+                exon_count += 1
 
         if len(self.intron_cords) > 0:
             # print(f"Intron Seqs")
             self.intron_seq = []
+            intron_count = 0
             for intron in self.intron_cords:
                 seq, url = upi.sequence(chrom = self.chrm, start = intron[0], end = intron[1], strand = self.strand, genome = self.genome)
                 if seq is None:
                     raise Exception("Json Decode Error probably or url redirect. Not sure, don't care")
                 self.intron_seq.append(seq)
-                self.urls.append(url)
+                self.urls[f"Intr_{intron_count}"] = url
+                intron_count += 1
                 # print(url)
 
         self.full_seq = upi.sequence(chrom = self.chrm, start = self.txStart, end = self.txEnd, strand = self.strand, genome = self.genome)

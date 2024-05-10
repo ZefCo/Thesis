@@ -93,7 +93,7 @@ def main():
     # print(data["NM_001351428.2"])
     # print(data["NM_001351428.2"].full_seq)
     # stitch_frame("/media/ethanspeakman/Elements/GeneData", "/media/ethanspeakman/Elements/Gene_Data_Sets/Second_ML_Algorithm/ML2.pkl")
-    select_data("/media/ethanspeakman/Elements/Known_Genes_Master.pkl", "/media/ethanspeakman/Elements/Gene_Data_Sets/Second_ML_Algorithm", n = 1_000)
+    # select_data("F:/Known_Genes_Master.pkl", "F:/Gene_Data_Sets/AntisenseNightmare", n = 1_000)
     # test_dict(pathlib.Path("D:\Downloads\GeneData\Fly\SelectedFlyDict\Data_set_1_cleaned_dict.pkl"))
     # test_dict(pathlib.Path("G:\Gene_Data_Sets\Data_set_2_cleaned_dict.pkl"))
 

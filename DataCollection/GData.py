@@ -19,7 +19,21 @@ def main():
     # ut_data = ut_data.rename(columns={"Unnamed: 18": "Posterior_20", "Unnamed: 19": "Anterior_20"})
     # ut_data.to_pickle(ut_file)
 
-    CancerData()
+    # folder_path = pathlib.Path("F:\Gene_Data_Sets")
+    # data: pathlib.Path = folder_path / "Exon2Exon.pkl"
+    # data = pandas.read_pickle(data)
+    # # save_file_path = folder_path / "E2E_DS1_k6.pkl"
+    # print(data)
+    # master_data: pandas.DataFrame = gen_te_points(data = data, n = 1_000)
+    # folder_path = pathlib.Path("F:\Gene_Data_Sets")
+    # e2e_file_path = folder_path / "E2E_DS1_k6.pkl"
+
+    # data = pandas.read_pickle(e2e_file_path)
+    # print(data)
+
+    # CancerData()
+    min_length: int = 20
+    NormalData(min_length = min_length)
 
 
 def CancerData():
@@ -60,7 +74,7 @@ def CancerData():
 
 
 
-def NormalData():
+def NormalData(min_length: int = 6):
     '''
     '''
     element_drive = pathlib.Path("F:\Gene_Data_Sets")
@@ -72,16 +86,17 @@ def NormalData():
     with open(file, "rb") as pfile:
         data_dict: dict = pickle.load(pfile)
     
-    selected_data = random_keys(data_dict, 5000)
+    selected_data = random_keys(data_dict, 500)
 
-    drg_introns = pandas.DataFrame(columns = ["Name", "Chrm", "Posterior_10", "Intron", "Anterior_10"])
-    drg_exons = pandas.DataFrame(columns = ["Name", "Chrm", "Posterior_10", "Exon", "Anterior_10"])
+    drg_introns = pandas.DataFrame(columns = ["Name", "Chrm", "Strand", f"Posterior_{min_length}", "Intron", f"Anterior_{min_length}"])
+    drg_exons = pandas.DataFrame(columns = ["Name", "Chrm", "Strand", f"Posterior_{min_length}", "Exon", f"Anterior_{min_length}"])
     I, E = 0, 0
     gene: Gene.Gene
     for name, gene in selected_data.items():
         introns = gene.intron_seq
         exons = gene.exon_seq
         chrome = gene.chrm
+        strand = gene.strand
 
         for i, intron in enumerate(introns):
             try:
@@ -95,45 +110,91 @@ def NormalData():
                 len_ant_in = 0
 
             try:
-                len_ant_ex = len(exons[i])
+                len_pos_in = len(introns[i - 1])
+            except Exception as e:
+                len_pos_in = 0
+
+            try:
+                len_ant_ex = len(exons[i + 1])
             except Exception as e:
                 len_ant_ex = 0
             
             try:
-                len_pos_ex = len(exons[i + 1])
+                len_pos_ex = len(exons[i])
             except Exception as e:
                 len_pos_ex = 0
 
-            if ((len_introns > 0) and (len_pos_ex >= 10) and (len_ant_ex >= 10)):
-                posterior = exons[i][len(exons[i]) - 10: len(exons[i])]  # last 10
-                anterior = exons[i + 1][0:10]  # first 10
-                things_to_add = [name, chrome, posterior, intron, anterior]
+            ## Introns
+            if ((len_pos_ex >= min_length) and (len_introns >= min_length) and (len_ant_ex >= min_length)):
+                if strand in "-":
+                    try:
+                        intron = intron[::-1].upper()
+                        anterior = compliment(exons[i])[0: min_length].upper() #[len(exons[i]) - 10: len(exons[i])][::-1]  # last 10
+                        posterior = compliment(exons[i + 1])[len(exons[i + 1]) - min_length: len(exons[i + 1])][::-1].upper() #[0:10][::-1]  # first 10
+
+                    except Exception as e:
+                        continue
+
+                else:
+                        posterior = exons[i][len(exons[i]) - min_length: len(exons[i])]  # last 10
+                        anterior = exons[i + 1][0: min_length]  # first 10
+
+                things_to_add = [name, chrome, strand, posterior, intron, anterior]
                 drg_introns.loc[len(drg_introns.index)] = things_to_add
     
-                # drg_introns.loc[I, "Name"] = name
-                # drg_introns.loc[I, "Chrm"] = chrome
-                # drg_introns.loc[I, "Posterior_10"] = posterior
-                # drg_introns.loc[I, "Intron"] = intron
-                # drg_introns.loc[I, "Anterior_10"] = anterior
-                # I += 1
+            if i > 0:  ## because if we just did this we would get the 0th position exon which would give an index error
+                       ## Note the len of anterior exon being used: that's beause 
+            ## Exons
+                if ((len_pos_in >= min_length) and (len_ant_ex >= min_length) and (len_ant_in >= min_length)):
+                    if strand in "-":
+                        try:
+                            exon = exons[i + 1][::-1].upper()
+                            anterior = compliment(introns[i][len(introns[i]) - min_length: len(introns[i])][::-1])[::-1].upper()  # last 10
+                            posterior = compliment(introns[i + 1][0: min_length]).upper()  # first 10
 
-            if i < len(introns):
+                        except Exception as e:
+                            continue
+                    else:
+                        try:
+                            exon = exons[i + 1].upper()
+                            posterior = introns[i][len(introns[i]) - min_length: len(introns[i])].upper() # last 10
+                            anterior = introns[i + 1][0: min_length].upper()  # first 10
+                            # things_to_add = [name, chrome, strand, posterior, exons[i + 1], anterior]
+                            # drg_exons.loc[len(drg_exons.index)] = things_to_add
+                        except Exception as e:
+                            continue
 
-                if ((len_pos_ex > 0) and (len_introns >= 10) and (len_ant_in >= 10)):
-                    posterior = introns[i][len(introns[i]) - 10: len(introns[i])]  # last 10
-                    anterior = introns[i + 1][0:10]  # first 10
-                    things_to_add = [name, chrome, posterior, exons[i + 1], anterior]
-                    drg_exons.loc[len(drg_exons.index)] = things_to_add
+                things_to_add = [name, chrome, strand, posterior, exon, anterior]
+                drg_exons.loc[len(drg_introns.index)] = things_to_add
 
-                    # drg_exons.loc[E, "Name"] = name
-                    # drg_exons.loc[E, "Chrm"] = chrome
-                    # drg_exons.loc[E, "Posterior_10"] = posterior
-                    # drg_exons.loc[E, "Exon"] = exons[i + 1]
-                    # drg_exons.loc[E, "Anterior_10"] = anterior
-                    # E += 1
 
     drg_introns.to_excel(intron_out, sheet_name = "sheet1", index = False)
     drg_exons.to_excel(exon_out, sheet_name = "sheet1", index = False)
+
+
+
+def compliment(sequence: str):
+    '''
+    Somewhere I screwup the data with the antisense genes.
+
+    This fixes it, somehow. I don't understand biology, nor do I want to work with biologist at all. I don't find it interesting and never should have picked up this project.
+
+    I might not need this, I might be able to just do the list[::-1][slice], but I'm over this project so deal with it.
+    '''
+    sequence = sequence.upper()
+    ecneuqes = ""
+    for n in sequence:
+        if n in "A":
+            ecneuqes = f"T{ecneuqes}"
+        if n in "T":
+            ecneuqes = f"A{ecneuqes}"
+        if n in "C":
+            ecneuqes = f"G{ecneuqes}"
+        if n in "G":
+            ecneuqes = f"C{ecneuqes}"
+
+    return ecneuqes
+
 
 
 def random_keys(dictionary: dict, n: int, half = False) -> dict:
