@@ -4,8 +4,8 @@
 NumImages  = 3000;
 %ExonPath   = '../Images/Images_Q3_3K/Exon/';
 %IntronPath = '../Images/Images_Q3_3K/Intron/';
-ExonPath   = 'Exon/';
-IntronPath = 'Intron/';
+ExonPath   = 'Images/Exon/';
+IntronPath = 'Images/Intron/';
 
 
 for nimag = 1:1:NumImages

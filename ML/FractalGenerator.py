@@ -18,16 +18,29 @@ def main():
     This is going to be the main script for generating all fractals from now on.
     '''
 
-    kmer = 6
+    kmer = 3
     min_length = 12
+    steps = 256  # this is our resolution. It means number of steps to take to cross the grid, ie pixels
     method = "GHM"
     data_set = 2
     ex_col: str = "exon"
     int_col: str = "intron"
     classification_col: str = "Classificaion"
     gene_name_col: str = "NCIBName"
-
-    generator(f"/media/ethanspeakman/Elements/Gene_Data_Sets/Data_Set_{data_set}_frame.pkl", kmer, target_dir = f"/media/ethanspeakman/Elements/Gene_Data_Sets/Data_Set_{data_set}_frame_{kmer}mer_{method}", ex_col = ex_col, int_col = int_col, classification_col = classification_col, method = method, min_length = min_length, gene_name_col = gene_name_col)
+    
+    # Linux
+    # generator(f"/media/ethanspeakman/Elements/Gene_Data_Sets/Data_Set_{data_set}_frame.pkl", kmer, target_dir = f"/media/ethanspeakman/Elements/Gene_Data_Sets/Data_Set_{data_set}_frame_{kmer}mer_{method}", ex_col = ex_col, int_col = int_col, classification_col = classification_col, method = method, min_length = min_length, gene_name_col = gene_name_col)
+    # Windows
+    generator(f"F:/Gene_Data_Sets/Data_Set_{data_set}_frame.pkl", 
+              kmer, 
+              target_dir = f"F:/Gene_Data_Sets/Data_Set_{data_set}_frame_{kmer}mer_{method}_256", 
+              ex_col = ex_col, 
+              int_col = int_col, 
+              classification_col = classification_col, 
+              method = method, 
+              min_length = min_length, 
+              gene_name_col = gene_name_col,
+              steps = steps)
 
 
 def generator(data_file: pathlib.Path, kmer: int,

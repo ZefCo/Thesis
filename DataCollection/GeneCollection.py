@@ -23,6 +23,10 @@ def main():
 
     Stopped at 40587 at school. Stopped at a different number at home. Both from a json decode error.
     '''
+    start_gene = 0
+    genome = "hg19"
+    species = "Homo_sapiens"
+
     # start_gene = 20083
     # genome = "mm39"
     # species = "Mouse"
@@ -43,9 +47,9 @@ def main():
     # genome = "sacCer3"
     # species = "Yeast"
 
-    start_gene = 0
-    genome = "calJac4"
-    species = "Callithrix_jacchus"
+    # start_gene = 0
+    # genome = "calJac4"
+    # species = "Callithrix_jacchus"
 
     # start_gene = 0
     # genome = "gorGor6"
@@ -79,16 +83,25 @@ def main():
     # genome = "ponAbe3"
     # species = "Pongo_pygmaeus_abelii"
 
-    output_file = cwd.parent / "Data_Files" / "Primates" / "Genetics" / f"{species}" / f"Known_Genes_{genome}_DICT_{start_gene}.pkl"
-    # dict_screwup()
-    # pickle_file, csv_file = getKnownGene()
-    # hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19.csv",
-    #                pathlib.Path(f"D:/Downloads/GeneData/Known_Genes_hg19_NCBIGene_DICT_{start_gene}.pkl"), 
-    #                ref_track="ncib",
-    #                gene_start = start_gene)
-    # hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19_ncbiRefSeqCurated.pkl")
+    # output_file = cwd.parent / "Data_Files" / "Primates" / "Genetics" / f"{species}" / f"Antisense_Investigation.pkl"
+    # # dict_screwup()
+    # # pickle_file, csv_file = getKnownGene()
+    # # hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19.csv",
+    # #                pathlib.Path(f"D:/Downloads/GeneData/Known_Genes_hg19_NCBIGene_DICT_{start_gene}.pkl"), 
+    # #                ref_track="ncib",
+    # #                gene_start = start_gene)
+    # # hg19_sequences(cwd.parent / "Data_Files" / "Gene_Files" / "Hg19" / "Known_Genes_hg19_ncbiRefSeqCurated.pkl")
 
-    hg19_sequences(cwd.parent / "Data_Files" / "Primates" / "Known_Genes" / species / f"Known_Genes_{genome}.csv",
+    # hg19_sequences(cwd.parent / "Data_Files" / "Primates" / "Known_Genes" / species / f"Known_Genes_{genome}.csv",
+    #                output_file, 
+    #                ref_track="ncib",
+    #                gene_start = start_gene,
+    #                species = species,
+    #                genome = genome)
+
+    output_file = cwd.parent / "Data_Files" / "Primates" / "Genetics" / f"{species}" / f"Sense_Investigation.pkl"
+
+    sense_sequences(cwd.parent / "Data_Files" / "Primates" / "Known_Genes" / species / f"Known_Genes_{genome}.csv",
                    output_file, 
                    ref_track="ncib",
                    gene_start = start_gene,
@@ -255,20 +268,20 @@ def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track
         row_of_interest = known_genes.iloc[row, :]
 
         gene_of_interest: Gene = Gene.Gene(name = row_of_interest["name"],
-                                           ncibname = row_of_interest["ncibname"],
-                                           ename = row_of_interest["ename"],
-                                           gname = row_of_interest["gname"], 
-                                           chrm = row_of_interest["chrom"], 
-                                           strand = row_of_interest["strand"], 
-                                           txStart = row_of_interest["txStart"],
-                                           txEnd = row_of_interest["txEnd"],
-                                           cdsStart = row_of_interest["cdsStart"],
-                                           cdsEnd = row_of_interest["cdsEnd"],
-                                           exonCount = row_of_interest["exonCount"],
-                                           exonStarts = row_of_interest["exonStarts"],
-                                           exonEnds = row_of_interest["exonEnds"],
-                                           exonFrames = row_of_interest["exonFrames"],
-                                           genome=genome)
+                                        ncibname = row_of_interest["ncibname"],
+                                        ename = row_of_interest["ename"],
+                                        gname = row_of_interest["gname"], 
+                                        chrm = row_of_interest["chrom"], 
+                                        strand = row_of_interest["strand"], 
+                                        txStart = row_of_interest["txStart"],
+                                        txEnd = row_of_interest["txEnd"],
+                                        cdsStart = row_of_interest["cdsStart"],
+                                        cdsEnd = row_of_interest["cdsEnd"],
+                                        exonCount = row_of_interest["exonCount"],
+                                        exonStarts = row_of_interest["exonStarts"],
+                                        exonEnds = row_of_interest["exonEnds"],
+                                        exonFrames = row_of_interest["exonFrames"],
+                                        genome = genome)
         try:
             gene_of_interest.sequence_breakdown()
         except Exception as e:
@@ -276,14 +289,6 @@ def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track
             print(e)
             # exit()
             continue
-
-        # try:
-        #     gene_of_interest.sequence_breakdown()
-        # except Exception as e:
-        #     print("Error: exiting")
-        #     print(type(e))
-        #     # continue
-        #     exit()
 
         if gene_of_interest.ncibname in pickle_dict.keys():
             key = re.split("_", gene_of_interest.ncibname)[0]
@@ -303,8 +308,197 @@ def hg19_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track
             print(type(e))
             print(f"Unable to write to file at this time: please check location can be written to")
             exit()
-            
-    print(f"Wrote file to\n\t{output_file}")
+                
+        print(f"Wrote file to\n\t{output_file}")
+
+
+def sense_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track = "ncib", gene_start = 0, gene_stop: int = None, species: str = "human", genome: str = "hg19"):
+    '''
+    Just does the + sequences
+    This will go to UCSC Genome Browser and grab all HG19 genes, then save them in a pickle file. They will not be chopped up, but instead will
+    be preserved in all their glory for chopping up later.
+    '''
+    print(f"writing file to\n\t{output_file}\nAfter ever iteration")
+    folder_target = output_file.parent
+    folder_target.mkdir(parents = True, exist_ok = True)
+    
+    if gene_file.suffix in ".pkl":
+        with open(gene_file, "rb") as p:
+            known_genes: pandas.DataFrame = pickle.load(p)
+    elif gene_file.suffix in ".csv":
+        with open(gene_file) as known_file:
+        # with open(root / "Data_Files" / "Sequence_Files" / "HG19" / "hg_test.csv") as known_file:
+            known_genes: pandas.DataFrame = pandas.read_csv(known_file, sep = ',', header=0, index_col=0)
+
+    headers = ['name','name2', 'chrom', 'strand', 'txStart', 'txEnd', 'cdsStart', 'cdsEnd', 'exonCount', 'exonStarts', 'exonEnds', 'cdsStartStat', 'cdsEndStat', 'exonFrames']
+    known_genes = known_genes[headers]
+
+    if ref_track in "enst":
+        known_genes = known_genes.rename(columns={"name": "ename", "name2": "gname"})
+        # headers = ["enstname", "engname", "chrom", "strand", "txStart", "txEnd", "cdsStart", "cdsEnd", "exonCount", "exonStarts", "exonEnds", "cdsStartStat", "cdsEndStat", "exonFrames"]
+        known_genes["name"] = None
+        known_genes["ncibname"] = None
+    else:
+        known_genes = known_genes.rename(columns={"name": "ncibname", "name2": "name"})
+        # headers = ["name", "ncibname", "chrom", "strand", "txStart", "txEnd", "cdsStart", "cdsEnd", "exonCount", "exonStarts", "exonEnds", "cdsStartStat", "cdsEndStat", "exonFrames"]
+        known_genes["ename"] = None
+        known_genes["gname"] = None
+
+    known_genes["chrom"] = known_genes["chrom"].astype("category")
+
+    known_genes["exonCount"] = known_genes["exonCount"].fillna(0)
+
+    known_genes = known_genes[known_genes["cdsStartStat"] == "cmpl"]
+    known_genes = known_genes[known_genes["cdsEndStat"] == "cmpl"]
+    known_genes = known_genes[known_genes["exonCount"] >= 1]
+
+    if isinstance(gene_stop, int):
+        rows = gene_stop
+    else:
+        rows, _ = known_genes.shape
+
+    pickle_dict = dict()
+
+    unique_index = 0
+    for row in range(gene_start, rows):
+        print(f"Working on row {row} / {rows} - {species}")
+        row_of_interest = known_genes.iloc[row, :]
+        if row_of_interest["strand"] in "+":
+
+            gene_of_interest: Gene = Gene.Gene(name = row_of_interest["name"],
+                                            ncibname = row_of_interest["ncibname"],
+                                            ename = row_of_interest["ename"],
+                                            gname = row_of_interest["gname"], 
+                                            chrm = row_of_interest["chrom"], 
+                                            strand = row_of_interest["strand"], 
+                                            txStart = row_of_interest["txStart"],
+                                            txEnd = row_of_interest["txEnd"],
+                                            cdsStart = row_of_interest["cdsStart"],
+                                            cdsEnd = row_of_interest["cdsEnd"],
+                                            exonCount = row_of_interest["exonCount"],
+                                            exonStarts = row_of_interest["exonStarts"],
+                                            exonEnds = row_of_interest["exonEnds"],
+                                            exonFrames = row_of_interest["exonFrames"],
+                                            genome = genome)
+            try:
+                gene_of_interest.sequence_breakdown()
+            except Exception as e:
+                print(type(e))
+                print(e)
+                continue
+
+            if gene_of_interest.ncibname in pickle_dict.keys():
+                key = re.split("_", gene_of_interest.ncibname)[0]
+                key = f"{key}_{unique_index}"
+                unique_index += 1
+            else:
+                key = gene_of_interest.ncibname
+
+            pickle_dict[key] = gene_of_interest
+
+            try:
+                with open(output_file, 'wb') as p:
+                    pickle.dump(pickle_dict, p)
+            except Exception as e:
+                print(type(e))
+                print(f"Unable to write to file at this time: please check location can be written to")
+                exit()
+                
+        print(f"Wrote file to\n\t{output_file}")
+
+
+
+def anti_sequences(gene_file: pathlib.Path, output_file: pathlib.Path, ref_track = "ncib", gene_start = 0, gene_stop: int = None, species: str = "human", genome: str = "hg19"):
+    '''
+    Only does the Anit-sense sequences
+    This will go to UCSC Genome Browser and grab all HG19 genes, then save them in a pickle file. They will not be chopped up, but instead will
+    be preserved in all their glory for chopping up later.
+    '''
+    print(f"writing file to\n\t{output_file}\nAfter ever iteration")
+    folder_target = output_file.parent
+    folder_target.mkdir(parents = True, exist_ok = True)
+    
+    if gene_file.suffix in ".pkl":
+        with open(gene_file, "rb") as p:
+            known_genes: pandas.DataFrame = pickle.load(p)
+    elif gene_file.suffix in ".csv":
+        with open(gene_file) as known_file:
+            known_genes: pandas.DataFrame = pandas.read_csv(known_file, sep = ',', header=0, index_col=0)
+
+    headers = ['name','name2', 'chrom', 'strand', 'txStart', 'txEnd', 'cdsStart', 'cdsEnd', 'exonCount', 'exonStarts', 'exonEnds', 'cdsStartStat', 'cdsEndStat', 'exonFrames']
+    known_genes = known_genes[headers]
+
+    if ref_track in "enst":
+        known_genes = known_genes.rename(columns={"name": "ename", "name2": "gname"})
+        known_genes["name"] = None
+        known_genes["ncibname"] = None
+    else:
+        known_genes = known_genes.rename(columns={"name": "ncibname", "name2": "name"})
+        known_genes["ename"] = None
+        known_genes["gname"] = None
+
+    known_genes["chrom"] = known_genes["chrom"].astype("category")
+
+    known_genes["exonCount"] = known_genes["exonCount"].fillna(0)
+
+    known_genes = known_genes[known_genes["cdsStartStat"] == "cmpl"]
+    known_genes = known_genes[known_genes["cdsEndStat"] == "cmpl"]
+    known_genes = known_genes[known_genes["exonCount"] >= 1]
+
+    if isinstance(gene_stop, int):
+        rows = gene_stop
+    else:
+        rows, _ = known_genes.shape
+
+    pickle_dict = dict()
+
+    unique_index = 0
+    for row in range(gene_start, rows):
+        print(f"Working on row {row} / {rows} - {species}")
+        row_of_interest = known_genes.iloc[row, :]
+        if row_of_interest["strand"] in "-":
+
+            gene_of_interest: Gene = Gene.Gene(name = row_of_interest["name"],
+                                            ncibname = row_of_interest["ncibname"],
+                                            ename = row_of_interest["ename"],
+                                            gname = row_of_interest["gname"], 
+                                            chrm = row_of_interest["chrom"], 
+                                            strand = row_of_interest["strand"], 
+                                            txStart = row_of_interest["txStart"],
+                                            txEnd = row_of_interest["txEnd"],
+                                            cdsStart = row_of_interest["cdsStart"],
+                                            cdsEnd = row_of_interest["cdsEnd"],
+                                            exonCount = row_of_interest["exonCount"],
+                                            exonStarts = row_of_interest["exonStarts"],
+                                            exonEnds = row_of_interest["exonEnds"],
+                                            exonFrames = row_of_interest["exonFrames"],
+                                            genome = genome)
+            try:
+                gene_of_interest.sequence_breakdown()
+            except Exception as e:
+                print(type(e))
+                print(e)
+                continue
+
+            if gene_of_interest.ncibname in pickle_dict.keys():
+                key = re.split("_", gene_of_interest.ncibname)[0]
+                key = f"{key}_{unique_index}"
+                unique_index += 1
+            else:
+                key = gene_of_interest.ncibname
+
+            pickle_dict[key] = gene_of_interest
+
+            try:
+                with open(output_file, 'wb') as p:
+                    pickle.dump(pickle_dict, p)
+            except Exception as e:
+                print(type(e))
+                print(f"Unable to write to file at this time: please check location can be written to")
+                exit()
+                
+        print(f"Wrote file to\n\t{output_file}")
+
 
 
 if __name__ in '__main__':
