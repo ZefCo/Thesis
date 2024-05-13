@@ -73,6 +73,8 @@ def plots_v2(genes: pandas.DataFrame, save_file_path: pathlib.Path, plot_path: p
     assumes the data is already formated as a dataframe with a posterior and anterior sequence
     '''
 
+    save_file_path.parent.mkdir(parents = True, exist_ok = True)
+
     marker = ","
     title = "Next Exon (X) to Previous Exon (Y)"
 

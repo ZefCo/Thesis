@@ -144,8 +144,11 @@ def NormalData(source_data: pathlib.Path, exon_out_path: pathlib.Path, intron_ou
                         anterior, posterior = ant_post(exons[i + 1], exons[i])
                     except Exception as e:
                         continue
-
-                things_to_add = [name, chrome, strand, posterior, intron, anterior]
+                
+                try:
+                    things_to_add = [name, chrome, strand, posterior, intron, anterior]
+                except Exception as e:
+                    continue
                 drg_introns.loc[len(drg_introns.index)] = things_to_add
     
             if i > 0:  ## because if we just did this we would get the 0th position exon which would give an index error
@@ -166,8 +169,10 @@ def NormalData(source_data: pathlib.Path, exon_out_path: pathlib.Path, intron_ou
                             anterior, posterior = ant_post(introns[i + 1], introns[i])
                         except Exception as e:
                             continue
-
-                things_to_add = [name, chrome, strand, posterior, exon, anterior]
+                try:
+                    things_to_add = [name, chrome, strand, posterior, exon, anterior]
+                except Exception as e:
+                    continue
                 drg_exons.loc[len(drg_introns.index)] = things_to_add
 
     exon_out_path.parent.mkdir(parents = True, exist_ok = True)
