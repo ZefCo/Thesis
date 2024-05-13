@@ -1,0 +1,3 @@
+Splitting this off from Fractal Dimension because I'm tyring to keep everything organized after making a mess of things.
+
+This is mostly looking at motiffs and markov chains of the sequences right around the breakpoint/boundary
