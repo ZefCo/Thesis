@@ -27,17 +27,17 @@ def main():
     # genome = "hg19"
     # species = "Homo_sapiens"
 
-    start_gene = 0
-    genome = "mm39"
-    species = "Mouse"
+    # start_gene = 0
+    # genome = "mm39"
+    # species = "Mouse"
 
     # start_gene = 0
     # genome = "xenTro9"
     # species = "Frog"
 
-    # start_gene = 16761
-    # genome = "dm6"
-    # species = "Fly"
+    start_gene = 0
+    genome = "dm6"
+    species = "Fly"
 
     # start_gene = 0
     # genome = "rn7"
@@ -98,10 +98,14 @@ def main():
     #                gene_start = start_gene,
     #                species = species,
     #                genome = genome)
+ 
+    # # For primates
+    # output_file = cwd.parent / "Data_Files" / "Primates" / "Genetics" / f"{species}" / f"Antisense_Investigation.pkl"  #this is actually a spelling error but I'm leaving it for consistency
+    # # For other species
+    intput_file = cwd.parent / "Data_Files" / species / f"Known_Genes_{genome}.csv"
+    output_file = cwd.parent / "Data_Files" / species / f"Antisense_Investigation.pkl"
 
-    output_file = cwd.parent / "Data_Files" / "Primates" / "Genetics" / f"{species}" / f"Antisense_Investigation.pkl"  #this is actually a spelling error but I'm leaving it for consistency
-
-    anti_sequences(cwd.parent / "Data_Files" / "Primates" / "Known_Genes" / species / f"Known_Genes_{genome}.csv",
+    sense_sequences(intput_file,
                    output_file, 
                    ref_track="ncib",
                    gene_start = start_gene,

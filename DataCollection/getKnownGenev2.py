@@ -17,17 +17,17 @@ def main():
     # chroms.append('chrY')
     # folder = genome.capitalize()
 
-    # genome = "dm6" #flies
-    # fly_chroms = ["chr2L", "chr2R", "chr3L", "chr3R", "chr4", "chrX", "chrY"]
-    # fly_folder = cwd.parent / "Data_Files" / "Fly"
-    # fly_folder.mkdir(parents = True, exist_ok = True)
+    genome = "dm6" #flies
+    chroms = ["chr2L", "chr2R", "chr3L", "chr3R", "chr4", "chrX", "chrY"]
+    folder = cwd.parent / "Data_Files" / "Fly"
+    folder.mkdir(parents = True, exist_ok = True)
 
     # genome = "mm39" #mouse
-    # mouse_chroms = [f'chr{i}' for i in range(1, 20)]
-    # mouse_chroms.append('chrX')
-    # mouse_chroms.append('chrY')
-    # mouse_folder = cwd.parent / "Data_Files" / "Mouse"
-    # mouse_folder.mkdir(parents = True, exist_ok = True)
+    # chroms = [f'chr{i}' for i in range(1, 20)]
+    # chroms.append('chrX')
+    # chroms.append('chrY')
+    # folder = cwd.parent / "Data_Files" / "Mouse"
+    # folder.mkdir(parents = True, exist_ok = True)
 
     # genome = "xenTro9" # Western frog
     # frog_chroms = [f"chr{i}" for i in range(1, 11)]
@@ -53,10 +53,10 @@ def main():
     # folder = cwd.parent / "Data_Files" / "Zebrafish"
     # folder.mkdir(parents=True, exist_ok=True)  #doesn't have a ref seq curated!
 
-    genome = "sacCer3"
-    chroms = ["chrIV", "chrM", "chrI", "chrVI", "chrIII", "chrIX", "chrVIII", "chrV", "chrXI", "chrX", "chrXIV", "chrII", "chrXIII", "chrXVI", "chrXII", "chrVII", "chrXV"]
-    folder = cwd.parent / "Data_Files" / "Yeast"
-    folder.mkdir(parents=True, exist_ok=True)
+    # genome = "sacCer3"
+    # chroms = ["chrIV", "chrM", "chrI", "chrVI", "chrIII", "chrIX", "chrVIII", "chrV", "chrXI", "chrX", "chrXIV", "chrII", "chrXIII", "chrXVI", "chrXII", "chrVII", "chrXV"]
+    # folder = cwd.parent / "Data_Files" / "Yeast"
+    # folder.mkdir(parents=True, exist_ok=True)
 
     # columns = hg19
 
