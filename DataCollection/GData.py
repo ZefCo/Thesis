@@ -74,16 +74,21 @@ def CancerData():
 
 
 
-def NormalData(min_length: int = 6):
+def NormalData(source_data: pathlib.Path, exon_out_path: pathlib.Path, intron_out_path: pathlib.Path, min_length: int = 6, *args, **kwargs):
     '''
     '''
-    element_drive = pathlib.Path("F:\Gene_Data_Sets")
-    gene_drive = pathlib.Path("F:\GeneData")
-    file = element_drive / "Data_Set_1_cleaned_dict.pkl"
-    exon_out = gene_drive / "Exon.xlsx"
-    intron_out = gene_drive / "Intron.xlsx"
+    def ant_post(ant: str, post: str, *args, **kwargs) -> tuple:
+        '''
+        grabs the posterior and anterior
 
-    with open(file, "rb") as pfile:
+        Returns the Anterior and Posterior sequeces in that order
+        '''
+        anterior = ant[0: min_length].upper()
+        posterior = post[len(post) - min_length: len(post)].upper()
+
+        return anterior, posterior
+
+    with open(source_data, "rb") as pfile:
         data_dict: dict = pickle.load(pfile)
     
     selected_data = random_keys(data_dict, 500)
@@ -128,16 +133,17 @@ def NormalData(min_length: int = 6):
             if ((len_pos_ex >= min_length) and (len_introns >= min_length) and (len_ant_ex >= min_length)):
                 if strand in "-":
                     try:
-                        intron = intron[::-1].upper()
-                        anterior = compliment(exons[i])[0: min_length].upper() #[len(exons[i]) - 10: len(exons[i])][::-1]  # last 10
-                        posterior = compliment(exons[i + 1])[len(exons[i + 1]) - min_length: len(exons[i + 1])][::-1].upper() #[0:10][::-1]  # first 10
-
+                        # anterior = exons[i][0: min_length].upper() #[len(exons[i]) - 10: len(exons[i])][::-1]  # last 10
+                        # posterior = exons[i + 1][len(exons[i + 1]) - min_length: len(exons[i + 1])].upper() #[0:10][::-1]  # first 10
+                        anterior, posterior = ant_post(exons[i], exons[i + 1])
                     except Exception as e:
                         continue
 
                 else:
-                        posterior = exons[i][len(exons[i]) - min_length: len(exons[i])]  # last 10
-                        anterior = exons[i + 1][0: min_length]  # first 10
+                    try:
+                        anterior, posterior = ant_post(exons[i + 1], exons[i])
+                    except Exception as e:
+                        continue
 
                 things_to_add = [name, chrome, strand, posterior, intron, anterior]
                 drg_introns.loc[len(drg_introns.index)] = things_to_add
@@ -146,38 +152,39 @@ def NormalData(min_length: int = 6):
                        ## Note the len of anterior exon being used: that's beause 
             ## Exons
                 if ((len_pos_in >= min_length) and (len_ant_ex >= min_length) and (len_ant_in >= min_length)):
+                    try:
+                        exon = exons[i + 1]
+                    except Exception as e:
+                        continue
                     if strand in "-":
                         try:
-                            exon = exons[i + 1][::-1].upper()
-                            anterior = compliment(introns[i][len(introns[i]) - min_length: len(introns[i])][::-1])[::-1].upper()  # last 10
-                            posterior = compliment(introns[i + 1][0: min_length]).upper()  # first 10
-
+                            anterior, posterior = ant_post(introns[i], introns[i + 1])
                         except Exception as e:
                             continue
                     else:
                         try:
-                            exon = exons[i + 1].upper()
-                            posterior = introns[i][len(introns[i]) - min_length: len(introns[i])].upper() # last 10
-                            anterior = introns[i + 1][0: min_length].upper()  # first 10
-                            # things_to_add = [name, chrome, strand, posterior, exons[i + 1], anterior]
-                            # drg_exons.loc[len(drg_exons.index)] = things_to_add
+                            anterior, posterior = ant_post(introns[i + 1], introns[i])
                         except Exception as e:
                             continue
 
                 things_to_add = [name, chrome, strand, posterior, exon, anterior]
                 drg_exons.loc[len(drg_introns.index)] = things_to_add
 
+    exon_out_path.parent.mkdir(parents = True, exist_ok = True)
+    intron_out_path.parent.mkdir(parents = True, exist_ok = True)
 
-    drg_introns.to_excel(intron_out, sheet_name = "sheet1", index = False)
-    drg_exons.to_excel(exon_out, sheet_name = "sheet1", index = False)
+    drg_introns.to_excel(intron_out_path, sheet_name = "sheet1", index = False)
+    drg_exons.to_excel(exon_out_path, sheet_name = "sheet1", index = False)
 
 
 
 def compliment(sequence: str):
     '''
+    This is antiquated and should not be used.
+
     Somewhere I screwup the data with the antisense genes.
 
-    This fixes it, somehow. I don't understand biology, nor do I want to work with biologist at all. I don't find it interesting and never should have picked up this project.
+    This fixes it, somehow? I don't understand biology, nor do I want to work with biologist at all. I don't find it interesting and never should have picked up this project.
 
     I might not need this, I might be able to just do the list[::-1][slice], but I'm over this project so deal with it.
     '''

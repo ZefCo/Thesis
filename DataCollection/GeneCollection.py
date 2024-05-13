@@ -99,9 +99,9 @@ def main():
     #                species = species,
     #                genome = genome)
 
-    output_file = cwd.parent / "Data_Files" / "Primates" / "Genetics" / f"{species}" / f"Sense_Investigation.pkl"
+    output_file = cwd.parent / "Data_Files" / "Primates" / "Genetics" / f"{species}" / f"Antisense_Investigation.pkl"
 
-    sense_sequences(cwd.parent / "Data_Files" / "Primates" / "Known_Genes" / species / f"Known_Genes_{genome}.csv",
+    anti_sequences(cwd.parent / "Data_Files" / "Primates" / "Known_Genes" / species / f"Known_Genes_{genome}.csv",
                    output_file, 
                    ref_track="ncib",
                    gene_start = start_gene,
