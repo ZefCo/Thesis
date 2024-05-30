@@ -74,7 +74,7 @@ def CancerData():
 
 
 
-def NormalData(source_data: pathlib.Path, exon_out_path: pathlib.Path, intron_out_path: pathlib.Path, min_length: int = 6, *args, **kwargs):
+def NormalData(source_data: pathlib.Path, exon_out_path: pathlib.Path, intron_out_path: pathlib.Path, min_length: int = 6, ran_ammount: int = None, *args, **kwargs):
     '''
     '''
     def ant_post(ant: str, post: str, *args, **kwargs) -> tuple:
@@ -91,7 +91,10 @@ def NormalData(source_data: pathlib.Path, exon_out_path: pathlib.Path, intron_ou
     with open(source_data, "rb") as pfile:
         data_dict: dict = pickle.load(pfile)
     
-    selected_data = random_keys(data_dict, 500)
+    if isinstance(ran_ammount, int):
+        selected_data = random_keys(data_dict, 500)
+    else:
+        selected_data = data_dict
 
     drg_introns = pandas.DataFrame(columns = ["Name", "Chrm", "Strand", f"Posterior_{min_length}", "Intron", f"Anterior_{min_length}"])
     drg_exons = pandas.DataFrame(columns = ["Name", "Chrm", "Strand", f"Posterior_{min_length}", "Exon", f"Anterior_{min_length}"])

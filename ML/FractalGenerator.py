@@ -180,7 +180,7 @@ def gaussian_generator(train_data: pandas.DataFrame,
                        target_dir: pathlib.Path = None,
                        int_col: str = None, ex_col: str = None,
                        classification_col: str = None, gene_name_col: str = None,
-                       steps: int = 64,
+                       steps: int = 64, delta: float = None,
                        *args, **kwargs):
     '''
     for when the method == gaussian
@@ -205,8 +205,10 @@ def gaussian_generator(train_data: pandas.DataFrame,
     meta_data = target_dir / f"Meta_Data.txt"
 
     rows, cols = train_data.shape
-    delta = (1 - 0) / steps
-    grid = np.arange(0, 1, delta)
+    if delta is None:
+        delta = (1 - 0) / steps
+
+    grid = np.arange(0, 1, (1 - 0) / steps)
     
     for row in range(rows):
         seq = train_data.loc[row, "Seq"]
@@ -216,7 +218,7 @@ def gaussian_generator(train_data: pandas.DataFrame,
 
         xy = time_embedding(seq, gap = 0, *args, **kwargs)
         try:
-            density = gaussian(xy, grid)
+            density = gaussian(xy, grid, *args, **kwargs)
         except Exception as exc:
             print(f"\t\tException\n\t\t{type(exc)}")
             continue
@@ -491,7 +493,7 @@ def generate_trajectories(data_file: pathlib.Path, choices: int = 5000, kp: int 
 
 
 
-def gaussian(xy: np.ndarray, t: np.ndarray, delta: int = 2, *args, **kwargs) -> np.array:
+def gaussian(xy: np.ndarray, t: np.ndarray, delta: int = 2, sigma: float = None, *args, **kwargs) -> np.array:
     '''
     Takes in two arrays, a point-set array and a grid array. The xy should be a Nx2 size vector:
 
@@ -508,12 +510,13 @@ def gaussian(xy: np.ndarray, t: np.ndarray, delta: int = 2, *args, **kwargs) -> 
 
     Look over the notes you took with Dr G... something is confusing about the normalization
     '''
-    if isinstance(delta, int):
-        if delta < 1:
-            delta = 1 # in case someone puts in a sigma value of 0
-        sigma = t[delta]  # it actually just pulls from the delta row to get the step size
-    elif isinstance(delta, float):
-        sigma = delta
+    if sigma is None:
+        if isinstance(delta, int):
+            if delta < 1:
+                delta = 1 # in case someone puts in a sigma value of 0
+            sigma = t[delta]  # it actually just pulls from the delta row to get the step size
+        elif isinstance(delta, float):
+            sigma = delta
 
     sigma_sqr = np.dot(sigma, sigma)
 

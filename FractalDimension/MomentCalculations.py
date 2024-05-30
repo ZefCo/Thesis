@@ -17,6 +17,7 @@ import GeneClass as Gene
 import random
 import Heatmaps as hm
 from typing import Tuple
+from typing import Dict
 plt.rcParams['text.usetex'] = True
 
 
@@ -60,11 +61,11 @@ def moments_v3(file_dir: pathlib.Path,
                ms: list, 
                min_k: int = 1, max_k: int = 6, 
                unlog: bool = False, logy: bool = False, N_value: bool = False, 
-               *args, **kwargs) -> Tuple[dict, dict, dict, dict]:
+               *args, **kwargs) -> Tuple[dict, dict, dict, dict, dict]:
     '''
     Does all the moment calculations, then returns them to be plotted speretly. Probably should have done this much earlier but... oh well.
 
-    Returns a tuple of 4 dictionaries.
+    Returns a tuple of 5 dictionaries: exon, intron, intra, unity, % diff
 
     Note, I'll have to modify this to be able to do this with and without the intergenomic data. Right now I'm just hard coding in the inter stuff.
     '''
@@ -318,7 +319,11 @@ def moments_v2(file_dir: pathlib.Path,
             fig_pd.savefig(cwd / "TE_Images_ForPaper" / "Moments" / f"{2*key}-mer_PD")
 
 
-def moments(file_dir: pathlib.Path, ms: list, min_k: int = 1, max_k: int = 6, unlog: bool = False, convergence: bool = False, logy: bool = False, N_value: bool = False, title: str = None, *args, **kwargs):
+def moments(file_dir: pathlib.Path, ms: list, 
+            min_k: int = 1, max_k: int = 6, 
+            unlog: bool = False, convergence: bool = False, logy: bool = False, N_value: bool = False, 
+            title: str = None, 
+            *args, **kwargs):
     '''
     Moment calculations do NOT need the 4**s part multiplied, everything just needs to be scaled from 0 to 1 in a traditional normalization.*
 
@@ -655,22 +660,49 @@ def multiple_species_plots(ms: list, me: dict, mi: dict, mn: dict, uni: dict, ou
     fig, axs = plt.subplots()
     fig.set_size_inches(inches, inches)
 
+    if me is None:
+        me = mi
+        mi = None
+
     for species, items in me.items():
         print(f"Species = {species}")
         subdict: dict = items["data"]
         for key, value in subdict.items():
             print(f"plotting for {2*key}-mer")
-            ms_markers = ms[::5]
-            me_markers = value[::5]
-            mi_markers = mi[species]["data"][key][::5]
-            mn_markers = mi[species]["data"][key][::5]
+            try:
+                ms_markers = ms[::5]
+            except Exception as e:
+                ms_markers = None
+            try:
+                me_markers = value[::5]
+            except Exception as e:
+                me_markers = None
+            try:
+                mi_markers = mi[species]["data"][key][::5]
+            except Exception as e:
+                mi_markers = None
+            try:
+                mn_markers = mi[species]["data"][key][::5]
+            except Exception as e:
+                mn_markers = None
 
             # axs.plot(ms, value)
-            axs.plot(ms_markers, me_markers, label = f"Exon - {species}", marker = items["marker"], markersize = 5)
-            # axs.plot(ms, mi[species]["data"][key])
-            axs.plot(ms_markers, mi_markers, label = f"Intron - {species}", marker = mi[species]["marker"], markersize = 5)
-            axs.plot(ms_markers, mn_markers, label = f"Inter - {species}", marker = mn[species]["marker"], markersize = 5)
-            axs.plot(ms, uni[key], linestyle = "dotted")
+            try:
+                axs.plot(ms_markers, me_markers, label = f"Exon - {species}", marker = items["marker"], markersize = 5)
+            except Exception as e:
+                pass
+            try:
+                axs.plot(ms_markers, mi_markers, label = f"Intron - {species}", marker = mi[species]["marker"], markersize = 5)
+            except Exception as e:
+                pass
+            try:
+                axs.plot(ms_markers, mn_markers, label = f"Inter - {species}", marker = mn[species]["marker"], markersize = 5)
+            except Exception as e:
+                pass
+            try:
+                axs.plot(ms, uni[key], linestyle = "dotted")
+            except Exception as e:
+                pass
         
     axs.set_title(f"{2*key}-mer")
     axs.set_ylabel(r"$\gamma(m)$", fontsize = 30) #, rotation='horizontal')
