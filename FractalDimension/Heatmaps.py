@@ -670,13 +670,14 @@ def heat_embedding(data: pandas.DataFrame,
         region = data.loc[row, classification_name]
 
         local_dict = _heat_data(sequence, k_p = k_p, k_m = k_m, nucsequence = nucsequence)
-        master_dict = _dict_deep_merge(master_dict, local_dict)
+        if isinstance(local_dict, dict):
+            master_dict = _dict_deep_merge(master_dict, local_dict)
 
-        if (region in "Exon") or (region in "exon") or (region in "e"):  # because I realized I was doing this like 3 different ways... I probably should have been more precise.
-            exon_dict = _dict_deep_merge(exon_dict, local_dict)
+            if (region in "Exon") or (region in "exon") or (region in "e"):  # because I realized I was doing this like 3 different ways... I probably should have been more precise.
+                exon_dict = _dict_deep_merge(exon_dict, local_dict)
 
-        elif (region in "Intron") or (region in "intron") or (region in "i"):
-            intron_dict = _dict_deep_merge(intron_dict, local_dict)
+            elif (region in "Intron") or (region in "intron") or (region in "i"):
+                intron_dict = _dict_deep_merge(intron_dict, local_dict)
 
     master_dict, master_max, master_min = _normalize_dict(master_dict, int(4**(k_p + k_m)), *args, **kwargs)
     try:
@@ -797,7 +798,6 @@ def _dict_deep_merge(dict_to_merge: dict, dict_to_add: dict):
     '''
     # ic(dict_to_add)
     forward_dict: dict
-
     for back_key, forward_dict in dict_to_add.items():
         for forward_key, forward_value in forward_dict.items():
             dict_to_merge[back_key][forward_key] += forward_value
