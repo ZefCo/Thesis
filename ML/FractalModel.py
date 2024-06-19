@@ -1,4 +1,4 @@
-print("Starting script")
+print("Starting Script")
 # https://towardsdatascience.com/convolutional-neural-networks-understanding-and-organizing-your-data-set-ba3e8b4086cb
 # https://datagy.io/python-decorators/
 # https://gitpython.readthedocs.io/en/stable/intro.html
@@ -9,7 +9,7 @@ print("Starting script")
 
 import os
 # os.environ["GET_PYTHON_REFRESH"] = "quiet"
-import git
+# import git
 import pandas
 import pathlib
 import shutil
@@ -22,7 +22,7 @@ import tensorflow as tf
 # print(tf.__version__)
 # exit()
 import random
-import numpy as np
+import numpy
 import pandas as pd
 # import plotly.graph_objects as go
 import datetime
@@ -37,19 +37,20 @@ width, height, depth = 256, 256, 1
 
 cwd = pathlib.Path.cwd()
 
+width, height, depth = 64, 64, 1
+
 def get_num_pixels(filepath):
     width, height = Image.open(filepath).size
     return width, height
 
 
-report = git.Repo(search_parent_directories=True)
-branch = report.active_branch
-# branch = "slurm"
+# report = git.Repo(search_parent_directories=True)
+# branch = report.active_branch
+branch = "laptop"
 
-image_dir = cwd / "Group_1"
+image_dir = cwd / "Test_Data"
 ive_dir = cwd / "FractalModels" / "IvE"
-date = datetime.datetime.now()
-version_num = f"{date.year}-{date.month}-{date.day}-{date.hour}-{date.minute}-{date.second}-{date.microsecond}"# len(next(os.walk(ive_dir))[1]) + 60
+version_num = "sanity"
 version_dir = ive_dir / f"version_{branch}_{version_num}"
 version_dir.mkdir(parents = True, exist_ok = True)
 model_dir = version_dir / "Model"
@@ -76,6 +77,9 @@ for folder in os.listdir(image_dir):
         if file.endswith("png"):
             pngs += 1
 
+def normalization(image_input, label):
+    image_input = tf.cast(image_input / tf.reduce_sum(image_input), tf.float32)
+    return image_input, label
 
 def normalization(image, label):
     image = tf.cast(image / 255, tf.float32)
@@ -87,12 +91,18 @@ valid_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), 
 train_set = train_set.map(normalization)
 valid_set = valid_set.map(normalization)
 
+image_norms, _ = next(iter(train_set))
+first_norm = image_norms[0]
+print(numpy.sum(first_norm))
+exit()
+
 steps_per_epoch = int(pngs / batch_size) + 1
 # print(steps_per_epoch)
 
 cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath = str(model_dir))
 python_script = pathlib.Path(__file__)
 shutil.copy(str(python_script), str(version_dir / python_script.name))
+
 
 input_layer = tf.keras.Input(shape = (width, height, depth))
 a = tf.keras.layers.Conv2D(5, (3, 3), padding = "same", activation = "relu")(input_layer) #), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(input_layer)

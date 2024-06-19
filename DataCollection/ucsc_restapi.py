@@ -17,17 +17,17 @@ def main():
     '''
     # # url_gen = UCSCURLGenerator()
 
-    # # ensURL = url_gen.ens_tracks(chrom="chr15", start=65849223, end = 65849223 + 18)
-    # # print(ensURL)
+    # ensURL = url_gen.ens_tracks(chrom="chr15", start=65849223, end = 65849223 + 18)
+    # print(ensURL)
 
-    # # _, seqURL = ens_tracks(chrom = "chr1", start = 94140169, end = 94140169 + 317)
-    # # print(seqURL)
+    # _, seqURL = ens_tracks(chrom = "chr1", start = 94140169, end = 94140169 + 317)
+    # print(seqURL)
 
 
 
     # geneid_url = geneid_track(chrom = "chr1", start = 94140169, end = 94140169 + 317)
     # print(geneid_url)
-    print_genomes(cwd / "Genome_list.csv", cwd / "Detailed_Genome.csv")
+    # print_genomes(cwd / "Genome_list.csv", cwd / "Detailed_Genome.csv")
     # print_chromes("sacCer3")
     
 

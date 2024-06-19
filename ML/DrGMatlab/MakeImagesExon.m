@@ -3,8 +3,8 @@
 
 %InputFile   = '../Data/Intron.xlsx';
 %OutputDir   = '../Images/Images_Q3_3K/Intron/';
-InputFile   = 'Exon.xlsx';
-OutputDir   = 'Exon/';
+InputFile   = 'Exon_all.xlsx';
+OutputDir   = 'Images/Test/';
 
 LattSize    = 64;
 QuartLength = 3;
@@ -25,9 +25,9 @@ Antr('a')=0; Antr('g')=1; Antr('t') = 2; Antr('c')=3;
 
 % Read Data
 AllDat    = readtable (InputFile);
-Posterior = table2array (AllDat (:, 3));
-Sequences = table2array (AllDat (:, 4));
-Anterior  = table2array (AllDat (:, 5));
+Posterior = table2array (AllDat (:, 4));
+Sequences = table2array (AllDat (:, 5));
+Anterior  = table2array (AllDat (:, 6));
 
 for nseq = 1:1:NumImages %size(Sequences, 1)
     clear x y Density;
