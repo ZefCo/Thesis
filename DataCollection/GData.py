@@ -74,8 +74,13 @@ def CancerData():
 
 
 
-def NormalData(source_data: pathlib.Path, exon_out_path: pathlib.Path, intron_out_path: pathlib.Path, min_length: int = 6, ran_ammount: int = None, *args, **kwargs):
+def NormalData(source_data: pathlib.Path, exon_out_path: pathlib.Path, intron_out_path: pathlib.Path, 
+               min_pos_length: int = 6, min_ant_length: int = 6,
+               ran_ammount: int = None, *args, **kwargs):
     '''
+    The min_pos_length and min_ant_length can be different lengths.
+
+    The min exon and intron length are the shorter/longer of the two.
     '''
     def ant_post(ant: str, post: str, *args, **kwargs) -> tuple:
         '''
@@ -83,10 +88,13 @@ def NormalData(source_data: pathlib.Path, exon_out_path: pathlib.Path, intron_ou
 
         Returns the Anterior and Posterior sequeces in that order
         '''
-        anterior = ant[0: min_length].upper()
-        posterior = post[len(post) - min_length: len(post)].upper()
+        anterior = ant[0: min_ant_length].upper()
+        posterior = post[len(post) - min_pos_length: len(post)].upper()
 
         return anterior, posterior
+    
+    min_exon = min_pos_length if min_pos_length < min_ant_length else min_ant_length
+    min_intron = min_pos_length if min_pos_length > min_ant_length else min_ant_length
 
     with open(source_data, "rb") as pfile:
         data_dict: dict = pickle.load(pfile)
@@ -96,8 +104,8 @@ def NormalData(source_data: pathlib.Path, exon_out_path: pathlib.Path, intron_ou
     else:
         selected_data = data_dict
 
-    drg_introns = pandas.DataFrame(columns = ["Name", "Chrm", "Strand", f"Posterior_{min_length}", "Intron", f"Anterior_{min_length}"])
-    drg_exons = pandas.DataFrame(columns = ["Name", "Chrm", "Strand", f"Posterior_{min_length}", "Exon", f"Anterior_{min_length}"])
+    drg_introns = pandas.DataFrame(columns = ["Name", "Chrm", "Strand", f"Posterior_{min_pos_length}", "Intron", f"Anterior_{min_ant_length}"])
+    drg_exons = pandas.DataFrame(columns = ["Name", "Chrm", "Strand", f"Posterior_{min_pos_length}", "Exon", f"Anterior_{min_ant_length}"])
     I, E = 0, 0
     gene: Gene.Gene
     for name, gene in selected_data.items():
@@ -133,7 +141,14 @@ def NormalData(source_data: pathlib.Path, exon_out_path: pathlib.Path, intron_ou
                 len_pos_ex = 0
 
             ## Introns
-            if ((len_pos_ex >= min_length) and (len_introns >= min_length) and (len_ant_ex >= min_length)):
+            if strand in "-":
+                local_pos = min_ant_length
+                local_ant = min_pos_length
+            else:
+                local_pos = min_pos_length
+                local_ant = min_ant_length
+
+            if ((len_pos_ex >= local_pos) and (len_introns >= min_intron) and (len_ant_ex >= local_ant)):
                 if strand in "-":
                     try:
                         # anterior = exons[i][0: min_length].upper() #[len(exons[i]) - 10: len(exons[i])][::-1]  # last 10
@@ -157,7 +172,7 @@ def NormalData(source_data: pathlib.Path, exon_out_path: pathlib.Path, intron_ou
             if i > 0:  ## because if we just did this we would get the 0th position exon which would give an index error
                        ## Note the len of anterior exon being used: that's beause 
             ## Exons
-                if ((len_pos_in >= min_length) and (len_ant_ex >= min_length) and (len_ant_in >= min_length)):
+                if ((len_pos_in >= local_pos) and (len_ant_ex >= min_exon) and (len_ant_in >= local_ant)):
                     try:
                         exon = exons[i + 1]
                     except Exception as e:

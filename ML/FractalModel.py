@@ -1,3 +1,4 @@
+print("Starting Script")
 # https://towardsdatascience.com/convolutional-neural-networks-understanding-and-organizing-your-data-set-ba3e8b4086cb
 # https://datagy.io/python-decorators/
 # https://gitpython.readthedocs.io/en/stable/intro.html
@@ -8,7 +9,7 @@
 
 import os
 # os.environ["GET_PYTHON_REFRESH"] = "quiet"
-import git
+# import git
 import pandas
 import pathlib
 import shutil
@@ -21,7 +22,7 @@ import tensorflow as tf
 # print(tf.__version__)
 # exit()
 import random
-import numpy as np
+import numpy
 import pandas as pd
 # import plotly.graph_objects as go
 import datetime
@@ -35,18 +36,20 @@ from PIL import Image
 
 cwd = pathlib.Path.cwd()
 
+width, height, depth = 64, 64, 1
+
 def get_num_pixels(filepath):
     width, height = Image.open(filepath).size
     return width, height
 
 
-report = git.Repo(search_parent_directories=True)
-branch = report.active_branch
-# branch = "slurm"
+# report = git.Repo(search_parent_directories=True)
+# branch = report.active_branch
+branch = "laptop"
 
-image_dir = cwd / "Data_Set_1_histogram_6mer_KTA"
+image_dir = cwd / "Test_Data"
 ive_dir = cwd / "FractalModels" / "IvE"
-version_num = len(next(os.walk(ive_dir))[1]) + 50
+version_num = "sanity"
 version_dir = ive_dir / f"version_{branch}_{version_num}"
 version_dir.mkdir(parents = True, exist_ok = True)
 model_dir = version_dir / "Model"
@@ -59,13 +62,13 @@ output_classes = 2
 # version_dir = model_dir / f"version_{version_num}"
 # output_classes = 4
 
-w, h = get_num_pixels(image_dir / "EXON" / "Exon_0.png")  # probably shouldn't hard code it to the first image, but I'm feeling lazy this morning
+# w, h = get_num_pixels(image_dir / "EXON" / "Exon_0.png")  # probably shouldn't hard code it to the first image, but I'm feeling lazy this morning
 
 seed = random.randint(1000000, 9000000)
 
 
-batch_size = 256
-epochs = 30
+batch_size = 1
+epochs = 10
 
 pngs = 0
 for folder in os.listdir(image_dir):
@@ -73,16 +76,20 @@ for folder in os.listdir(image_dir):
         if file.endswith("png"):
             pngs += 1
 
+def normalization(image_input, label):
+    image_input = tf.cast(image_input / tf.reduce_sum(image_input), tf.float32)
+    return image_input, label
 
-def normalization(image, label):
-    image = tf.cast(image / 255, tf.float32)
-    return image, label
-
-train_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (w, h), seed = seed, subset = "training", validation_split = 0.2, batch_size = batch_size, label_mode = "categorical", color_mode = "grayscale")
-valid_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (w, h), seed = seed, subset = "validation", validation_split = 0.2, batch_size = batch_size, label_mode = "categorical", color_mode = "grayscale")
+train_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (width, height), seed = seed, subset = "training", validation_split = 0.2, batch_size = batch_size, label_mode = "categorical", color_mode = "grayscale")
+valid_set = tf.keras.preprocessing.image_dataset_from_directory(str(image_dir), image_size = (width, height), seed = seed, subset = "validation", validation_split = 0.2, batch_size = batch_size, label_mode = "categorical", color_mode = "grayscale")
 
 train_set = train_set.map(normalization)
 valid_set = valid_set.map(normalization)
+
+image_norms, _ = next(iter(train_set))
+first_norm = image_norms[0]
+print(numpy.sum(first_norm))
+exit()
 
 steps_per_epoch = int(pngs / batch_size) + 1
 # print(steps_per_epoch)
@@ -91,20 +98,20 @@ cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath = str(model_dir))
 python_script = pathlib.Path(__file__)
 shutil.copy(str(python_script), str(version_dir / python_script.name))
 
-input_layer = tf.keras.Input(shape = (w, h, 1))
-a = tf.keras.layers.Conv2D(w, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(input_layer)
+input_layer = tf.keras.Input(shape = (width, height, 1))
+a = tf.keras.layers.Conv2D(width, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(input_layer)
 a = tf.keras.layers.Dropout(.5)(a)
 a = tf.keras.layers.BatchNormalization()(a)
-b = tf.keras.layers.Conv2D(w, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(a)
-b = tf.keras.layers.Dropout(.5)(b)
-b = tf.keras.layers.BatchNormalization()(b)
-c = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(b)
-c = tf.keras.layers.Dropout(.5)(c)
-c = tf.keras.layers.BatchNormalization()(c)
+# b = tf.keras.layers.Conv2D(w, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(a)
+# b = tf.keras.layers.Dropout(.5)(b)
+# b = tf.keras.layers.BatchNormalization()(b)
+# c = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(b)
+# c = tf.keras.layers.Dropout(.5)(c)
+# c = tf.keras.layers.BatchNormalization()(c)
 # d = tf.keras.layers.Conv2D(64, (1, 1), activation = "gelu", kernel_regularizer = tf.keras.regularizers.l2(l = 0.001))(c)
 # d = tf.keras.layers.Dropout(.5)(d)
 # d = tf.keras.layers.BatchNormalization()(d)
-flatten = tf.keras.layers.Flatten()(b)
+flatten = tf.keras.layers.Flatten()(a)
 final = tf.keras.layers.Dropout(.5)(flatten)
 output_layer = tf.keras.layers.Dense(output_classes, activation = "softmax")(final)
 model = tf.keras.Model(inputs = input_layer, outputs = output_layer)

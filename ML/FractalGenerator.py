@@ -186,17 +186,24 @@ def gaussian_generator(train_data: pandas.DataFrame,
     for when the method == gaussian
     '''
 
-    def plot_gaussmap(data: np.ndarray, file_path: pathlib.Path):
+    def plot_gaussmap(data: np.ndarray, file_path: pathlib.Path, save_raw: bool = False, *args, **kwargs):
         '''
         This has to do a little trick to get the image to work right.
         PNG requires the image to be uint8 encoded, which doesn't work with floats, so we have to find the maximum float, then create a scale from that.
         That is then multipled by the entire dataset and saved.
         '''
-        max_norm = data.max()
-        scale = 255 / max_norm
-        data = (data * scale).astype("uint8")
-        image = Image.fromarray(data)
-        image.save(file_path)
+        if save_raw:
+            np.save(file_path, data)
+
+        else:
+            data = data * 255_000
+            data = data.astype("u1")
+
+            # max_norm = data.max()
+            # scale = 255 / max_norm
+            # data = (data * scale).astype("uint8")
+            image = Image.fromarray(data)
+            image.save(file_path)
 
     exon, intron = 0, 0
     exon_images = target_dir / "EXON"
@@ -227,7 +234,7 @@ def gaussian_generator(train_data: pandas.DataFrame,
             filepath = intron_images / f"Intron_{intron}.png"
             intron += 1
             try:
-                plot_gaussmap(density, filepath)
+                plot_gaussmap(density, filepath, *args, **kwargs)
                 with open(meta_data, "at") as mf:
                     mf.write(f"{filepath.name}\t{gene_name}\Intron {intron}\tLength = {length}\n")
 
@@ -239,7 +246,7 @@ def gaussian_generator(train_data: pandas.DataFrame,
             filepath = exon_images / f"Exon_{exon}.png"
             exon += 1
             try:
-                plot_gaussmap(density, filepath)
+                plot_gaussmap(density, filepath, *args, **kwargs)
                 with open(meta_data, "at") as mf:
                     mf.write(f"{filepath.name}\t{gene_name}\tExon {exon}\tLength = {length}\n")
 
