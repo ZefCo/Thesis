@@ -1,0 +1,69 @@
+Seed: 3025990
+
+Model: "model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ input_1 (InputLayer)        [(None, 256, 256, 1)]     0         
+                                                                 
+ conv2d (Conv2D)             (None, 256, 256, 8)       80        
+                                                                 
+ max_pooling2d (MaxPooling2D  (None, 128, 128, 8)      0         
+ )                                                               
+                                                                 
+ batch_normalization (BatchN  (None, 128, 128, 8)      32        
+ ormalization)                                                   
+                                                                 
+ conv2d_1 (Conv2D)           (None, 128, 128, 16)      1168      
+                                                                 
+ max_pooling2d_1 (MaxPooling  (None, 64, 64, 16)       0         
+ 2D)                                                             
+                                                                 
+ batch_normalization_1 (Batc  (None, 64, 64, 16)       64        
+ hNormalization)                                                 
+                                                                 
+ conv2d_2 (Conv2D)           (None, 64, 64, 32)        4640      
+                                                                 
+ max_pooling2d_2 (MaxPooling  (None, 32, 32, 32)       0         
+ 2D)                                                             
+                                                                 
+ batch_normalization_2 (Batc  (None, 32, 32, 32)       128       
+ hNormalization)                                                 
+                                                                 
+ conv2d_3 (Conv2D)           (None, 32, 32, 64)        18496     
+                                                                 
+ max_pooling2d_3 (MaxPooling  (None, 16, 16, 64)       0         
+ 2D)                                                             
+                                                                 
+ batch_normalization_3 (Batc  (None, 16, 16, 64)       256       
+ hNormalization)                                                 
+                                                                 
+ conv2d_4 (Conv2D)           (None, 16, 16, 128)       73856     
+                                                                 
+ max_pooling2d_4 (MaxPooling  (None, 8, 8, 128)        0         
+ 2D)                                                             
+                                                                 
+ batch_normalization_4 (Batc  (None, 8, 8, 128)        512       
+ hNormalization)                                                 
+                                                                 
+ conv2d_5 (Conv2D)           (None, 8, 8, 256)         295168    
+                                                                 
+ max_pooling2d_5 (MaxPooling  (None, 4, 4, 256)        0         
+ 2D)                                                             
+                                                                 
+ batch_normalization_5 (Batc  (None, 4, 4, 256)        1024      
+ hNormalization)                                                 
+                                                                 
+ flatten (Flatten)           (None, 4096)              0         
+                                                                 
+ dense (Dense)               (None, 100)               409700    
+                                                                 
+ dropout (Dropout)           (None, 100)               0         
+                                                                 
+ dense_1 (Dense)             (None, 2)                 202       
+                                                                 
+=================================================================
+Total params: 805,326
+Trainable params: 804,318
+Non-trainable params: 1,008
+_________________________________________________________________
