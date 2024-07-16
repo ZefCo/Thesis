@@ -182,6 +182,8 @@ def recreate(filepath: pathlib.Path, kmer, output_file: pathlib.Path = None, pd_
         data: pandas.DataFrame = pandas.read_csv(filepath, header = 0)
         x_column = data["Unnamed: 0"]
 
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+
     average = 0.25**kmer
     data["PD"] = (data["E%"] - data["I%"]) / (0.5 * (data["E%"] + data["I%"]+ (2*average)))
 

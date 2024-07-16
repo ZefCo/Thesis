@@ -346,6 +346,8 @@ def matplotfigure(frame: dict or pathlib.Path or str,
         p = plt.Rectangle([list(x_tick_marks.values())[0], list(y_tick_marks.values())[0]], list(x_tick_marks.values())[1] - list(x_tick_marks.values())[0], list(y_tick_marks.values())[1] - list(y_tick_marks.values())[0], color = "black", linewidth = border, fill = False)  #set_fill = False, 
         ax.add_patch(p)
 
+    plt.tick_params(*args, **kwargs)
+
     # axes = ax.axes.flat
 
     for axis in ['top','bottom','left','right']:
@@ -358,6 +360,7 @@ def matplotfigure(frame: dict or pathlib.Path or str,
 
     print(f"Output image to {file}")
     plt.close()
+    plt.clf()
 
 
 
@@ -577,6 +580,7 @@ def time_embedding_v2(data: pandas.DataFrame,
                       exon_outfile: pathlib.Path or str = None,
                       intron_outfile: pathlib.Path or str = None,
                       inter_outfile: pathlib.Path or str = None,
+                      return_file: bool = False,
                       *args, **kwargs):
     '''
     Rewrite this so that it pickles the data. Then we'll save that to a figure seperately.
@@ -699,6 +703,10 @@ def time_embedding_v2(data: pandas.DataFrame,
         with open(inter_outfile, "wb") as n_file:
             print(f"Writing to {inter_outfile}")
             pickle.dump(n_frame, n_file)
+
+    if return_file:
+        print(type(e_frame), type(i_frame), type(n_frame))
+        return e_frame, i_frame, n_frame
 
     # save the dictionary here
 
