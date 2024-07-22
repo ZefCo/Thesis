@@ -54,6 +54,9 @@ Thesis.Rproj
 !/FractalDimension/TE_Images_ForPaper/*/*
 !/FractalDimension/TE_Images_ForPaper/*
 !/FractalDimension/TE_Images_ForPaper/*/*/*
+!/FractalDimension/TE_Images_ForPaper/TE_Zoom/*/*/*.png
+!/FractalDimension/TE_Images_ForPaper/TE_Zoom/*/*/*/*.png
+!/FractalDimension/TE_Images_ForPaper/TE_Zoom/*/*/*/*/*.png
 !GenePerChrom.pkl
 
 /ML/FractalModels/IvE/version_slurm_100/Model/variables/variables.data-00000-of-00001
